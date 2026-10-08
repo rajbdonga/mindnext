@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Policy</title>
+<link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    color: #111;
+    background: #fff;
+    margin: 0;
+    padding: 30px 20px;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .policy-top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  .site-logo {
+    height: 38px;
+    width: auto;
+    display: block;
+  }
+  .back-home-btn {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .back-home-btn:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 600px) {
+    .policy-top-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #000;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    color: #000;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 15px;
+    color: #222;
+  }
+  ul {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+  li {
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #222;
+  }
+  a {
+    color: #0066cc;
+  }
+  .footer-note {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: 13px;
+    color: #666;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="policy-top-header">
+    <a href="index.html">
+      <img src="images/mindnext-logo.png" alt="MINDNEXT Technologies" class="site-logo">
+    </a>
+    <a href="index.html" class="back-home-btn">&larr; Back to Home</a>
+  </div>
+
+  <h1>Information Security Policy</h1>
+  <p><strong>MINDNEXT Technologies</strong> prioritizes information security across all custom software development, cloud operations, and client infrastructure management. This Information Security Policy outlines our security architecture, compliance standards, access management, and incident response procedures.</p>
+
+  <h2>1. Security Governance &amp; Standards</h2>
+  <p>Our software engineering and cloud deployment processes align with ISO/IEC 27001, SOC 2 Type II, and CIS Benchmarks. We follow the Principle of Least Privilege (PoLP) and Defense-in-Depth across all environments.</p>
+
+  <h2>2. Access Control &amp; Authentication</h2>
+  <ul>
+    <li>Mandatory Multi-Factor Authentication (MFA) on all developer workstations, Git repositories, and cloud management consoles.</li>
+    <li>Role-Based Access Control (RBAC) ensuring developers only have access to resources required for their assigned sprint tasks.</li>
+    <li>Ephemeral session credentials and automated access revocation upon project milestone completion.</li>
+  </ul>
+
+  <h2>3. Secure Software Development (SecDevOps)</h2>
+  <ul>
+    <li>Automated Static Application Security Testing (SAST) and vulnerability dependency audits in CI/CD pipelines.</li>
+    <li>Dynamic testing and OWASP Top 10 vulnerability remediation before staging releases.</li>
+    <li>Peer code reviews and strict pull request approval workflows.</li>
+  </ul>
+
+  <h2>4. Cloud Infrastructure Security</h2>
+  <ul>
+    <li>Encrypted virtual private cloud networks (VPC) with private subnets and restricted security groups.</li>
+    <li>Automated secrets management via hardware security modules (HSM) with zero plain-text secrets in source code.</li>
+    <li>TLS 1.3 encryption for data in transit and AES-256 encryption for all data at rest.</li>
+  </ul>
+
+  <h2>5. Incident Response &amp; Continuity</h2>
+  <p>MINDNEXT maintains a 24/7 automated monitoring system for client cloud platforms. In the event of a critical security incident (Severity 1), our incident response team initiates triage within 15 minutes and provides continuous status updates until resolution.</p>
+
+  <h2>6. Responsible Vulnerability Disclosure</h2>
+  <p>If you believe you have discovered a vulnerability in any MINDNEXT service or application, please contact our security team at <a href="mailto:security@mindnext.in">security@mindnext.in</a>. We will acknowledge receipt within 24 hours.</p>
+
+  <h2>7. Contact Security Team</h2>
+  <p>
+    <strong>MINDNEXT Technologies Security Operations</strong><br>
+    Email: <a href="mailto:security@mindnext.in">security@mindnext.in</a> / <a href="mailto:contact@mindnext.in">contact@mindnext.in</a>
+  </p>
+
+  <div class="footer-note">
+    &copy; 2026 MINDNEXT Technologies. All rights reserved. &middot; <a href="index.html">Home</a> &middot; <a href="privacy-policy.html">Privacy Policy</a> &middot; <a href="terms-of-service.html">Terms of Service</a>
+  </div>
+</div>
+
+</body>
+</html>
