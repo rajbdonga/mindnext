@@ -1422,7 +1422,8 @@
             </label>
             <button type="button" class="tool-btn" onclick="insertEditorLink()" title="Insert Link">🔗 Link</button>
             <button type="button" class="tool-btn" onclick="execEditorCmd('removeFormat')" title="Clear Formatting">🧹</button>
-            <span class="tool-badge-paste" title="Paste any text directly (Ctrl+V) from Word, Docs, Gmail — Bolds, Bullets, Fonts, Colors &amp; Spaces are 100% Preserved!">📋 Paste Formatted (Exact Style Preserved)</span>
+            <button type="button" class="tool-btn" onclick="autoBeautifyEditor()" style="background:rgba(16,185,129,0.18); border-color:#10b981; color:#34d399;" title="Format plain text automatically into bold headings, bullet points and styled links">✨ Auto-Format (Bold &amp; Bullets)</button>
+            <span class="tool-badge-paste" title="Paste any text directly (Ctrl+V) from Word, Docs, Gmail — Bolds, Bullets, Fonts, Colors &amp; Spaces are 100% Preserved!">📋 Exact Paste Preserved</span>
           </div>
 
           <!-- Rich ContentEditable Editor Box -->
@@ -1768,73 +1769,48 @@ const PRESET_TEMPLATES = {
   pharma: {
     name: "Pharma IT Solutions Proposal",
     subject: "Introduction: Customized IT Solutions for Pharmaceutical Companies | MindNext",
-    body: `Dear Team,
-
-I hope you are doing well.
-
-I am writing to introduce MindNext, a technology and service-based business focused on providing customized IT solutions to pharmaceutical companies.
-
-We aim to help pharma companies streamline their operational processes through technology-driven solutions, including pharma activity management, doctor enrollment, automated agreement generation, digital documentation, activity-related promotional creatives, and customized software solutions.
-
-As part of our proposed business collaboration, we would like to understand your requirements and explore how MindNext can support your team.
-
-Depending on the activity and project requirements, your team may provide the necessary activity details, approved doctor-facing posters, business or promotional creatives, product-related content, and other relevant materials. Based on these inputs, MindNext can work on the required digital workflow and supporting solutions, including:
-
-• Pharma Activity Management: Organizing activity-related information and workflows.
-
-• Doctor Enrollment & Data Management: Managing doctor details and activity-specific records.
-
-• Automated Agreement Generation: Generating agreements using approved formats and relevant doctor and activity details.
-
-• Digital Documentation & Tracking: Tracking agreement status, pending approvals, and completed documentation.
-
-• Creative & Promotional Support: Supporting the preparation of activity-related posters and digital creatives based on the content and requirements shared by your team.
-
-• Customized IT Solutions: Developing websites, dashboards, applications, and automation tools according to business needs.
-
-Benefits for Your Organization
-
-Our objective is to help your organization reduce manual work, improve documentation accuracy, save operational time, maintain organized records, and improve visibility into activity progress.
-
-We would appreciate the opportunity to discuss your current workflow, identify areas where technology can add value, and propose a suitable solution based on your requirements.
-
-Please let us know a convenient time for a brief discussion. We would be happy to share our business proposal and explore a mutually beneficial collaboration.
-
-Thank you for your time and consideration.
-
-Best regards,
-MindNext
-IT Solutions & Digital Services
-Website: https://mindnext.in
-Contact: +91 79849 19956`
+    body: `<p>Dear Team,</p>
+<p>I hope you are doing well.</p>
+<p>I am writing to introduce <strong>MindNext</strong>, a technology and service-based business focused on providing customized IT solutions to pharmaceutical companies.</p>
+<p>We aim to help pharma companies streamline their operational processes through technology-driven solutions, including <strong>pharma activity management, doctor enrollment, automated agreement generation, digital documentation, activity-related promotional creatives, and customized software solutions</strong>.</p>
+<p>As part of our proposed business collaboration, we would like to understand your requirements and explore how MindNext can support your team.</p>
+<p>Depending on the activity and project requirements, your team may provide the necessary activity details, approved doctor-facing posters, business or promotional creatives, product-related content, and other relevant materials. Based on these inputs, MindNext can work on the required digital workflow and supporting solutions, including:</p>
+<ul style="margin: 12px 0 20px 24px; padding: 0;">
+  <li style="margin-bottom: 9px; line-height: 1.65;"><strong>Pharma Activity Management:</strong> Organizing activity-related information and workflows.</li>
+  <li style="margin-bottom: 9px; line-height: 1.65;"><strong>Doctor Enrollment &amp; Data Management:</strong> Managing doctor details and activity-specific records.</li>
+  <li style="margin-bottom: 9px; line-height: 1.65;"><strong>Automated Agreement Generation:</strong> Generating agreements using approved formats and relevant doctor and activity details.</li>
+  <li style="margin-bottom: 9px; line-height: 1.65;"><strong>Digital Documentation &amp; Tracking:</strong> Tracking agreement status, pending approvals, and completed documentation.</li>
+  <li style="margin-bottom: 9px; line-height: 1.65;"><strong>Creative &amp; Promotional Support:</strong> Supporting the preparation of activity-related posters and digital creatives based on the content and requirements shared by your team.</li>
+  <li style="margin-bottom: 9px; line-height: 1.65;"><strong>Customized IT Solutions:</strong> Developing websites, dashboards, applications, and automation tools according to business needs.</li>
+</ul>
+<h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 24px 0 10px 0; letter-spacing: -0.2px;">Benefits for Your Organization</h3>
+<p>Our objective is to help your organization reduce manual work, improve documentation accuracy, save operational time, maintain organized records, and improve visibility into activity progress.</p>
+<p>We would appreciate the opportunity to discuss your current workflow, identify areas where technology can add value, and propose a suitable solution based on your requirements.</p>
+<p>Please let us know a convenient time for a brief discussion. We would be happy to share our business proposal and explore a mutually beneficial collaboration.</p>
+<p>Thank you for your time and consideration.</p>
+<div style="margin-top: 26px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 14.5px; line-height: 1.65; color: #4a5568;">
+  Best regards,<br>
+  <strong style="color:#2563eb; font-size:15px;">MindNext</strong><br>
+  IT Solutions &amp; Digital Services<br>
+  <strong>Website:</strong> <a href="https://mindnext.in" style="color:#2563eb; text-decoration:underline;" target="_blank">https://mindnext.in</a><br>
+  <strong>Contact:</strong> <a href="tel:+917984919956" style="color:#1e293b; font-weight:600; text-decoration:none;">+91 79849 19956</a>
+</div>`
   },
   pitch: {
     subject: "Strategic Digital Architecture & Enterprise Solutions for {company_name}",
-    body: `Dear {company_name} Leadership Team,
-
-I hope this message finds you well.
-
-At MINDNEXT Technologies, we architect mission-critical cloud platforms, bespoke enterprise systems, and next-generation software engineered to accelerate modern business scale.
-
-We have been observing {company_name}'s digital milestones and would love to explore how our specialized engineering pods can partner with your team.
-
-Would you be open to a brief 10-minute introductory call next week?
-
-Best regards,
-{sender_name}
-MINDNEXT Technologies (mindnext.in)`
+    body: `<p>Dear {company_name} Leadership Team,</p><p>I hope this message finds you well.</p><p>At <strong>MINDNEXT Technologies</strong>, we architect mission-critical cloud platforms, bespoke enterprise systems, and next-generation software engineered to accelerate modern business scale.</p><p>We have been observing {company_name}'s digital milestones and would love to explore how our specialized engineering pods can partner with your team.</p><p>Would you be open to a brief 10-minute introductory call next week?</p><div style="margin-top:24px; padding-top:14px; border-top:1px solid #e2e8f0;">Best regards,<br><strong>{sender_name}</strong><br>MINDNEXT Technologies (<a href="https://mindnext.in">mindnext.in</a>)</div>`
   },
   cloud: {
     subject: "Cloud Modernization & DevOps Pods for {company_name}",
-    body: `Hi {company_name} Team,\n\nWe help enterprises like {company_name} optimize high-load backend architectures and multi-cloud resilience.\n\nLooking forward to connecting.\n\nSincerely,\n{sender_name}`
+    body: `<p>Hi {company_name} Team,</p><p>We help enterprises like {company_name} optimize high-load backend architectures and multi-cloud resilience.</p><p>Looking forward to connecting.</p><div style="margin-top:20px;">Sincerely,<br><strong>{sender_name}</strong></div>`
   },
   intro: {
     subject: "Quick introduction: MINDNEXT Technologies x {company_name}",
-    body: `Hello {company_name} Team,\n\nMy name is {sender_name} with MINDNEXT Technologies. We would love to connect with your team.\n\nBest,\n{sender_name}`
+    body: `<p>Hello {company_name} Team,</p><p>My name is <strong>{sender_name}</strong> with MINDNEXT Technologies. We would love to connect with your team.</p><div style="margin-top:20px;">Best,<br><strong>{sender_name}</strong></div>`
   },
   custom: {
     subject: "Collaboration Opportunity with {company_name}",
-    body: `Hello {company_name} Team,\n\n[Write your customized message here...]\n\nRegards,\n{sender_name}`
+    body: `<p>Hello {company_name} Team,</p><p>[Write your customized message here...]</p><div style="margin-top:20px;">Regards,<br><strong>{sender_name}</strong></div>`
   }
 };
 
@@ -1936,21 +1912,37 @@ function loadData() {
 
   // Composer
   const savedComp = localStorage.getItem(STORAGE_KEYS.COMPOSER);
+  let loadedPreset = 'pharma';
+  let loadedSubject = PRESET_TEMPLATES.pharma.subject;
+  let loadedBody = PRESET_TEMPLATES.pharma.body;
+
   if (savedComp) {
     try {
       const comp = JSON.parse(savedComp);
-      document.getElementById('composerSubject').value = comp.subject || '';
-      document.getElementById('tplSelect').value = comp.preset || 'pharma';
-      
-      const editor = document.getElementById('composerBodyEditor');
-      const rawTextarea = document.getElementById('composerBody');
-      const htmlVal = comp.body || '';
-      if (editor) editor.innerHTML = htmlVal;
-      if (rawTextarea) rawTextarea.value = htmlVal;
+      loadedPreset = comp.preset || 'pharma';
+      loadedSubject = comp.subject || PRESET_TEMPLATES.pharma.subject;
+      // If saved body has rich tags, use it; if plain text, format it
+      if (comp.body && (comp.body.includes('<strong>') || comp.body.includes('<ul') || comp.body.includes('<h3'))) {
+        loadedBody = comp.body;
+      } else if (comp.body && comp.body.trim().length > 0) {
+        loadedBody = formatEmailToProfessionalHtml(comp.body);
+      } else {
+        loadedBody = PRESET_TEMPLATES.pharma.body;
+      }
     } catch(e) {}
-  } else {
-    applyTemplatePreset('pharma');
   }
+
+  const subjInput = document.getElementById('composerSubject');
+  const tplSelect = document.getElementById('tplSelect');
+  const editor = document.getElementById('composerBodyEditor');
+  const rawTextarea = document.getElementById('composerBody');
+
+  if (subjInput) subjInput.value = loadedSubject;
+  if (tplSelect) tplSelect.value = loadedPreset;
+  if (editor) editor.innerHTML = loadedBody;
+  if (rawTextarea) rawTextarea.value = loadedBody;
+  
+  updateComposerPreview();
 
   updateAllCounts();
   renderImportTable();
@@ -2546,8 +2538,8 @@ function applyTemplatePreset(key) {
   const rawTextarea = document.getElementById('composerBody');
   
   let contentHtml = tpl.body;
-  if (!contentHtml.includes('<p>') && !contentHtml.includes('<ul>')) {
-    contentHtml = formatEmailToProfessionalHtml(tpl.body);
+  if (!contentHtml.includes('<strong>') && !contentHtml.includes('<ul')) {
+    contentHtml = formatEmailToProfessionalHtml(tpl.body, false);
   }
   
   if (editor) editor.innerHTML = contentHtml;
@@ -2568,53 +2560,73 @@ function insertTagBody(tag) {
   updateComposerPreview();
 }
 
-function formatEmailToProfessionalHtml(text) {
-  if (!text) return '';
-  
-  const paragraphs = text.split(/\n\s*\n/);
-  const htmlParts = [];
-  
-  for (let p of paragraphs) {
-    p = p.trim();
-    if (!p) continue;
-    
-    const lines = p.split('\n');
-    const isBulletList = lines.every(l => l.trim().match(/^([•\-\*]|\d+\.)\s+/));
-    
-    if (isBulletList) {
-      const listItems = lines.map(line => {
-        let itemText = line.trim().replace(/^([•\-\*]|\d+\.)\s+/, '');
-        itemText = formatInlineMarkdown(itemText);
-        return `<li style="margin-bottom: 10px; line-height: 1.65; color: #2d3748;">${itemText}</li>`;
-      }).join('');
-      htmlParts.push(`<ul style="margin: 12px 0 20px 22px; padding: 0; color: #2d3748;">${listItems}</ul>`);
-      continue;
-    }
-    
-    if (p.length < 60 && (p.toLowerCase().includes('benefits') || p.toLowerCase().includes('overview') || p.startsWith('#'))) {
-      const headingText = p.replace(/^#+\s*/, '');
-      htmlParts.push(`<h3 style="font-size: 17px; font-weight: 700; color: #1a202c; margin: 24px 0 10px 0; letter-spacing: -0.2px;">${formatInlineMarkdown(headingText)}</h3>`);
-      continue;
-    }
-    
-    if (p.match(/^(best regards|sincerely|regards|thank you|thanks),?/i)) {
-      const sigLines = p.split('\n').map(l => formatInlineMarkdown(l.trim())).join('<br>');
-      htmlParts.push(`
-        <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 14px; line-height: 1.6; color: #4a5568;">
-          ${sigLines}
-        </div>
-      `);
-      continue;
-    }
-    
-    const pFormatted = p.split('\n').map(l => formatInlineMarkdown(l.trim())).join('<br>');
-    htmlParts.push(`<p style="margin: 0 0 16px 0; line-height: 1.65; font-size: 14.5px; color: #2d3748;">${pFormatted}</p>`);
+function autoBeautifyEditor() {
+  const editor = document.getElementById('composerBodyEditor');
+  if (!editor) return;
+  const raw = editor.innerText || editor.textContent;
+  if (!raw || !raw.trim()) {
+    editor.innerHTML = PRESET_TEMPLATES.pharma.body;
+  } else {
+    editor.innerHTML = formatEmailToProfessionalHtml(raw, false);
   }
-  
-  return `
-<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14.5px; color: #2d3748; line-height: 1.65; max-width: 680px; margin: 0 auto; background: #ffffff; padding: 26px 30px; border-radius: 8px; border: 1px solid #edf2f7;">
-  ${htmlParts.join('\n')}
-</div>`;
+  syncComposerEditor();
+  showToast('Email content formatted with bold, bullets & styling!', 'success');
+}
+
+function formatEmailToProfessionalHtml(text, wrapContainer = true) {
+  if (!text) return '';
+
+  // Clean div/p linebreaks from contenteditable into clean text lines
+  let clean = text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<p[^>]*>/gi, '')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<div[^>]*>/gi, '');
+
+  const rawParagraphs = clean.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  const htmlParts = [];
+
+  for (let p of rawParagraphs) {
+    const lines = p.split(/\n/).map(l => l.trim()).filter(Boolean);
+
+    // Check if lines are bullet points (start with • or - or * or digit.)
+    const hasBullets = lines.some(l => l.match(/^([•\-\*]|\d+\.)\s+/));
+    if (hasBullets) {
+      let listItems = '';
+      for (let line of lines) {
+        const isBullet = line.match(/^([•\-\*]|\d+\.)\s+/);
+        let itemText = isBullet ? line.replace(/^([•\-\*]|\d+\.)\s+/, '') : line;
+        itemText = formatInlineMarkdown(itemText);
+        listItems += '<li style="margin-bottom: 9px; line-height: 1.65; color: #2d3748;">' + itemText + '</li>';
+      }
+      htmlParts.push('<ul style="margin: 12px 0 20px 24px; padding: 0;">' + listItems + '</ul>');
+      continue;
+    }
+
+    // Check for Section Heading (e.g. Benefits for Your Organization)
+    if (p.length < 65 && (p.toLowerCase().includes('benefits') || p.toLowerCase().includes('overview') || p.startsWith('#') || p.toLowerCase().includes('about us'))) {
+      const heading = p.replace(/^#+\s*/, '');
+      htmlParts.push('<h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 24px 0 10px 0; letter-spacing: -0.2px;">' + formatInlineMarkdown(heading) + '</h3>');
+      continue;
+    }
+
+    // Check for Signature block
+    if (p.match(/^(best regards|sincerely|regards|thank you|thanks),?/i)) {
+      const sigLines = lines.map(l => formatInlineMarkdown(l)).join('<br>');
+      htmlParts.push('<div style="margin-top: 26px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 14.5px; line-height: 1.65; color: #4a5568;">' + sigLines + '</div>');
+      continue;
+    }
+
+    // Regular Paragraph
+    const pContent = lines.map(l => formatInlineMarkdown(l)).join(' ');
+    htmlParts.push('<p style="margin: 0 0 16px 0; line-height: 1.7; font-size: 15px; color: #2d3748;">' + pContent + '</p>');
+  }
+
+  const innerHtml = htmlParts.join('\n');
+  if (!wrapContainer) return innerHtml;
+
+  return '<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #2d3748; line-height: 1.65; max-width: 680px; margin: 0 auto; background: #ffffff; padding: 26px 30px; border-radius: 8px; border: 1px solid #edf2f7;">\n' + innerHtml + '\n</div>';
 }
 
 function formatInlineMarkdown(str) {
@@ -2622,23 +2634,21 @@ function formatInlineMarkdown(str) {
   str = str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   str = str.replace(/__(.*?)__/g, '<strong>$1</strong>');
   str = str.replace(/(?<!<strong>)\bMindNext\b(?!<\/strong>)/g, '<strong>MindNext</strong>');
-  
+
+  // Bold label before colon: e.g. "Pharma Activity Management: text"
   if (str.includes(':') && !str.startsWith('http') && !str.startsWith('tel:') && !str.includes('<strong>')) {
     const colonIdx = str.indexOf(':');
     const prefix = str.substring(0, colonIdx);
     const rest = str.substring(colonIdx);
-    if (prefix.length < 50) {
-      str = `<strong>${prefix}</strong>${rest}`;
+    if (prefix.length < 55) {
+      str = '<strong>' + prefix + '</strong>' + rest;
     }
   }
-  
-  str = str.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color: #2b6cb0; text-decoration: underline;" target="_blank">$1</a>');
-  str = str.replace(/(\+91\s*[0-9\s]{10,})/g, '<a href="tel:$1" style="color: #2d3748; text-decoration: none; font-weight: 600;">$1</a>');
-  
+
+  str = str.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color: #2563eb; text-decoration: underline;" target="_blank">$1</a>');
+  str = str.replace(/(\+91\s*[0-9\s]{10,})/g, '<a href="tel:$1" style="color: #1e293b; font-weight: 600; text-decoration: none;">$1</a>');
   return str;
 }
-
-
 
 /* ================= RICH TEXT WYSIWYG CONTROLS ================= */
 function execEditorCmd(cmd, val = null) {
@@ -2665,12 +2675,11 @@ function insertEditorLink() {
 function handleComposerPaste(e) {
   e.preventDefault();
   
-  // 1. Check if rich HTML is available in clipboard (from Word, Google Docs, Web, Gmail)
   const htmlData = e.clipboardData.getData('text/html');
   const textData = e.clipboardData.getData('text/plain');
   
-  if (htmlData) {
-    // Clean office/mso junk while preserving ALL formatting (bold, font-size, font-weight, color, bullets, tables, spaces)
+  if (htmlData && (htmlData.includes('<b>') || htmlData.includes('<strong>') || htmlData.includes('<ul') || htmlData.includes('font-weight') || htmlData.includes('<h'))) {
+    // Clean office/mso junk while preserving ALL formatting
     let clean = htmlData
       .replace(/<!--[\s\S]*?-->/gi, '')
       .replace(/<(meta|link|title|style)[\s\S]*?<\/\1>/gi, '')
@@ -2679,22 +2688,9 @@ function handleComposerPaste(e) {
       
     document.execCommand('insertHTML', false, clean);
   } else if (textData) {
-    // If plain text was pasted, maintain lines, spaces, and convert bullet dots into real lists
-    const paragraphs = textData.split(/\r?\n\r?\n/);
-    const converted = paragraphs.map(p => {
-      p = p.trim();
-      if (!p) return '';
-      const lines = p.split(/\r?\n/);
-      const isBullets = lines.length > 1 && lines.every(l => l.trim().match(/^([•\-\*]|\d+\.)\s+/));
-      if (isBullets) {
-        return '<ul style="margin:10px 0 16px 24px; padding:0;">' + 
-          lines.map(l => '<li style="margin-bottom:7px;">' + escapeHtml(l.trim().replace(/^([•\-\*]|\d+\.)\s+/, '')) + '</li>').join('') + 
-          '</ul>';
-      }
-      return '<p style="margin:0 0 14px 0;">' + lines.map(l => escapeHtml(l)).join('<br>') + '</p>';
-    }).filter(Boolean).join('');
-    
-    document.execCommand('insertHTML', false, converted);
+    // Automatically convert plain text bullets, bold keywords & headings into rich HTML!
+    const formatted = formatEmailToProfessionalHtml(textData, false);
+    document.execCommand('insertHTML', false, formatted);
   }
   
   syncComposerEditor();
@@ -2729,12 +2725,16 @@ function renderMessage(company, email) {
   subj = subj.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
   bodyContent = bodyContent.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
 
-  // If the content is already full rich HTML (contains tags), preserve its exact inline styles & tags
-  let finalHtml = bodyContent;
-  if (!finalHtml.includes('<p') && !finalHtml.includes('<div') && !finalHtml.includes('<ul')) {
-    finalHtml = formatEmailToProfessionalHtml(bodyContent);
+  // Check if content already has rich tags (strong, ul, h3)
+  const hasRichTags = bodyContent.includes('<strong>') || bodyContent.includes('<b>') || bodyContent.includes('<ul') || bodyContent.includes('<ol') || bodyContent.includes('<h3');
+  
+  let finalHtml;
+  if (!hasRichTags) {
+    // Automatically parse into rich professional HTML
+    finalHtml = formatEmailToProfessionalHtml(bodyContent, true);
   } else {
-    finalHtml = `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14.5px; color: #1e293b; line-height: 1.65; max-width: 680px; margin: 0 auto; background: #ffffff; padding: 24px 28px; border-radius: 8px; border: 1px solid #edf2f7;">${finalHtml}</div>`;
+    // Preserve existing rich formatting and wrap in container
+    finalHtml = '<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #2d3748; line-height: 1.65; max-width: 680px; margin: 0 auto; background: #ffffff; padding: 26px 30px; border-radius: 8px; border: 1px solid #edf2f7;">' + bodyContent + '</div>';
   }
 
   return { subject: subj, body: bodyContent, html: finalHtml };
