@@ -1250,79 +1250,37 @@
         <div class="dropzone-hint" style="font-size:12px;">Format: Company Name, Email (auto-detected)</div>
       </div>
 
-      <!-- Verification Results & Download CSVs (Appears ONLY after upload is completed) -->
-    <div class="table-container" id="verificationResultsSection" style="display: none;">
-      <div class="table-toolbar">
-        <div>
-          <h2 style="font-size:19px; font-weight:700; color:#fff;">Verification Results</h2>
-          <p style="font-size:13px; color:var(--text-secondary);">Download filtered Success CSV or Error CSV (Duplicates &amp; Format Errors).</p>
+            <!-- Result CSV Box: Appears ONLY after CSV file upload is completed -->
+      <div id="uploadResultCsvBox" style="display: none; margin-top: 18px; padding: 16px 20px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="font-size: 14.5px; font-weight:700; color:#fff;" id="uploadResultTitle">Verification Completed</div>
+            <div style="font-size: 12.5px; color:var(--text-secondary);" id="uploadResultSubtitle">Download your evaluated CSV files:</div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <!-- SUCCESS CSV DOWNLOAD -->
+            <button class="btn btn-success btn-sm" onclick="downloadSuccessCSV()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Success CSV (<span id="countSuccessBadge">0</span>)
+            </button>
+
+            <!-- ERROR CSV DOWNLOAD -->
+            <button class="btn btn-danger btn-sm" onclick="downloadErrorCSV()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Error CSV (<span id="countErrorBadge">0</span>)
+            </button>
+
+            <button type="button" class="btn btn-outline btn-sm" onclick="dismissResultCsvBox()" title="Close box" style="padding:5px 10px; font-size:12px;">✕</button>
+          </div>
         </div>
-
-        <div class="actions-bar">
-          <!-- SUCCESS CSV DOWNLOAD -->
-          <button class="btn btn-success btn-sm" onclick="downloadSuccessCSV()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Download Success CSV (<span id="countSuccessBadge">0</span>)
-          </button>
-
-          <!-- ERROR CSV DOWNLOAD -->
-          <button class="btn btn-danger btn-sm" onclick="downloadErrorCSV()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Download Error CSV (<span id="countErrorBadge">0</span>)
-          </button>
-
-          <!-- ADD SUCCESS TO MANAGE EMAILS -->
-          <button class="btn btn-primary btn-sm" onclick="addSuccessRecordsToManageList()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Add Success to Manage List
-          </button>
-
-          <button class="btn btn-outline btn-sm" onclick="clearImportResults()">Clear Table</button>
-        </div>
-      </div>
-
-      <!-- Filters & Results Table -->
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-        <div class="table-tabs">
-          <button class="table-filter-btn active" id="fltAll" onclick="filterImportResults('all')">All (<span id="fltAllCount">0</span>)</button>
-          <button class="table-filter-btn" id="fltSuccess" onclick="filterImportResults('success')">Success (<span id="fltSuccessCount">0</span>)</button>
-          <button class="table-filter-btn" id="fltError" onclick="filterImportResults('error')">Errors (<span id="fltErrorCount">0</span>)</button>
-        </div>
-
-        <div class="search-input-wrap">
-          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="importSearchInput" class="form-control" placeholder="Search result records..." oninput="renderImportTable()">
-        </div>
-      </div>
-
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width:40px;">#</th>
-              <th>Company Name</th>
-              <th>Email Address</th>
-              <th>Status</th>
-              <th>Error / Validation Details</th>
-              <th style="text-align:right;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="importResultsTbody"></tbody>
-        </table>
       </div>
     </div>
   </section>
@@ -1989,9 +1947,9 @@ function updateAllCounts() {
   if (fltErrorCount) fltErrorCount.textContent = err;
 
   // Show Verification Results section ONLY after CSV is uploaded with records
-  const resultsSec = document.getElementById('verificationResultsSection');
-  if (resultsSec) {
-    resultsSec.style.display = (importResults && importResults.length > 0) ? 'block' : 'none';
+  const resultBox = document.getElementById('uploadResultCsvBox');
+  if (resultBox && (!importResults || importResults.length === 0)) {
+    resultBox.style.display = 'none';
   }
 
   // Manage Badges
@@ -2268,6 +2226,11 @@ function addSuccessRecordsToManageList() {
   showToast(`Added ${added} verified contacts into Manage Emails list!`, 'success');
 }
 
+function dismissResultCsvBox() {
+  const box = document.getElementById('uploadResultCsvBox');
+  if (box) box.style.display = 'none';
+}
+
 function clearImportResults() {
   importResults = [];
   saveData(STORAGE_KEYS.IMPORT_RESULTS, importResults);
@@ -2286,42 +2249,7 @@ function filterImportResults(flt) {
 }
 
 function renderImportTable() {
-  const tbody = document.getElementById('importResultsTbody');
-  const search = (document.getElementById('importSearchInput')?.value || '').toLowerCase().trim();
-
-  let filtered = importResults.filter(r => {
-    if (filterImport === 'success' && r.status !== 'SUCCESS') return false;
-    if (filterImport === 'error' && r.status !== 'ERROR') return false;
-    if (search) {
-      return (r.company || '').toLowerCase().includes(search) || (r.email || '').toLowerCase().includes(search);
-    }
-    return true;
-  });
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">No records found.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map((r, i) => {
-    const isSucc = r.status === 'SUCCESS';
-    return `
-      <tr>
-        <td style="color:var(--text-muted); font-size:12px;">${i + 1}</td>
-        <td><strong>${escapeHtml(r.company)}</strong></td>
-        <td><code style="color:${isSucc ? '#34d399' : '#fb7185'}; font-size:13px;">${escapeHtml(r.email)}</code></td>
-        <td>
-          <span class="badge ${isSucc ? 'badge-success' : 'badge-error'}">${isSucc ? 'SUCCESS' : 'ERROR'}</span>
-        </td>
-        <td style="font-size:12.5px; color:${isSucc ? 'var(--text-secondary)' : '#fca5a5'};">
-          ${isSucc ? 'Valid & Unique' : `<strong>[${escapeHtml(r.errorType)}]</strong> ${escapeHtml(r.reason)}`}
-        </td>
-        <td style="text-align:right;">
-          <button class="btn-remove" onclick="removeImportItem('${r.id}')">Remove</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  // Verification table removed per user request. Results handled via Download Success/Error CSV buttons.
 }
 
 function removeImportItem(id) {
