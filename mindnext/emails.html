@@ -851,6 +851,119 @@
   .toast-success { border-left: 4px solid var(--accent-emerald); }
   .toast-error { border-left: 4px solid var(--accent-rose); }
   .toast-info { border-left: 4px solid var(--accent-violet); }
+
+  /* Rich Text Editor & Toolbar */
+  .rich-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: #15192c;
+    border: 1px solid var(--border-color);
+    border-bottom: 1px solid #28304f;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 8px 12px;
+  }
+  .tool-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f1f5f9;
+    border-radius: 5px;
+    padding: 4px 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .tool-btn:hover {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: #38bdf8;
+    color: #fff;
+  }
+  .tool-select {
+    background: #0d1120;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #f1f5f9;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    height: 30px;
+    outline: none;
+    cursor: pointer;
+  }
+  .tool-sep {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+  }
+  .tool-badge-paste {
+    margin-left: auto;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+  .rich-editor-box {
+    min-height: 280px;
+    max-height: 520px;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #1e293b;
+    border: 1.5px solid var(--border-color);
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 18px 22px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.65;
+    outline: none;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.06);
+  }
+  .rich-editor-box:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+  }
+  .rich-editor-box ul, .rich-editor-box ol {
+    margin: 10px 0 16px 24px;
+    padding: 0;
+  }
+  .rich-editor-box li {
+    margin-bottom: 7px;
+    line-height: 1.65;
+  }
+  .rich-editor-box p {
+    margin: 0 0 14px 0;
+    line-height: 1.65;
+  }
+  .rich-editor-box h1, .rich-editor-box h2, .rich-editor-box h3, .rich-editor-box h4 {
+    margin: 20px 0 10px 0;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  .rich-editor-box a {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+  .rich-editor-box blockquote {
+    border-left: 3px solid #cbd5e1;
+    margin: 12px 0;
+    padding-left: 12px;
+    color: #64748b;
+  }
+
 </style>
 </head>
 <body>
@@ -1273,16 +1386,50 @@
           <input type="text" id="composerSubject" class="form-control" placeholder="Subject..." oninput="updateComposerPreview()">
         </div>
 
+        
         <div class="form-group">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label class="input-label" for="composerBody">Email Body Message</label>
-            <div style="display:flex; gap:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+            <label class="input-label" style="margin:0;">Email Body Message (Rich Editor &bull; Exact Paste Preserved)</label>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <span class="tag-pill" onclick="insertTagBody('{company_name}')">+ {company_name}</span>
               <span class="tag-pill" onclick="insertTagBody('{email}')">+ {email}</span>
+              <span class="tag-pill" onclick="insertTagBody('{sender_name}')">+ {sender_name}</span>
             </div>
           </div>
-          <textarea id="composerBody" class="form-control" rows="8" placeholder="Email body..." oninput="updateComposerPreview()"></textarea>
+
+          <!-- Rich Text Formatting Toolbar -->
+          <div class="rich-toolbar" id="composerToolbar">
+            <button type="button" class="tool-btn" onclick="execEditorCmd('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button type="button" class="tool-btn" onclick="execEditorCmd('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button type="button" class="tool-btn" onclick="execEditorCmd('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+            <span class="tool-sep"></span>
+            <select class="tool-select" onchange="execEditorFormatBlock(this.value)" title="Text style / Size">
+              <option value="p">Normal Text</option>
+              <option value="h3">Main Heading (Large)</option>
+              <option value="h4">Sub-heading (Medium)</option>
+            </select>
+            <span class="tool-sep"></span>
+            <button type="button" class="tool-btn" onclick="execEditorCmd('insertUnorderedList')" title="Bullet Points (&bull; List)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="9" y1="6" x2="20" y2="6"></line><line x1="9" y1="12" x2="20" y2="12"></line><line x1="9" y1="18" x2="20" y2="18"></line><circle cx="4" cy="6" r="1.8" fill="currentColor"></circle><circle cx="4" cy="12" r="1.8" fill="currentColor"></circle><circle cx="4" cy="18" r="1.8" fill="currentColor"></circle></svg>
+            </button>
+            <button type="button" class="tool-btn" onclick="execEditorCmd('insertOrderedList')" title="Numbered List (1, 2, 3)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h2v4H4"></path><path d="M4 14h3v4H4"></path></svg>
+            </button>
+            <span class="tool-sep"></span>
+            <label style="display:inline-flex; align-items:center; gap:4px; font-size:12px; color:#cbd5e1; cursor:pointer;" title="Text Color">
+              <span>Color:</span>
+              <input type="color" id="toolColorPicker" value="#1e293b" onchange="execEditorCmd('foreColor', this.value)" style="width:22px; height:22px; border:none; padding:0; background:transparent; cursor:pointer; vertical-align:middle; border-radius:3px;">
+            </label>
+            <button type="button" class="tool-btn" onclick="insertEditorLink()" title="Insert Link">🔗 Link</button>
+            <button type="button" class="tool-btn" onclick="execEditorCmd('removeFormat')" title="Clear Formatting">🧹</button>
+            <span class="tool-badge-paste" title="Paste any text directly (Ctrl+V) from Word, Docs, Gmail — Bolds, Bullets, Fonts, Colors &amp; Spaces are 100% Preserved!">📋 Paste Formatted (Exact Style Preserved)</span>
+          </div>
+
+          <!-- Rich ContentEditable Editor Box -->
+          <div id="composerBodyEditor" class="rich-editor-box" contenteditable="true" spellcheck="false" oninput="syncComposerEditor()" onpaste="handleComposerPaste(event)"></div>
+          <textarea id="composerBody" style="display:none;"></textarea>
         </div>
+
       </div>
 
       <!-- Preview Card -->
@@ -1792,9 +1939,14 @@ function loadData() {
   if (savedComp) {
     try {
       const comp = JSON.parse(savedComp);
-      document.getElementById('composerSubject').value = comp.subject;
-      document.getElementById('composerBody').value = comp.body;
+      document.getElementById('composerSubject').value = comp.subject || '';
       document.getElementById('tplSelect').value = comp.preset || 'pharma';
+      
+      const editor = document.getElementById('composerBodyEditor');
+      const rawTextarea = document.getElementById('composerBody');
+      const htmlVal = comp.body || '';
+      if (editor) editor.innerHTML = htmlVal;
+      if (rawTextarea) rawTextarea.value = htmlVal;
     } catch(e) {}
   } else {
     applyTemplatePreset('pharma');
@@ -2389,7 +2541,18 @@ function applyTemplatePreset(key) {
   const tpl = PRESET_TEMPLATES[key];
   if (!tpl) return;
   document.getElementById('composerSubject').value = tpl.subject;
-  document.getElementById('composerBody').value = tpl.body;
+  
+  const editor = document.getElementById('composerBodyEditor');
+  const rawTextarea = document.getElementById('composerBody');
+  
+  let contentHtml = tpl.body;
+  if (!contentHtml.includes('<p>') && !contentHtml.includes('<ul>')) {
+    contentHtml = formatEmailToProfessionalHtml(tpl.body);
+  }
+  
+  if (editor) editor.innerHTML = contentHtml;
+  if (rawTextarea) rawTextarea.value = contentHtml;
+  
   updateComposerPreview();
 }
 
@@ -2476,28 +2639,120 @@ function formatInlineMarkdown(str) {
 }
 
 
+
+/* ================= RICH TEXT WYSIWYG CONTROLS ================= */
+function execEditorCmd(cmd, val = null) {
+  const editor = document.getElementById('composerBodyEditor');
+  if (editor) editor.focus();
+  document.execCommand(cmd, false, val);
+  syncComposerEditor();
+}
+
+function execEditorFormatBlock(tag) {
+  const editor = document.getElementById('composerBodyEditor');
+  if (editor) editor.focus();
+  document.execCommand('formatBlock', false, tag ? '<' + tag + '>' : '<p>');
+  syncComposerEditor();
+}
+
+function insertEditorLink() {
+  const url = prompt('Enter link URL (e.g. https://mindnext.in):', 'https://');
+  if (url && url !== 'https://') {
+    execEditorCmd('createLink', url);
+  }
+}
+
+function handleComposerPaste(e) {
+  e.preventDefault();
+  
+  // 1. Check if rich HTML is available in clipboard (from Word, Google Docs, Web, Gmail)
+  const htmlData = e.clipboardData.getData('text/html');
+  const textData = e.clipboardData.getData('text/plain');
+  
+  if (htmlData) {
+    // Clean office/mso junk while preserving ALL formatting (bold, font-size, font-weight, color, bullets, tables, spaces)
+    let clean = htmlData
+      .replace(/<!--[\s\S]*?-->/gi, '')
+      .replace(/<(meta|link|title|style)[\s\S]*?<\/\1>/gi, '')
+      .replace(/<(meta|link|title)[^>]*>/gi, '')
+      .replace(/class="Mso[^"]*"/gi, '');
+      
+    document.execCommand('insertHTML', false, clean);
+  } else if (textData) {
+    // If plain text was pasted, maintain lines, spaces, and convert bullet dots into real lists
+    const paragraphs = textData.split(/\r?\n\r?\n/);
+    const converted = paragraphs.map(p => {
+      p = p.trim();
+      if (!p) return '';
+      const lines = p.split(/\r?\n/);
+      const isBullets = lines.length > 1 && lines.every(l => l.trim().match(/^([•\-\*]|\d+\.)\s+/));
+      if (isBullets) {
+        return '<ul style="margin:10px 0 16px 24px; padding:0;">' + 
+          lines.map(l => '<li style="margin-bottom:7px;">' + escapeHtml(l.trim().replace(/^([•\-\*]|\d+\.)\s+/, '')) + '</li>').join('') + 
+          '</ul>';
+      }
+      return '<p style="margin:0 0 14px 0;">' + lines.map(l => escapeHtml(l)).join('<br>') + '</p>';
+    }).filter(Boolean).join('');
+    
+    document.execCommand('insertHTML', false, converted);
+  }
+  
+  syncComposerEditor();
+}
+
+function syncComposerEditor() {
+  const editor = document.getElementById('composerBodyEditor');
+  const rawTextarea = document.getElementById('composerBody');
+  if (editor && rawTextarea) {
+    rawTextarea.value = editor.innerHTML;
+  }
+  updateComposerPreview();
+}
+
+function insertTagBody(tag) {
+  const editor = document.getElementById('composerBodyEditor');
+  if (editor) {
+    editor.focus();
+    document.execCommand('insertText', false, tag);
+    syncComposerEditor();
+  }
+}
+
+
 function renderMessage(company, email) {
   const senderName = document.getElementById('accSenderName')?.value || 'MindNext';
-  let subj = document.getElementById('composerSubject').value || '';
-  let body = document.getElementById('composerBody').value || '';
+  let subj = document.getElementById('composerSubject')?.value || '';
+  
+  const editor = document.getElementById('composerBodyEditor');
+  let bodyContent = editor ? editor.innerHTML : (document.getElementById('composerBody')?.value || '');
 
   subj = subj.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
-  body = body.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
+  bodyContent = bodyContent.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
 
-  const html = formatEmailToProfessionalHtml(body);
+  // If the content is already full rich HTML (contains tags), preserve its exact inline styles & tags
+  let finalHtml = bodyContent;
+  if (!finalHtml.includes('<p') && !finalHtml.includes('<div') && !finalHtml.includes('<ul')) {
+    finalHtml = formatEmailToProfessionalHtml(bodyContent);
+  } else {
+    finalHtml = `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14.5px; color: #1e293b; line-height: 1.65; max-width: 680px; margin: 0 auto; background: #ffffff; padding: 24px 28px; border-radius: 8px; border: 1px solid #edf2f7;">${finalHtml}</div>`;
+  }
 
-  return { subject: subj, body: body, html: html };
+  return { subject: subj, body: bodyContent, html: finalHtml };
 }
 
 function updateComposerPreview() {
   const r = renderMessage('Nexus Global Corp', 'partner@nexusglobal.com');
-  document.getElementById('previewSubjectText').textContent = r.subject;
-  document.getElementById('previewBodyText').innerHTML = r.html;
+  const subjEl = document.getElementById('previewSubjectText');
+  const bodyEl = document.getElementById('previewBodyText');
+  if (subjEl) subjEl.textContent = r.subject;
+  if (bodyEl) bodyEl.innerHTML = r.html;
 
+  const editor = document.getElementById('composerBodyEditor');
+  const curHtml = editor ? editor.innerHTML : (document.getElementById('composerBody')?.value || '');
   const data = {
-    preset: document.getElementById('tplSelect').value,
-    subject: document.getElementById('composerSubject').value,
-    body: document.getElementById('composerBody').value
+    preset: document.getElementById('tplSelect')?.value || 'pharma',
+    subject: document.getElementById('composerSubject')?.value || '',
+    body: curHtml
   };
   localStorage.setItem(STORAGE_KEYS.COMPOSER, JSON.stringify(data));
 }
