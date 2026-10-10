@@ -964,6 +964,92 @@
     color: #64748b;
   }
 
+
+  /* ============================================================== */
+  /* BULLETPROOF STYLES FOR RICH EMAIL EDITOR & LIVE PREVIEW CARD  */
+  /* ============================================================== */
+  #previewBodyText, .rich-editor-box {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+    color: #1e293b !important;
+  }
+
+  #previewBodyText p, .rich-editor-box p {
+    margin: 0 0 14px 0 !important;
+    line-height: 1.7 !important;
+    font-size: 15px !important;
+    color: #1e293b !important;
+  }
+
+  #previewBodyText strong, #previewBodyText b,
+  .rich-editor-box strong, .rich-editor-box b {
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+
+  #previewBodyText ul, .rich-editor-box ul {
+    display: block !important;
+    list-style-type: disc !important;
+    list-style-position: outside !important;
+    margin: 14px 0 18px 28px !important;
+    padding-left: 12px !important;
+  }
+
+  #previewBodyText ol, .rich-editor-box ol {
+    display: block !important;
+    list-style-type: decimal !important;
+    list-style-position: outside !important;
+    margin: 14px 0 18px 28px !important;
+    padding-left: 12px !important;
+  }
+
+  #previewBodyText li, .rich-editor-box li {
+    display: list-item !important;
+    list-style-type: disc !important;
+    margin-bottom: 9px !important;
+    line-height: 1.65 !important;
+    color: #2d3748 !important;
+  }
+
+  #previewBodyText h1, .rich-editor-box h1 {
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 22px 0 12px 0 !important;
+    line-height: 1.3 !important;
+  }
+
+  #previewBodyText h2, .rich-editor-box h2 {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 20px 0 10px 0 !important;
+    line-height: 1.3 !important;
+  }
+
+  #previewBodyText h3, .rich-editor-box h3 {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 24px 0 10px 0 !important;
+    line-height: 1.35 !important;
+    letter-spacing: -0.2px !important;
+  }
+
+  #previewBodyText h4, .rich-editor-box h4 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 18px 0 8px 0 !important;
+  }
+
+  #previewBodyText a, .rich-editor-box a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+    font-weight: 600 !important;
+  }
+
 </style>
 </head>
 <body>
@@ -2675,24 +2761,56 @@ function insertEditorLink() {
 function handleComposerPaste(e) {
   e.preventDefault();
   
-  const htmlData = e.clipboardData.getData('text/html');
-  const textData = e.clipboardData.getData('text/plain');
+  const htmlData = e.clipboardData ? e.clipboardData.getData('text/html') : '';
+  const textData = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
   
-  if (htmlData && (htmlData.includes('<b>') || htmlData.includes('<strong>') || htmlData.includes('<ul') || htmlData.includes('font-weight') || htmlData.includes('<h'))) {
-    // Clean office/mso junk while preserving ALL formatting
-    let clean = htmlData
+  let contentToInsert = '';
+
+  if (htmlData && (htmlData.includes('<b>') || htmlData.includes('<strong>') || htmlData.includes('<ul') || htmlData.includes('font-weight') || htmlData.includes('<h') || htmlData.includes('<li'))) {
+    // Office / Web HTML paste: clean comment tags and Mso bloat while preserving all styles
+    contentToInsert = htmlData
       .replace(/<!--[\s\S]*?-->/gi, '')
       .replace(/<(meta|link|title|style)[\s\S]*?<\/\1>/gi, '')
       .replace(/<(meta|link|title)[^>]*>/gi, '')
       .replace(/class="Mso[^"]*"/gi, '');
-      
-    document.execCommand('insertHTML', false, clean);
   } else if (textData) {
-    // Automatically convert plain text bullets, bold keywords & headings into rich HTML!
-    const formatted = formatEmailToProfessionalHtml(textData, false);
-    document.execCommand('insertHTML', false, formatted);
+    // Plain text paste: automatically parse bullet dots, bold keywords, headings and spacing into rich HTML
+    contentToInsert = formatEmailToProfessionalHtml(textData, false);
   }
-  
+
+  if (contentToInsert) {
+    // Insert using Selection API with fallback
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && sel.getRangeAt(0).commonAncestorContainer.closest && sel.getRangeAt(0).commonAncestorContainer.closest('#composerBodyEditor')) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = contentToInsert;
+      const frag = document.createDocumentFragment();
+      let node, lastNode;
+      while ((node = tempDiv.firstChild)) {
+        lastNode = frag.appendChild(node);
+      }
+      range.insertNode(frag);
+      if (lastNode) {
+        range.setStartAfter(lastNode);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    } else {
+      const editor = document.getElementById('composerBodyEditor');
+      if (editor) {
+        // If editor was empty or not focused, replace or append
+        if (!editor.innerHTML || editor.innerHTML === '<br>' || editor.innerHTML === '<p><br></p>') {
+          editor.innerHTML = contentToInsert;
+        } else {
+          editor.innerHTML += contentToInsert;
+        }
+      }
+    }
+  }
+
   syncComposerEditor();
 }
 
