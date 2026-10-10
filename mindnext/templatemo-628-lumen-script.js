@@ -184,6 +184,34 @@
       }
       var noteEl = formEl.querySelector('.form-note') || document.getElementById('formNote');
       if (noteEl) noteEl.classList.add('show');
+
+      var name = (formEl.querySelector('#hf-name') || {}).value || 'Visitor';
+      var email = (formEl.querySelector('#hf-email') || {}).value || '';
+      var interest = (formEl.querySelector('#hf-interest') || {}).value || '';
+      var timeline = (formEl.querySelector('#hf-timeline') || {}).value || '';
+      var message = (formEl.querySelector('#hf-message') || {}).value || '';
+
+      var gatewayUrl = 'https://script.google.com/macros/s/AKfycbyY2QQt9z9M-gklnij7wSA5OsQV18lfMUoZlrrfMrNn28Qx1oXr3w_fDLpIrNqJf-JH/exec';
+      try {
+        fetch(gatewayUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            to: 'business.mindnext@gmail.com',
+            subject: 'New Website Inquiry: ' + name + ' (' + interest + ')',
+            body: 'New website inquiry from MINDNEXT:\n\n' +
+                  'Name: ' + name + '\n' +
+                  'Email: ' + email + '\n' +
+                  'Solution of Interest: ' + interest + '\n' +
+                  'Estimated Timeline: ' + timeline + '\n\n' +
+                  'Requirements:\n' + message + '\n\n' +
+                  'Submitted: ' + new Date().toLocaleString(),
+            senderName: 'MINDNEXT Inquiry'
+          })
+        }).catch(function () {});
+      } catch(err) {}
+
       formEl.reset();
     });
   });
