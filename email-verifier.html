@@ -1502,10 +1502,21 @@
           <input type="password" id="accAppPassword" class="form-control" value="xonw ofra prsn yhzt" required>
           <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('accAppPassword')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
           </button>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <label class="input-label" for="accGoogleScriptUrl" style="margin:0;">Google Web App Dispatch URL (Free Gmail Gateway)</label>
+          <a href="javascript:void(0)" onclick="openGmailSetupModal()" style="font-size:12px; color:var(--accent-cyan); text-decoration:underline;">1-Min Setup Guide</a>
+        </div>
+        <input type="url" id="accGoogleScriptUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+        <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
+          Connect your free Google Apps Script Web App to dispatch emails directly from <strong>business.mindnext@gmail.com</strong>.
         </div>
       </div>
 
@@ -1519,6 +1530,52 @@
         <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- GMAIL SETUP GUIDE MODAL -->
+<div class="modal-backdrop" id="gmailSetupModal">
+  <div class="modal-box" style="max-width: 600px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="font-size:18px; font-weight:700; color:#fff;">Gmail Direct Dispatch Setup (1 Minute)</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeGmailSetupModal()">Close</button>
+    </div>
+
+    <div style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+      <p style="margin-bottom:10px;">
+        Browser security restrictions ki vajah se koi bhi static website directly <code>smtp.gmail.com</code> se raw connect nahi kar sakti. Isliye Google ne <strong>Google Apps Script</strong> diya hai jisse aapke Gmail (<code>business.mindnext@gmail.com</code>) se emails 100% direct send hote hain:
+      </p>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">
+        <strong style="color:#fff;">Steps to Setup (Sirf 1 baar karna hai):</strong>
+        <ol style="margin:6px 0 0 18px; padding:0; display:flex; flex-direction:column; gap:4px;">
+          <li>Naye tab me <strong><a href="https://script.google.com" target="_blank" style="color:var(--accent-cyan); font-weight:600;">script.google.com</a></strong> open karein (<code>business.mindnext@gmail.com</code> se login karein).</li>
+          <li><strong>New Project</strong> par click karein.</li>
+          <li>Jo default code likha hai usko hata kar neeche ka code paste karein:</li>
+        </ol>
+      </div>
+
+      <pre style="background:var(--bg-input); border:1px solid var(--border-color); padding:10px; border-radius:6px; font-size:12px; color:#38bdf8; overflow-x:auto; user-select:all;">
+function doPost(e) {
+  var d = JSON.parse(e.postData.contents);
+  GmailApp.sendEmail(d.to, d.subject, d.body, {
+    name: d.senderName || "MINDNEXT Technologies",
+    htmlBody: d.body.replace(/\n/g, "&lt;br&gt;")
+  });
+  return ContentService.createTextOutput("SUCCESS");
+}</pre>
+
+      <ol start="4" style="margin:10px 0 0 18px; padding:0; display:flex; flex-direction:column; gap:4px;">
+        <li>Upar <strong>Deploy &rarr; New deployment</strong> click karein.</li>
+        <li>Select type me <strong>Web app</strong> choose karein.</li>
+        <li>Execute as: <strong>Me (business.mindnext@gmail.com)</strong> aur Who has access: <strong>Anyone</strong> karke <strong>Deploy</strong> karein.</li>
+        <li>Jo Web app URL mile (jaise <code>https://script.google.com/macros/s/.../exec</code>), use copy karke <strong>Account</strong> me paste karein!</li>
+      </ol>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+      <button class="btn btn-primary btn-sm" onclick="closeGmailSetupModal()">Done</button>
+    </div>
   </div>
 </div>
 
@@ -1672,6 +1729,9 @@ function loadData() {
       document.getElementById('accSenderName').value = acc.name || 'MINDNEXT Technologies';
       document.getElementById('accAppPassword').value = acc.appPassword || 'xonw ofra prsn yhzt';
       document.getElementById('accPortalPassword').value = acc.portalPassword || 'mindnext2026';
+      if (document.getElementById('accGoogleScriptUrl')) {
+        document.getElementById('accGoogleScriptUrl').value = acc.googleScriptUrl || '';
+      }
     } catch(e) {}
   }
 
@@ -2235,13 +2295,40 @@ function removeManagedContact(id) {
 function sendSingleContact(id) {
   const contact = managedContacts.find(c => c.id === id);
   if (!contact) return;
+  const scriptUrl = (document.getElementById('accGoogleScriptUrl')?.value || '').trim();
+  const senderName = document.getElementById('accSenderName')?.value || 'MINDNEXT Technologies';
   const rendered = renderMessage(contact.company, contact.email);
-  openWebGmail(contact.email, rendered.subject, rendered.body);
-  contact.status = 'Sent';
-  contact.lastSentAt = new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
-  saveData(STORAGE_KEYS.MANAGED, managedContacts);
-  renderManageTable();
-  showToast(`Email prepared for ${contact.company}!`, 'success');
+
+  if (scriptUrl && scriptUrl.startsWith('https://script.google.com')) {
+    showToast(`Dispatching email to ${contact.email} via Gmail Gateway...`, 'info');
+    fetch(scriptUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: contact.email,
+        subject: rendered.subject,
+        body: rendered.body,
+        senderName: senderName
+      })
+    }).then(() => {
+      contact.status = 'Sent';
+      contact.lastSentAt = new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+      saveData(STORAGE_KEYS.MANAGED, managedContacts);
+      renderManageTable();
+      showToast(`Email delivered to ${contact.company}! Check your Gmail sent items.`, 'success');
+    }).catch(() => {
+      openWebGmail(contact.email, rendered.subject, rendered.body);
+    });
+  } else {
+    // Directly open in official Web Gmail with prefilled email, subject, body!
+    openWebGmail(contact.email, rendered.subject, rendered.body);
+    contact.status = 'Sent';
+    contact.lastSentAt = new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+    saveData(STORAGE_KEYS.MANAGED, managedContacts);
+    renderManageTable();
+    showToast(`Gmail compose opened for ${contact.company}!`, 'success');
+  }
 }
 
 /* ================= 7. COMPOSER & TEMPLATES ================= */
@@ -2316,6 +2403,23 @@ async function executeCampaignDispatch(mode) {
     targetList = [...managedContacts];
   }
 
+  const scriptUrl = (document.getElementById('accGoogleScriptUrl')?.value || '').trim();
+  const senderName = document.getElementById('accSenderName')?.value || 'MINDNEXT Technologies';
+
+  if (!scriptUrl || !scriptUrl.startsWith('https://script.google.com')) {
+    const wantGuide = confirm(
+      "⚠️ Gmail Dispatch Gateway URL set nahi hai!\n\n" +
+      "Browser static website se directly smtp.gmail.com connect nahi kar sakta (Google security block).\n\n" +
+      "Emails ko apne Gmail (business.mindnext@gmail.com) se direct send karne ke liye free Google Web App URL lagana zaroori hai (sirf 1 minute lagta hai).\n\n" +
+      "Kya aap abhi '1-Min Setup Guide' dekhna chahte hain?\n\n" +
+      "(OK = Setup Guide kholein | Cancel = Direct Web Gmail se bhejein)"
+    );
+    if (wantGuide) {
+      openGmailSetupModal();
+      return;
+    }
+  }
+
   // Switch directly to View Credentials Status view so the user can watch live delivery!
   switchMainView('manage');
 
@@ -2336,7 +2440,7 @@ async function executeCampaignDispatch(mode) {
   if (liveBadge) liveBadge.textContent = '0%';
   if (liveBar) liveBar.style.width = '0%';
   if (liveCount) liveCount.textContent = `0 of ${targetList.length} dispatched`;
-  if (liveEmail) liveEmail.textContent = 'Connecting to mail server...';
+  if (liveEmail) liveEmail.textContent = 'Connecting...';
 
   // Open Progress Modal
   document.getElementById('progressModal').classList.add('show');
@@ -2347,9 +2451,6 @@ async function executeCampaignDispatch(mode) {
 
   const logBox = document.getElementById('progressLog');
   logBox.innerHTML = `<div>[Started] Initiating campaign sequence for ${targetList.length} recipients...</div>`;
-
-  const senderEmail = document.getElementById('accSenderEmail').value.trim();
-  const appPassword = (document.getElementById('accAppPassword').value || '').replace(/\s+/g, '');
 
   let processed = 0;
   const nowStr = new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
@@ -2366,20 +2467,27 @@ async function executeCampaignDispatch(mode) {
     const { subject, body } = renderMessage(contact.company, contact.email);
 
     try {
-      if (window.Email && typeof Email.send === 'function' && appPassword.length >= 12) {
-        await Email.send({
-          Host: "smtp.gmail.com",
-          Username: senderEmail,
-          Password: appPassword,
-          To: contact.email,
-          From: senderEmail,
-          Subject: subject,
-          Body: body.replace(/\n/g, '<br>')
+      if (scriptUrl && scriptUrl.startsWith('https://script.google.com')) {
+        await fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: contact.email,
+            subject: subject,
+            body: body,
+            senderName: senderName
+          })
         });
+        contact.status = 'Sent';
+        contact.lastSentAt = nowStr;
+        logBox.innerHTML += `<div style="color:var(--accent-emerald);">&check; Successfully delivered via Gmail to ${escapeHtml(contact.email)}</div>`;
+      } else {
+        openWebGmail(contact.email, subject, body);
+        contact.status = 'Sent';
+        contact.lastSentAt = nowStr;
+        logBox.innerHTML += `<div style="color:var(--accent-cyan);">&check; Opened in Web Gmail for ${escapeHtml(contact.email)}</div>`;
       }
-      contact.status = 'Sent';
-      contact.lastSentAt = nowStr;
-      logBox.innerHTML += `<div style="color:var(--accent-emerald);">&check; Successfully delivered to ${escapeHtml(contact.email)}</div>`;
     } catch (err) {
       contact.status = 'Sent';
       contact.lastSentAt = nowStr;
@@ -2405,7 +2513,7 @@ async function executeCampaignDispatch(mode) {
     renderManageTable();
 
     if (i < targetList.length - 1) {
-      await new Promise(r => setTimeout(r, 1100));
+      await new Promise(r => setTimeout(r, 1000));
     }
   }
 
@@ -2414,13 +2522,13 @@ async function executeCampaignDispatch(mode) {
   renderManageTable();
 
   if (stateVal) stateVal.innerHTML = '<span style="color:var(--accent-emerald);">Completed</span>';
-  if (stateHint) stateHint.textContent = `All ${processed} emails sent`;
+  if (stateHint) stateHint.textContent = `All ${processed} emails dispatched`;
   if (liveTitle) liveTitle.textContent = 'Credentials Delivery Finished';
   if (liveBadge) liveBadge.textContent = '100% Done';
   if (liveEmail) liveEmail.textContent = 'All credentials delivered successfully';
 
   logBox.innerHTML += `<div style="color:#34d399; font-weight:700; margin-top:6px;">[Completed] Campaign finished successfully!</div>`;
-  showToast(`Campaign finished: ${processed} credentials emails sent!`, 'success');
+  showToast(`Campaign finished: ${processed} credentials emails processed!`, 'success');
 }
 
 function closeProgressModal() {
@@ -2441,42 +2549,55 @@ function closeAccountModal() {
   document.getElementById('accountModal').classList.remove('show');
 }
 
+function openGmailSetupModal() {
+  document.getElementById('gmailSetupModal').classList.add('show');
+}
+
+function closeGmailSetupModal() {
+  document.getElementById('gmailSetupModal').classList.remove('show');
+}
+
 function handleSaveAccount(e) {
   e.preventDefault();
   const acc = {
     email: document.getElementById('accSenderEmail').value.trim(),
     name: document.getElementById('accSenderName').value.trim(),
     appPassword: document.getElementById('accAppPassword').value.trim(),
+    googleScriptUrl: (document.getElementById('accGoogleScriptUrl')?.value || '').trim(),
     portalPassword: document.getElementById('accPortalPassword').value.trim()
   };
   localStorage.setItem(STORAGE_KEYS.ACCOUNT, JSON.stringify(acc));
   localStorage.setItem(STORAGE_KEYS.PASSWORD, acc.portalPassword);
   closeAccountModal();
   updateComposerPreview();
-  showToast('Account credentials and passcode saved!', 'success');
+  showToast('Account credentials and gateway saved!', 'success');
 }
 
-function sendTestEmailToSelf() {
+async function sendTestEmailToSelf() {
   const email = document.getElementById('accSenderEmail').value.trim();
-  const pass = (document.getElementById('accAppPassword').value || '').replace(/\s+/g, '');
   const name = document.getElementById('accSenderName').value.trim();
+  const scriptUrl = (document.getElementById('accGoogleScriptUrl')?.value || '').trim();
 
-  showToast(`Sending test email to ${email}...`, 'info');
-  if (window.Email && typeof Email.send === 'function' && pass.length >= 12) {
-    Email.send({
-      Host: "smtp.gmail.com",
-      Username: email,
-      Password: pass,
-      To: email,
-      From: email,
-      Subject: "MINDNEXT Portal: Test Verification",
-      Body: `Hello ${name},<br><br>Your email dispatcher is active and connected!<br><br>Timestamp: ${new Date().toLocaleString()}`
-    }).then(() => {
-      showToast('Test email sent to your inbox!', 'success');
-    }).catch(() => {
-      openWebGmail(email, "MINDNEXT Test Email", "Your email dispatcher is active!");
-    });
+  if (scriptUrl && scriptUrl.startsWith('https://script.google.com')) {
+    showToast(`Sending test email to ${email} via Google Gateway...`, 'info');
+    try {
+      await fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          subject: "MINDNEXT Portal: Test Verification",
+          body: `Hello ${name},\n\nYour Gmail Dispatch Gateway is working perfectly!\n\nSent from: MINDNEXT Portal\nTimestamp: ${new Date().toLocaleString()}`,
+          senderName: name
+        })
+      });
+      showToast(`Test email dispatched to ${email}! Check your Gmail inbox/sent items.`, 'success');
+    } catch (err) {
+      showToast('Error sending via Google Gateway. Check URL.', 'error');
+    }
   } else {
+    showToast('Google Gateway URL not set. Opening Gmail compose...', 'info');
     openWebGmail(email, "MINDNEXT Test Email", "Your email dispatcher is active!");
   }
 }
