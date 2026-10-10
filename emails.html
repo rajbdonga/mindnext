@@ -968,80 +968,108 @@
       </div>
     </div>
 
-    <!-- Workspace Grid -->
-    <div class="workspace-grid">
-      <!-- Reference DB Card -->
-      <div class="panel-card">
-        <div class="panel-header">
-          <h2 class="panel-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-violet);">
-              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+    <!-- SINGLE UNIFIED UPLOAD & VERIFICATION CARD -->
+    <div class="panel-card" style="max-width: 900px; margin: 0 auto 28px auto;">
+      <div class="panel-header" style="flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 class="panel-title" style="font-size: 20px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan);">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
-            Master Reference Database
+            Upload &amp; Verify Email CSV
           </h2>
-          <span class="badge badge-success" id="refDbCountBadge">0 in DB</span>
+          <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+            Download Reference CSV template, upload your file, and verify for format errors and duplicate emails.
+          </p>
         </div>
-        <p style="font-size:13px; color:var(--text-secondary); margin-top:-6px;">
-          Emails in this reference list will be detected as <strong>Duplicate Error</strong> if found in any uploaded CSV.
-        </p>
-
-        <div class="dropzone-box" onclick="document.getElementById('refFileInput').click()">
-          <input type="file" id="refFileInput" accept=".csv" style="display:none;" onchange="handleRefFileUpload(event)">
-          <div class="dropzone-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div>
+          <button class="btn btn-outline btn-sm" onclick="downloadSampleReferenceCSV()" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-cyan);" title="Download standard CSV template">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-          </div>
-          <div class="dropzone-text">Upload Reference CSV</div>
-          <div class="dropzone-hint">Expected Columns: <strong>Company Name, Email</strong></div>
-        </div>
-
-        <div class="actions-bar" style="justify-content:space-between;">
-          <button class="btn btn-outline btn-sm" onclick="downloadMasterReferenceCSV()">Export Current Reference CSV</button>
-          <button class="btn btn-outline btn-sm" style="color:var(--accent-rose);" onclick="clearReferenceDatabase()">Clear DB</button>
+            Download Reference CSV
+          </button>
         </div>
       </div>
 
-      <!-- Upload CSV to Verify Card -->
-      <div class="panel-card">
-        <div class="panel-header">
-          <h2 class="panel-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan);">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            Upload Prospect CSV to Verify
-          </h2>
-          <span class="badge badge-amber">Checks: Duplicates &amp; Format Errors</span>
+      <!-- Dropzone -->
+      <div class="dropzone-box" onclick="document.getElementById('verifyFileInput').click()" style="padding: 38px 24px;">
+        <input type="file" id="verifyFileInput" accept=".csv" style="display:none;" onchange="handleVerifyFileUpload(event)">
+        <div class="dropzone-icon" style="color:var(--accent-cyan); margin-bottom:10px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
         </div>
+        <div class="dropzone-text" style="font-size:16px;">Click or Drag &amp; Drop CSV File to Upload</div>
+        <div class="dropzone-hint" style="font-size:13px; margin-top:4px;">Expected Columns: <strong>Company Name, Email</strong> (auto-detected)</div>
+      </div>
 
-        <p style="font-size:13px; color:var(--text-secondary); margin-top:-6px;">
-          Upload your CSV file or paste rows below. Checks for <strong>Duplicate Emails</strong> and <strong>Invalid Email Formats</strong>.
-        </p>
-
-        <div class="dropzone-box" onclick="document.getElementById('verifyFileInput').click()">
-          <input type="file" id="verifyFileInput" accept=".csv" style="display:none;" onchange="handleVerifyFileUpload(event)">
-          <div class="dropzone-icon" style="color:var(--accent-cyan);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
+      <!-- Manual paste option inside expandable block -->
+      <div style="margin-top: 14px;">
+        <details style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 10px 14px;">
+          <summary style="font-size: 13px; color: var(--text-secondary); cursor: pointer; user-select: none;">
+            Or paste rows manually (Company Name, Email)
+          </summary>
+          <div style="margin-top: 10px;">
+            <textarea id="importPasteArea" class="form-control" rows="3" placeholder="Company Name, email@example.com (one per line)"></textarea>
+            <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+              <button class="btn btn-primary btn-sm" onclick="processImportPastedData()">Verify Pasted Data</button>
+            </div>
           </div>
-          <div class="dropzone-text">Click or Drag &amp; Drop CSV File</div>
-          <div class="dropzone-hint">Format: <strong>Company Name, Email</strong></div>
+        </details>
+      </div>
+
+      <!-- INSTANT STATUS BANNER (Appears/Updates immediately on upload) -->
+      <div id="uploadStatusSection" style="margin-top: 20px; padding: 18px 20px; border-radius: 12px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.35); display: none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom: 14px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div id="uploadStatusIcon" style="width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background: rgba(34, 197, 94, 0.15); color: var(--accent-emerald);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div>
+              <div style="font-size:16px; font-weight:700; color:#fff;" id="uploadStatusTitle">Verification Status: Completed</div>
+              <div style="font-size:13px; color:var(--text-secondary);" id="uploadStatusSub">Total <strong id="uploadStatusTotal" style="color:#fff;">0</strong> records evaluated</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="badge badge-success" style="font-size:13px; padding:6px 14px;" id="statusSuccessPill">0 Success</span>
+            <span class="badge badge-error" style="font-size:13px; padding:6px 14px;" id="statusErrorPill">0 Errors</span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <textarea id="importPasteArea" class="form-control" rows="2" placeholder="Or paste: Company Name, Email (one per line)"></textarea>
-        </div>
-
-        <div style="display:flex; justify-content:flex-end;">
-          <button class="btn btn-primary btn-sm" onclick="processImportPastedData()">Run Verification &amp; Deduplication</button>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-success btn-sm" onclick="downloadSuccessCSV()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Success CSV (<span id="statusSuccessCount">0</span>)
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="downloadErrorCSV()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Error CSV (<span id="statusErrorCount">0</span>)
+            </button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addSuccessRecordsToManageList()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Success to Manage List
+          </button>
         </div>
       </div>
     </div>
@@ -1573,26 +1601,91 @@ function saveData(key, data) {
 }
 
 function updateAllCounts() {
-  document.getElementById('refDbCountBadge').textContent = `${referenceList.length} in DB`;
-  document.getElementById('navManageBadge').textContent = managedContacts.length;
+  const refDbBadge = document.getElementById('refDbCountBadge');
+  if (refDbBadge) refDbBadge.textContent = `${referenceList.length} in DB`;
+  
+  const navManageBadge = document.getElementById('navManageBadge');
+  if (navManageBadge) navManageBadge.textContent = managedContacts.length;
 
-  document.getElementById('sendTotalCount').textContent = managedContacts.length;
-  document.getElementById('sendUnsentCount').textContent = managedContacts.filter(c => c.status !== 'Sent').length;
-  document.getElementById('sendSentCount').textContent = managedContacts.filter(c => c.status === 'Sent').length;
+  const sendTotalCount = document.getElementById('sendTotalCount');
+  if (sendTotalCount) sendTotalCount.textContent = managedContacts.length;
+  const sendUnsentCount = document.getElementById('sendUnsentCount');
+  if (sendUnsentCount) sendUnsentCount.textContent = managedContacts.filter(c => c.status !== 'Sent').length;
+  const sendSentCount = document.getElementById('sendSentCount');
+  if (sendSentCount) sendSentCount.textContent = managedContacts.filter(c => c.status === 'Sent').length;
 
   // Import Badges
   const succ = importResults.filter(r => r.status === 'SUCCESS').length;
   const err = importResults.filter(r => r.status === 'ERROR').length;
-  document.getElementById('countSuccessBadge').textContent = succ;
-  document.getElementById('countErrorBadge').textContent = err;
-  document.getElementById('fltAllCount').textContent = importResults.length;
-  document.getElementById('fltSuccessCount').textContent = succ;
-  document.getElementById('fltErrorCount').textContent = err;
+  
+  const countSuccessBadge = document.getElementById('countSuccessBadge');
+  if (countSuccessBadge) countSuccessBadge.textContent = succ;
+  const countErrorBadge = document.getElementById('countErrorBadge');
+  if (countErrorBadge) countErrorBadge.textContent = err;
+  const fltAllCount = document.getElementById('fltAllCount');
+  if (fltAllCount) fltAllCount.textContent = importResults.length;
+  const fltSuccessCount = document.getElementById('fltSuccessCount');
+  if (fltSuccessCount) fltSuccessCount.textContent = succ;
+  const fltErrorCount = document.getElementById('fltErrorCount');
+  if (fltErrorCount) fltErrorCount.textContent = err;
+
+  // Update Status Banner inside unified upload card
+  const statusSection = document.getElementById('uploadStatusSection');
+  if (statusSection) {
+    if (importResults.length > 0) {
+      statusSection.style.display = 'block';
+      const statusTotal = document.getElementById('uploadStatusTotal');
+      if (statusTotal) statusTotal.textContent = importResults.length;
+      const statusSuccPill = document.getElementById('statusSuccessPill');
+      if (statusSuccPill) statusSuccPill.textContent = `${succ} Success`;
+      const statusErrPill = document.getElementById('statusErrorPill');
+      if (statusErrPill) statusErrPill.textContent = `${err} Errors`;
+      const statusSuccCount = document.getElementById('statusSuccessCount');
+      if (statusSuccCount) statusSuccCount.textContent = succ;
+      const statusErrCount = document.getElementById('statusErrorCount');
+      if (statusErrCount) statusErrCount.textContent = err;
+
+      const statusTitle = document.getElementById('uploadStatusTitle');
+      const statusSub = document.getElementById('uploadStatusSub');
+      const statusIcon = document.getElementById('uploadStatusIcon');
+
+      if (err > 0 && succ > 0) {
+        if (statusTitle) statusTitle.textContent = `Verification Status: ${succ} Valid, ${err} Errors Found`;
+        if (statusSub) statusSub.innerHTML = `Total <strong>${importResults.length}</strong> records processed. Ready to download filtered CSVs.`;
+        if (statusIcon) {
+          statusIcon.style.background = 'rgba(245, 158, 11, 0.15)';
+          statusIcon.style.color = 'var(--accent-amber)';
+          statusIcon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        }
+      } else if (err > 0 && succ === 0) {
+        if (statusTitle) statusTitle.textContent = `Verification Status: All ${err} Records Have Errors`;
+        if (statusSub) statusSub.innerHTML = `Total <strong>${importResults.length}</strong> records failed verification. Download Error CSV for details.`;
+        if (statusIcon) {
+          statusIcon.style.background = 'rgba(244, 63, 94, 0.15)';
+          statusIcon.style.color = 'var(--accent-rose)';
+          statusIcon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+        }
+      } else {
+        if (statusTitle) statusTitle.textContent = `Verification Status: All ${succ} Records Valid & Unique!`;
+        if (statusSub) statusSub.innerHTML = `Total <strong>${importResults.length}</strong> records verified with zero errors.`;
+        if (statusIcon) {
+          statusIcon.style.background = 'rgba(34, 197, 94, 0.15)';
+          statusIcon.style.color = 'var(--accent-emerald)';
+          statusIcon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        }
+      }
+    } else {
+      statusSection.style.display = 'none';
+    }
+  }
 
   // Manage Badges
-  document.getElementById('manageCountAll').textContent = managedContacts.length;
-  document.getElementById('manageCountUnsent').textContent = managedContacts.filter(c => c.status !== 'Sent').length;
-  document.getElementById('manageCountSent').textContent = managedContacts.filter(c => c.status === 'Sent').length;
+  const manageCountAll = document.getElementById('manageCountAll');
+  if (manageCountAll) manageCountAll.textContent = managedContacts.length;
+  const manageCountUnsent = document.getElementById('manageCountUnsent');
+  if (manageCountUnsent) manageCountUnsent.textContent = managedContacts.filter(c => c.status !== 'Sent').length;
+  const manageCountSent = document.getElementById('manageCountSent');
+  if (manageCountSent) manageCountSent.textContent = managedContacts.filter(c => c.status === 'Sent').length;
 }
 
 /* ================= 4. IMPORT & VERIFICATION LOGIC ================= */
@@ -1726,7 +1819,12 @@ function verifyImportedRows(rows) {
 
   const succCount = newResults.filter(r => r.status === 'SUCCESS').length;
   const errCount = newResults.filter(r => r.status === 'ERROR').length;
-  showToast(`Processed: ${succCount} Success, ${errCount} Errors found.`, succCount > 0 ? 'success' : 'error');
+  showToast(`Uploaded & Verified: ${succCount} Success, ${errCount} Errors found.`, succCount > 0 ? 'success' : 'error');
+
+  const statusEl = document.getElementById('uploadStatusSection');
+  if (statusEl) {
+    statusEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
 function handleVerifyFileUpload(e) {
