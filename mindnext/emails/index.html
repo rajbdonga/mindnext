@@ -1220,49 +1220,58 @@
           
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <input type="file" id="verifyFileInput" accept=".csv" style="display:none;" onchange="handleFileSelected(event)">
-            <button type="button" class="btn btn-sm" onclick="document.getElementById('verifyFileInput').click()" style="background:#7c3aed; color:#fff; border-radius:6px; padding:7px 16px;">
+            <button type="button" id="btnChooseFile" class="btn btn-sm" onclick="triggerChooseFile()" style="background:#7c3aed; color:#fff; border-radius:6px; padding:7px 16px;">
               Choose file
             </button>
             <span id="chosenFileNameText" style="font-size:13px; color:var(--text-secondary);">No file chosen</span>
           </div>
 
-          <div>
-            <button type="button" class="btn btn-sm" onclick="submitChosenFile()" style="background:#7c3aed; color:#fff; border-radius:8px; padding:8px 24px; font-weight:600; border:none;">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <button type="button" id="btnSubmitFile" class="btn btn-sm" onclick="submitChosenFile()" style="background:#7c3aed; color:#fff; border-radius:8px; padding:8px 24px; font-weight:600; border:none;">
               Submit
             </button>
+            <span id="uploadLockedHint" style="font-size:12.5px; color:var(--accent-amber); display:none;">&bull; Upload locked. Click "Refresh / New Upload" to submit another file.</span>
           </div>
         </div>
       </div>
 
       <!-- Result CSV Box: Appears ONLY after CSV file upload is completed -->
-      <div id="uploadResultCsvBox" style="display: none; margin-top: 18px; padding: 16px 20px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 10px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div id="uploadResultCsvBox" style="display: none; margin-top: 18px; padding: 18px 20px; background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
           <div>
             <div style="font-size: 14.5px; font-weight:700; color:#fff;" id="uploadResultTitle">Verification Completed</div>
-            <div style="font-size: 12.5px; color:var(--text-secondary);" id="uploadResultSubtitle">Download your evaluated CSV files:</div>
+            <div style="font-size: 12.5px; color:var(--text-secondary);" id="uploadResultSubtitle">Download your evaluated CSV report files:</div>
           </div>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <!-- SUCCESS CSV DOWNLOAD -->
-            <button class="btn btn-success btn-sm" onclick="downloadSuccessCSV()">
+            <!-- SUCCESS CSV DOWNLOAD (Appears ONLY if success records exist) -->
+            <button id="btnDownloadSuccessCSV" class="btn btn-success btn-sm" onclick="downloadSuccessCSV()" style="display:none;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Download Success CSV (<span id="countSuccessBadge">0</span>)
+              Download Success Report CSV (<span id="countSuccessBadge">0</span>)
             </button>
 
-            <!-- ERROR CSV DOWNLOAD -->
-            <button class="btn btn-danger btn-sm" onclick="downloadErrorCSV()">
+            <!-- ERROR CSV DOWNLOAD (Appears ONLY if error records exist) -->
+            <button id="btnDownloadErrorCSV" class="btn btn-danger btn-sm" onclick="downloadErrorCSV()" style="display:none;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Download Error CSV (<span id="countErrorBadge">0</span>)
+              Download Error Report CSV (<span id="countErrorBadge">0</span>)
             </button>
 
-            <button type="button" class="btn btn-outline btn-sm" onclick="dismissResultCsvBox()" title="Close box" style="padding:5px 10px; font-size:12px;">✕</button>
+            <!-- REFRESH / NEW UPLOAD BUTTON (Resets & Unlocks for new upload) -->
+            <button id="btnRefreshUpload" class="btn btn-outline btn-sm" onclick="resetUploadForNewFile()" style="background:rgba(255,255,255,0.08); border:1px solid var(--border-color); color:#fff; font-weight:600; padding:7px 14px; border-radius:6px; display:inline-flex; align-items:center; gap:6px;" title="Reset upload form to upload another CSV">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Refresh / New Upload
+            </button>
           </div>
         </div>
       </div>
@@ -1677,9 +1686,12 @@
       <pre style="background:var(--bg-input); border:1px solid var(--border-color); padding:10px; border-radius:6px; font-size:12px; color:#38bdf8; overflow-x:auto; user-select:all;">
 function doPost(e) {
   var d = JSON.parse(e.postData.contents);
-  GmailApp.sendEmail(d.to, d.subject, d.body, {
+  var html = d.htmlBody || d.html || d.body;
+  var plain = d.plainBody || (html ? html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "");
+  GmailApp.sendEmail(d.to, d.subject, plain, {
     name: d.senderName || "MINDNEXT Technologies",
-    htmlBody: d.body.replace(/\n/g, "&lt;br&gt;")
+    htmlBody: html,
+    replyTo: "business.mindnext@gmail.com"
   });
   return ContentService.createTextOutput("SUCCESS");
 }</pre>
@@ -1736,7 +1748,7 @@ const PRESET_TEMPLATES = {
         pharma: {
     name: "Pharma IT Solutions Proposal",
     subject: "Business Proposal – Pharma Activity Management & Doctor Agreement Generation Solutions | MindNext",
-    body: `<p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Dear Team,</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">I hope you are doing well.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">I am writing to introduce <strong>MindNext</strong>, a technology and service-based business focused on providing customized IT solutions to pharmaceutical companies.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">We aim to help pharma companies streamline their operational processes through technology-driven solutions, including pharma activity management, doctor enrollment, automated agreement generation, digital documentation, activity-related promotional creatives, and customized software solutions.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">As part of our proposed business collaboration, we would like to understand your requirements and explore how MindNext can support your team.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Depending on the activity and project requirements, your team may provide the necessary activity details, approved doctor-facing posters, business or promotional creatives, product-related content, and other relevant materials. Based on these inputs, MindNext can work on the required digital workflow and supporting solutions, including:</p><ul style="margin: 10px 0 16px 22px; padding: 0;"><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Pharma Activity Management:</strong> Organizing activity-related information and workflows.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Doctor Enrollment &amp; Data Management:</strong> Managing doctor details and activity-specific records.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Automated Agreement Generation:</strong> Generating agreements using approved formats and relevant doctor and activity details.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Digital Documentation &amp; Tracking:</strong> Tracking agreement status, pending approvals, and completed documentation.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Creative &amp; Promotional Support:</strong> Supporting the preparation of activity-related posters and digital creatives based on the content and requirements shared by your team.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Customized IT Solutions:</strong> Developing websites, dashboards, applications, and automation tools according to business needs.</li></ul><p style="margin: 20px 0 10px 0; font-size: 16px; font-weight: bold; color: #111111;">Benefits for Your Organization</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Our objective is to help your organization reduce manual work, improve documentation accuracy, save operational time, maintain organized records, and improve visibility into activity progress.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">We would appreciate the opportunity to discuss your current workflow, identify areas where technology can add value, and propose a suitable solution based on your requirements.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Please let us know a convenient time for a brief discussion. We would be happy to share our business proposal and explore a mutually beneficial collaboration.</p><p style="margin: 0 0 18px 0; font-size: 15px; line-height: 1.6; color: #222222;">Thank you for your time and consideration.</p><p style="margin: 20px 0 0 0; font-size: 15px; line-height: 1.6; color: #333333;">Best regards,<br><strong style="color: #111111;">MindNext</strong><br>IT Solutions &amp; Digital Services<br>Website: <a href="https://mindnext.in" style="color: #1155cc; text-decoration: underline;" target="_blank">https://mindnext.in</a><br>Contact: <a href="tel:+917984919956" style="color: #1155cc; text-decoration: none;">+91 79849 19956</a></p>`
+    body: `<p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Dear Team,</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">I hope you are doing well.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">I am writing to introduce <strong>MindNext</strong>, a technology and service-based business focused on providing customized IT solutions to pharmaceutical companies.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">We aim to help pharma companies streamline their operational processes through technology-driven solutions, including pharma activity management, doctor enrollment, automated agreement generation, digital documentation, activity-related promotional creatives, and customized software solutions.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">As part of our proposed business collaboration, we would like to understand your requirements and explore how MindNext can support your team.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Depending on the activity and project requirements, your team may provide the necessary activity details, approved doctor-facing posters, business or promotional creatives, product-related content, and other relevant materials. Based on these inputs, MindNext can work on the required digital workflow and supporting solutions, including:</p><ul style="margin: 10px 0 16px 22px; padding: 0;"><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Pharma Activity Management:</strong> Organizing activity-related information and workflows.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Doctor Enrollment &amp; Data Management:</strong> Managing doctor details and activity-specific records.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Automated Agreement Generation:</strong> Generating agreements using approved formats and relevant doctor and activity details.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Digital Documentation &amp; Tracking:</strong> Tracking agreement status, pending approvals, and completed documentation.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Creative &amp; Promotional Support:</strong> Supporting the preparation of activity-related posters and digital creatives based on the content and requirements shared by your team.</li><li style="margin-bottom: 6px; font-size: 15px; line-height: 1.6; color: #222222;"><strong>Customized IT Solutions:</strong> Developing websites, dashboards, applications, and automation tools according to business needs.</li></ul><p style="margin: 20px 0 10px 0; font-size: 16px; font-weight: bold; color: #111111;">Benefits for Your Organization</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Our objective is to help your organization reduce manual work, improve documentation accuracy, save operational time, maintain organized records, and improve visibility into activity progress.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">We would appreciate the opportunity to discuss your current workflow, identify areas where technology can add value, and propose a suitable solution based on your requirements.</p><p style="margin: 0 0 14px 0; font-size: 15px; line-height: 1.6; color: #222222;">Please let us know a convenient time for a brief discussion. We would be happy to share our business proposal and explore a mutually beneficial collaboration.</p><p style="margin: 0 0 18px 0; font-size: 15px; line-height: 1.6; color: #222222;">Thank you for your time and consideration.</p><p style="margin: 20px 0 0 0; font-size: 15px; line-height: 1.6; color: #333333;">Best regards,<br><strong style="color: #111111;">MindNext</strong><br>IT Solutions &amp; Digital Services<br>Website: <a href="https://mindnext.in" style="color: #1155cc; text-decoration: underline;" target="_blank">https://mindnext.in</a><br>Contact: <a href="tel:+917984919956" style="color: #1155cc; text-decoration: none;">+91 79849 19956</a></p><p style="margin:20px 0 0 0;font-size:11px;color:#888888;border-top:1px solid #e2e8f0;padding-top:8px;">To opt out of future proposals, simply reply with \"Unsubscribe\".</p>`
   },
   pitch: {
     subject: "Strategic Digital Architecture & Enterprise Solutions for {company_name}",
@@ -2107,6 +2119,52 @@ function verifyImportedRows(rows) {
 
 let selectedVerifyFile = null;
 
+let isUploadLocked = false;
+
+function triggerChooseFile() {
+  if (isUploadLocked) {
+    showToast('Upload is locked. Please click "Refresh / New Upload" to upload a new file.', 'warning');
+    return;
+  }
+  document.getElementById('verifyFileInput').click();
+}
+
+function lockUploadForm(locked) {
+  isUploadLocked = locked;
+  const btnChoose = document.getElementById('btnChooseFile');
+  const btnSubmit = document.getElementById('btnSubmitFile');
+  const hint = document.getElementById('uploadLockedHint');
+
+  if (btnChoose) {
+    btnChoose.disabled = locked;
+    btnChoose.style.opacity = locked ? '0.5' : '1';
+    btnChoose.style.cursor = locked ? 'not-allowed' : 'pointer';
+  }
+  if (btnSubmit) {
+    btnSubmit.disabled = locked;
+    btnSubmit.style.opacity = locked ? '0.5' : '1';
+    btnSubmit.style.cursor = locked ? 'not-allowed' : 'pointer';
+  }
+  if (hint) {
+    hint.style.display = locked ? 'inline' : 'none';
+  }
+}
+
+function resetUploadForNewFile() {
+  selectedVerifyFile = null;
+  const fileInput = document.getElementById('verifyFileInput');
+  if (fileInput) fileInput.value = '';
+
+  const nameEl = document.getElementById('chosenFileNameText');
+  if (nameEl) nameEl.textContent = 'No file chosen';
+
+  const resultBox = document.getElementById('uploadResultCsvBox');
+  if (resultBox) resultBox.style.display = 'none';
+
+  lockUploadForm(false);
+  showToast('Upload form refreshed. You can now select and upload a new CSV file.', 'info');
+}
+
 function handleFileSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -2379,8 +2437,10 @@ function sendSingleContact(id) {
       body: JSON.stringify({
         to: contact.email,
         subject: rendered.subject,
-        body: rendered.html,
+        body: rendered.plain || rendered.body,
+        plainBody: rendered.plain || rendered.body,
         htmlBody: rendered.html,
+        html: rendered.html,
         senderName: senderName
       })
     }).then(() => {
@@ -2662,7 +2722,19 @@ function renderMessage(company, email) {
   // Strip all newlines between HTML tags so Google Apps Script replace(/\n/g, '<br>') cannot add extra gap spaces!
   finalHtml = finalHtml.replace(/>\s*\n+\s*</g, '><').replace(/\n+/g, ' ').trim();
 
-  return { subject: subj, body: bodyContent, html: finalHtml };
+  const plainText = bodyContent
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  return { subject: subj, body: plainText, plain: plainText, html: finalHtml };
 }
 
 function updateComposerPreview() {
@@ -2781,8 +2853,10 @@ async function executeCampaignDispatch(mode) {
           body: JSON.stringify({
             to: contact.email,
             subject: subject,
-            body: html,
+            body: body,
+            plainBody: body,
             htmlBody: html,
+            html: html,
             senderName: senderName
           })
         });
@@ -2820,7 +2894,7 @@ async function executeCampaignDispatch(mode) {
     renderManageTable();
 
     if (i < targetList.length - 1) {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 2500));
     }
   }
 
