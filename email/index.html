@@ -1257,6 +1257,7 @@
         <div class="panel-header">
           <h2 class="panel-title">Email Title &amp; Body Composer</h2>
           <select id="tplSelect" class="form-control" style="width:auto; padding:4px 10px; font-size:12px;" onchange="applyTemplatePreset(this.value)">
+            <option value="pharma" selected>Template: Pharma IT Solutions Proposal (Recommended)</option>
             <option value="pitch">Template: Enterprise Software Pitch</option>
             <option value="cloud">Template: Cloud Modernization &amp; DevOps</option>
             <option value="intro">Template: Executive Introduction</option>
@@ -1293,8 +1294,11 @@
         <div style="background:var(--bg-card-subtle); border:1px solid var(--border-color); border-radius:12px; padding:16px;">
           <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Subject:</div>
           <div id="previewSubjectText" style="font-weight:700; color:var(--accent-cyan); font-size:14.5px; margin-bottom:12px;"></div>
-          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Message Body:</div>
-          <div id="previewBodyText" style="font-size:13px; color:var(--text-primary); white-space:pre-wrap; line-height:1.7;"></div>
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span>Rendered Recipient View:</span>
+            <span style="color:var(--accent-emerald); font-weight:700; font-size:11px;">&check; Professional Formatted Email</span>
+          </div>
+          <div id="previewBodyText" style="background:#ffffff; color:#2d3748; border-radius:8px; padding:18px 20px; box-shadow:0 3px 12px rgba(0,0,0,0.3); max-height:460px; overflow-y:auto; border:1px solid #cbd5e1;"></div>
         </div>
       </div>
     </div>
@@ -1614,6 +1618,49 @@ const DEFAULT_MANAGED = [
 ];
 
 const PRESET_TEMPLATES = {
+  pharma: {
+    name: "Pharma IT Solutions Proposal",
+    subject: "Introduction: Customized IT Solutions for Pharmaceutical Companies | MindNext",
+    body: `Dear Team,
+
+I hope you are doing well.
+
+I am writing to introduce MindNext, a technology and service-based business focused on providing customized IT solutions to pharmaceutical companies.
+
+We aim to help pharma companies streamline their operational processes through technology-driven solutions, including pharma activity management, doctor enrollment, automated agreement generation, digital documentation, activity-related promotional creatives, and customized software solutions.
+
+As part of our proposed business collaboration, we would like to understand your requirements and explore how MindNext can support your team.
+
+Depending on the activity and project requirements, your team may provide the necessary activity details, approved doctor-facing posters, business or promotional creatives, product-related content, and other relevant materials. Based on these inputs, MindNext can work on the required digital workflow and supporting solutions, including:
+
+• Pharma Activity Management: Organizing activity-related information and workflows.
+
+• Doctor Enrollment & Data Management: Managing doctor details and activity-specific records.
+
+• Automated Agreement Generation: Generating agreements using approved formats and relevant doctor and activity details.
+
+• Digital Documentation & Tracking: Tracking agreement status, pending approvals, and completed documentation.
+
+• Creative & Promotional Support: Supporting the preparation of activity-related posters and digital creatives based on the content and requirements shared by your team.
+
+• Customized IT Solutions: Developing websites, dashboards, applications, and automation tools according to business needs.
+
+Benefits for Your Organization
+
+Our objective is to help your organization reduce manual work, improve documentation accuracy, save operational time, maintain organized records, and improve visibility into activity progress.
+
+We would appreciate the opportunity to discuss your current workflow, identify areas where technology can add value, and propose a suitable solution based on your requirements.
+
+Please let us know a convenient time for a brief discussion. We would be happy to share our business proposal and explore a mutually beneficial collaboration.
+
+Thank you for your time and consideration.
+
+Best regards,
+MindNext
+IT Solutions & Digital Services
+Website: https://mindnext.in
+Contact: +91 79849 19956`
+  },
   pitch: {
     subject: "Strategic Digital Architecture & Enterprise Solutions for {company_name}",
     body: `Dear {company_name} Leadership Team,
@@ -1747,10 +1794,10 @@ function loadData() {
       const comp = JSON.parse(savedComp);
       document.getElementById('composerSubject').value = comp.subject;
       document.getElementById('composerBody').value = comp.body;
-      document.getElementById('tplSelect').value = comp.preset || 'pitch';
+      document.getElementById('tplSelect').value = comp.preset || 'pharma';
     } catch(e) {}
   } else {
-    applyTemplatePreset('pitch');
+    applyTemplatePreset('pharma');
   }
 
   updateAllCounts();
@@ -2313,7 +2360,8 @@ function sendSingleContact(id) {
       body: JSON.stringify({
         to: contact.email,
         subject: rendered.subject,
-        body: rendered.body,
+        body: rendered.html,
+        htmlBody: rendered.html,
         senderName: senderName
       })
     }).then(() => {
@@ -2357,21 +2405,94 @@ function insertTagBody(tag) {
   updateComposerPreview();
 }
 
+function formatEmailToProfessionalHtml(text) {
+  if (!text) return '';
+  
+  const paragraphs = text.split(/\n\s*\n/);
+  const htmlParts = [];
+  
+  for (let p of paragraphs) {
+    p = p.trim();
+    if (!p) continue;
+    
+    const lines = p.split('\n');
+    const isBulletList = lines.every(l => l.trim().match(/^([•\-\*]|\d+\.)\s+/));
+    
+    if (isBulletList) {
+      const listItems = lines.map(line => {
+        let itemText = line.trim().replace(/^([•\-\*]|\d+\.)\s+/, '');
+        itemText = formatInlineMarkdown(itemText);
+        return `<li style="margin-bottom: 10px; line-height: 1.65; color: #2d3748;">${itemText}</li>`;
+      }).join('');
+      htmlParts.push(`<ul style="margin: 12px 0 20px 22px; padding: 0; color: #2d3748;">${listItems}</ul>`);
+      continue;
+    }
+    
+    if (p.length < 60 && (p.toLowerCase().includes('benefits') || p.toLowerCase().includes('overview') || p.startsWith('#'))) {
+      const headingText = p.replace(/^#+\s*/, '');
+      htmlParts.push(`<h3 style="font-size: 17px; font-weight: 700; color: #1a202c; margin: 24px 0 10px 0; letter-spacing: -0.2px;">${formatInlineMarkdown(headingText)}</h3>`);
+      continue;
+    }
+    
+    if (p.match(/^(best regards|sincerely|regards|thank you|thanks),?/i)) {
+      const sigLines = p.split('\n').map(l => formatInlineMarkdown(l.trim())).join('<br>');
+      htmlParts.push(`
+        <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 14px; line-height: 1.6; color: #4a5568;">
+          ${sigLines}
+        </div>
+      `);
+      continue;
+    }
+    
+    const pFormatted = p.split('\n').map(l => formatInlineMarkdown(l.trim())).join('<br>');
+    htmlParts.push(`<p style="margin: 0 0 16px 0; line-height: 1.65; font-size: 14.5px; color: #2d3748;">${pFormatted}</p>`);
+  }
+  
+  return `
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14.5px; color: #2d3748; line-height: 1.65; max-width: 680px; margin: 0 auto; background: #ffffff; padding: 26px 30px; border-radius: 8px; border: 1px solid #edf2f7;">
+  ${htmlParts.join('\n')}
+</div>`;
+}
+
+function formatInlineMarkdown(str) {
+  if (!str) return '';
+  str = str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  str = str.replace(/__(.*?)__/g, '<strong>$1</strong>');
+  str = str.replace(/(?<!<strong>)\bMindNext\b(?!<\/strong>)/g, '<strong>MindNext</strong>');
+  
+  if (str.includes(':') && !str.startsWith('http') && !str.startsWith('tel:') && !str.includes('<strong>')) {
+    const colonIdx = str.indexOf(':');
+    const prefix = str.substring(0, colonIdx);
+    const rest = str.substring(colonIdx);
+    if (prefix.length < 50) {
+      str = `<strong>${prefix}</strong>${rest}`;
+    }
+  }
+  
+  str = str.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color: #2b6cb0; text-decoration: underline;" target="_blank">$1</a>');
+  str = str.replace(/(\+91\s*[0-9\s]{10,})/g, '<a href="tel:$1" style="color: #2d3748; text-decoration: none; font-weight: 600;">$1</a>');
+  
+  return str;
+}
+
+
 function renderMessage(company, email) {
-  const senderName = document.getElementById('accSenderName')?.value || 'MINDNEXT Technologies';
+  const senderName = document.getElementById('accSenderName')?.value || 'MindNext';
   let subj = document.getElementById('composerSubject').value || '';
   let body = document.getElementById('composerBody').value || '';
 
   subj = subj.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
   body = body.replace(/\{company_name\}/gi, company || 'your company').replace(/\{email\}/gi, email || '').replace(/\{sender_name\}/gi, senderName);
 
-  return { subject: subj, body: body };
+  const html = formatEmailToProfessionalHtml(body);
+
+  return { subject: subj, body: body, html: html };
 }
 
 function updateComposerPreview() {
   const r = renderMessage('Nexus Global Corp', 'partner@nexusglobal.com');
   document.getElementById('previewSubjectText').textContent = r.subject;
-  document.getElementById('previewBodyText').textContent = r.body;
+  document.getElementById('previewBodyText').innerHTML = r.html;
 
   const data = {
     preset: document.getElementById('tplSelect').value,
@@ -2469,7 +2590,7 @@ async function executeCampaignDispatch(mode) {
     logBox.innerHTML += `<div>Sending [${i + 1}/${targetList.length}] &rarr; ${escapeHtml(contact.company)} (${escapeHtml(contact.email)})</div>`;
     logBox.scrollTop = logBox.scrollHeight;
 
-    const { subject, body } = renderMessage(contact.company, contact.email);
+    const { subject, body, html } = renderMessage(contact.company, contact.email);
 
     try {
       if (scriptUrl && scriptUrl.startsWith('https://script.google.com')) {
@@ -2480,7 +2601,8 @@ async function executeCampaignDispatch(mode) {
           body: JSON.stringify({
             to: contact.email,
             subject: subject,
-            body: body,
+            body: html,
+            htmlBody: html,
             senderName: senderName
           })
         });
@@ -2583,6 +2705,8 @@ async function sendTestEmailToSelf() {
   const name = document.getElementById('accSenderName').value.trim();
   const scriptUrl = (document.getElementById('accGoogleScriptUrl')?.value || DEFAULT_GATEWAY_URL).trim();
 
+  const rendered = renderMessage('Demo Partner Inc', email);
+
   if (scriptUrl && scriptUrl.startsWith('https://script.google.com')) {
     showToast(`Sending test email to ${email} via Google Gateway...`, 'info');
     try {
@@ -2592,8 +2716,9 @@ async function sendTestEmailToSelf() {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           to: email,
-          subject: "MINDNEXT Portal: Test Verification",
-          body: `Hello ${name},\n\nYour Gmail Dispatch Gateway is working perfectly!\n\nSent from: MINDNEXT Portal\nTimestamp: ${new Date().toLocaleString()}`,
+          subject: rendered.subject,
+          body: rendered.html,
+          htmlBody: rendered.html,
           senderName: name
         })
       });
