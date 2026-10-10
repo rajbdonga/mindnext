@@ -8,7 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<!-- Clean URL normalizer: removes .html from address bar automatically -->
+<script>
+  (function() {
+    if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('.html')) {
+      var clean = window.location.pathname.replace(/\.html$/, '');
+      if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    }
+  })();
+</script>
 <!-- SMTP.js for direct client-side email dispatching -->
 <script src="https://smtpjs.com/v3/smtp.js"></script>
 <style>

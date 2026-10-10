@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terms of Service</title>
 <link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<!-- Clean URL normalizer: removes .html from address bar automatically -->
+<script>
+  (function() {
+    if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('.html')) {
+      var clean = window.location.pathname.replace(/\.html$/, '');
+      if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    }
+  })();
+</script>
 <style>
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

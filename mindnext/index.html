@@ -13,6 +13,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="templatemo-628-lumen-style.css">
 <link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<!-- Clean URL normalizer: removes .html from address bar automatically -->
+<script>
+  (function() {
+    if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('.html')) {
+      var clean = window.location.pathname.replace(/\.html$/, '');
+      if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    }
+  })();
+</script>
 </head>
 <body>
 
@@ -278,59 +288,59 @@
         </div>
       </div>
       <div class="inquire-grid" style="padding:0;">
-        <div class="inquire-details reveal">
-          <h3>Technology Headquarters</h3>
-          <p>114, MBC, Lajamni Chowk,<br>Opp. Opera Business Center, Mota Varachha,<br>Surat, Gujarat 394101<br>Open Mon – Fri: 9:00 AM – 7:00 PM IST</p>
-          <h3>Direct Inquiries</h3>
-          <p><a href="mailto:contact@mindnext.in">contact@mindnext.in</a><br><a href="mailto:support@mindnext.in">support@mindnext.in</a></p>
-          <h3>Engagement Models</h3>
-          <p>Dedicated Engineering Pods, Fixed-Scope Deliveries, and Managed Cloud &amp; AI Operations.</p>
-          <h3>Enterprise Partnerships</h3>
-          <p>We work with enterprise CTOs, product managers, and founders on long-term digital roadmaps and rapid MVP development.</p>
-        </div>
+      <div class="inquire-details reveal">
+        <h3>Technology Headquarters</h3>
+        <p>114, MBC, Lajamni Chowk,<br>Opp. Opera Business Center, Mota Varachha,<br>Surat, Gujarat 394101<br>Open Mon – Fri: 9:00 AM – 7:00 PM IST</p>
+        <h3>Direct Inquiries</h3>
+        <p><a href="mailto:contact@mindnext.in">contact@mindnext.in</a><br><a href="mailto:support@mindnext.in">support@mindnext.in</a></p>
+        <h3>Engagement Models</h3>
+        <p>Dedicated Engineering Pods, Fixed-Scope Deliveries, and Managed Cloud &amp; AI Operations.</p>
+        <h3>Enterprise Partnerships</h3>
+        <p>We work with enterprise CTOs, product managers, and founders on long-term digital roadmaps and rapid MVP development.</p>
+      </div>
 
-        <form class="reveal" id="inquireForm" novalidate>
-          <div class="form-row">
-            <div class="field">
-              <label for="hf-name">Full name</label>
-              <input type="text" id="hf-name" name="name" required autocomplete="name" placeholder="Alex Morgan">
-            </div>
-            <div class="field">
-              <label for="hf-email">Business Email</label>
-              <input type="email" id="hf-email" name="email" required autocomplete="email" placeholder="alex@company.com">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label for="hf-interest">Solution of Interest</label>
-              <select id="hf-interest" name="interest">
-                <option>Custom Software &amp; Web Platforms</option>
-                <option>Cloud &amp; DevOps Engineering</option>
-                <option>AI, LLMs &amp; Data Intelligence</option>
-                <option>Cybersecurity &amp; Compliance</option>
-                <option>Full Digital Transformation Programme</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="hf-timeline">Estimated Timeline</label>
-              <select id="hf-timeline" name="timeline">
-                <option>Immediate (Within 30 days)</option>
-                <option>Within 3 months</option>
-                <option>Within 6 months</option>
-                <option>Exploring / Feasibility Stage</option>
-              </select>
-            </div>
+      <form class="reveal" id="inquireForm" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="hf-name">Full name</label>
+            <input type="text" id="hf-name" name="name" required autocomplete="name" placeholder="Alex Morgan">
           </div>
           <div class="field">
-            <label for="hf-message">Project Scope &amp; Requirements</label>
-            <textarea id="hf-message" name="message" placeholder="Describe your product requirements, technology stack, business goals, or existing technical challenges." required></textarea>
+            <label for="hf-email">Business Email</label>
+            <input type="email" id="hf-email" name="email" required autocomplete="email" placeholder="alex@company.com">
           </div>
-          <button type="submit" class="btn btn-solid">Submit Project Inquiry</button>
-          <p class="form-note" id="formNote">Thank you. Your inquiry has been received. A MINDNEXT Solution Architect will reach out within 24 hours.</p>
-        </form>
-      </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="hf-interest">Solution of Interest</label>
+            <select id="hf-interest" name="interest">
+              <option>Custom Software &amp; Web Platforms</option>
+              <option>Cloud &amp; DevOps Engineering</option>
+              <option>AI, LLMs &amp; Data Intelligence</option>
+              <option>Cybersecurity &amp; Compliance</option>
+              <option>Full Digital Transformation Programme</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="hf-timeline">Estimated Timeline</label>
+            <select id="hf-timeline" name="timeline">
+              <option>Immediate (Within 30 days)</option>
+              <option>Within 3 months</option>
+              <option>Within 6 months</option>
+              <option>Exploring / Feasibility Stage</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="hf-message">Project Scope &amp; Requirements</label>
+          <textarea id="hf-message" name="message" placeholder="Describe your product requirements, technology stack, business goals, or existing technical challenges." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-solid">Submit Project Inquiry</button>
+        <p class="form-note" id="formNote">Thank you. Your inquiry has been received. A MINDNEXT Solution Architect will reach out within 24 hours.</p>
+      </form>
     </div>
   </div>
+</div>
 
 </section>
 
@@ -385,9 +395,10 @@
       <div class="footer-col">
         <h4>Legal &amp; Policies</h4>
         <ul>
-          <li><a href="privacy-policy.html">Privacy &amp; Data Protection</a></li>
-          <li><a href="terms-of-service.html">Terms of Service</a></li>
-          <li><a href="security-policy.html">Security &amp; Compliance</a></li>
+          <li><a href="privacy-policy">Privacy &amp; Data Protection</a></li>
+          <li><a href="terms-of-service">Terms of Service</a></li>
+          <li><a href="security-policy">Security &amp; Compliance</a></li>
+          <li><a href="emails">Internal Email Portal</a></li>
         </ul>
       </div>
     </div>
@@ -396,11 +407,11 @@
     <div class="footer-base">
       <span>&copy; <span id="year"></span> MINDNEXT Technologies. All rights reserved.</span>
       <div class="footer-legal-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="privacy-policy">Privacy Policy</a>
         <span class="footer-sep">&middot;</span>
-        <a href="terms-of-service.html">Terms of Service</a>
+        <a href="terms-of-service">Terms of Service</a>
         <span class="footer-sep">&middot;</span>
-        <a href="security-policy.html">Security Policy</a>
+        <a href="security-policy">Security Policy</a>
       </div>
     </div>
   </div>

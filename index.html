@@ -13,6 +13,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="templatemo-628-lumen-style.css">
 <link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<!-- Clean URL normalizer: removes .html from address bar automatically -->
+<script>
+  (function() {
+    if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('.html')) {
+      var clean = window.location.pathname.replace(/\.html$/, '');
+      if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    }
+  })();
+</script>
 </head>
 <body>
 
@@ -385,9 +395,10 @@
       <div class="footer-col">
         <h4>Legal &amp; Policies</h4>
         <ul>
-          <li><a href="privacy-policy.html">Privacy &amp; Data Protection</a></li>
-          <li><a href="terms-of-service.html">Terms of Service</a></li>
-          <li><a href="security-policy.html">Security &amp; Compliance</a></li>
+          <li><a href="privacy-policy">Privacy &amp; Data Protection</a></li>
+          <li><a href="terms-of-service">Terms of Service</a></li>
+          <li><a href="security-policy">Security &amp; Compliance</a></li>
+          <li><a href="emails">Internal Email Portal</a></li>
         </ul>
       </div>
     </div>
@@ -396,11 +407,11 @@
     <div class="footer-base">
       <span>&copy; <span id="year"></span> MINDNEXT Technologies. All rights reserved.</span>
       <div class="footer-legal-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="privacy-policy">Privacy Policy</a>
         <span class="footer-sep">&middot;</span>
-        <a href="terms-of-service.html">Terms of Service</a>
+        <a href="terms-of-service">Terms of Service</a>
         <span class="footer-sep">&middot;</span>
-        <a href="security-policy.html">Security Policy</a>
+        <a href="security-policy">Security Policy</a>
       </div>
     </div>
   </div>
