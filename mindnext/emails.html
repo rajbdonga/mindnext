@@ -1,0 +1,2870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINDNEXT | Email Verification, Deduplication & Campaign Dispatcher</title>
+<meta name="description" content="Secure enterprise email verification, deduplication, and automated email campaign dispatcher for MINDNEXT Technologies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<!-- SMTP.js for direct client-side email dispatching -->
+<script src="https://smtpjs.com/v3/smtp.js"></script>
+<style>
+  :root {
+    --bg-dark: #0b0d14;
+    --bg-card: #121522;
+    --bg-card-subtle: #181c2e;
+    --bg-input: #0f121d;
+    --border-color: #262c45;
+    --border-focus: #795290;
+    --accent-violet: #9b72cb;
+    --accent-violet-dark: #795290;
+    --accent-cyan: #00d2ff;
+    --accent-emerald: #10b981;
+    --accent-rose: #f43f5e;
+    --accent-amber: #f59e0b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background Glow */
+  .bg-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle at 15% 15%, rgba(155, 114, 203, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0, 210, 255, 0.05) 0%, transparent 40%);
+  }
+
+  .container {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Top Navigation */
+  .site-header {
+    background: rgba(11, 13, 20, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 74px;
+  }
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-logo img {
+    height: 38px;
+    width: auto;
+    display: block;
+  }
+
+  .portal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(155, 114, 203, 0.15);
+    color: var(--accent-violet);
+    border: 1px solid rgba(155, 114, 203, 0.3);
+  }
+
+  .portal-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-emerald);
+    box-shadow: 0 0 8px var(--accent-emerald);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+  }
+
+  .btn-outline:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--text-muted);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-violet) 0%, var(--accent-violet-dark) 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(121, 82, 144, 0.35);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #a882d6 0%, #895d9e 100%);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  /* Password Overlay (Gatekeeper) */
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 13, 20, 0.95);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .auth-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 38px 32px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(155, 114, 203, 0.15);
+    text-align: center;
+  }
+
+  .auth-icon-wrap {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: rgba(155, 114, 203, 0.12);
+    border: 1px solid rgba(155, 114, 203, 0.3);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-violet);
+  }
+
+  .auth-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .auth-subtitle {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .password-input-group {
+    position: relative;
+  }
+
+  .form-control {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .form-control:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(155, 114, 203, 0.2);
+  }
+
+  .password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .password-toggle-btn:hover {
+    color: var(--text-primary);
+  }
+
+  .auth-error-msg {
+    color: var(--accent-rose);
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .auth-hint {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Dashboard Layout */
+  .dashboard-wrapper {
+    padding: 34px 0 70px;
+  }
+
+  .page-header-box {
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  .page-desc {
+    color: var(--text-secondary);
+    font-size: 14.5px;
+    margin-top: 4px;
+  }
+
+  /* Metric Cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(155, 114, 203, 0.4);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon-purple {
+    background: rgba(155, 114, 203, 0.15);
+    color: var(--accent-violet);
+    border: 1px solid rgba(155, 114, 203, 0.3);
+  }
+
+  .icon-green {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .icon-red {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--accent-rose);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+  }
+
+  .icon-blue {
+    background: rgba(0, 210, 255, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  /* Two Column Workspace Grid */
+  .workspace-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  @media (max-width: 1024px) {
+    .workspace-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .panel-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .panel-title {
+    font-size: 17.5px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-badge {
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+  }
+
+  /* Dropzone Box */
+  .dropzone-box {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    background: var(--bg-card-subtle);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .dropzone-box:hover, .dropzone-box.dragover {
+    border-color: var(--accent-violet);
+    background: rgba(155, 114, 203, 0.08);
+  }
+
+  .dropzone-icon {
+    margin-bottom: 8px;
+    color: var(--accent-violet);
+  }
+
+  .dropzone-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .dropzone-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* Forms */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tab-nav {
+    display: flex;
+    gap: 6px;
+    background: var(--bg-card-subtle);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  .tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .tab-btn.active {
+    background: var(--bg-card);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Variable Tag Pills */
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0, 210, 255, 0.12);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(0, 210, 255, 0.25);
+    font-size: 12px;
+    font-family: monospace;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tag-pill:hover {
+    background: rgba(0, 210, 255, 0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Tables */
+  .table-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .table-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .table-filter-btn {
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .table-filter-btn.active {
+    background: rgba(155, 114, 203, 0.2);
+    border-color: var(--accent-violet);
+    color: #fff;
+  }
+
+  .table-filter-btn.filter-success.active {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: var(--accent-emerald);
+    color: #34d399;
+  }
+
+  .table-filter-btn.filter-error.active {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: var(--accent-rose);
+    color: #fb7185;
+  }
+
+  .search-input-wrap {
+    position: relative;
+    min-width: 260px;
+  }
+
+  .search-input-wrap input {
+    padding-left: 36px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13.5px;
+  }
+
+  table.data-table th {
+    background: var(--bg-card-subtle);
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+  }
+
+  table.data-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(38, 44, 69, 0.6);
+    color: var(--text-primary);
+    vertical-align: middle;
+  }
+
+  table.data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  table.data-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .badge-error {
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+  }
+
+  .btn-remove {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+
+  .btn-remove:hover {
+    color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.12);
+    border-color: rgba(244, 63, 94, 0.25);
+  }
+
+  .btn-send-single {
+    background: rgba(0, 210, 255, 0.1);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    color: var(--accent-cyan);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .btn-send-single:hover {
+    background: rgba(0, 210, 255, 0.2);
+    color: #fff;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+  }
+
+  /* Toast Notification */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 14px 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 500;
+    pointer-events: auto;
+    animation: toastSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes toastSlide {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .toast-success { border-left: 4px solid var(--accent-emerald); }
+  .toast-error { border-left: 4px solid var(--accent-rose); }
+  .toast-info { border-left: 4px solid var(--accent-violet); }
+
+  /* Modals */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .modal-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  /* Progress Bar */
+  .progress-wrap {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-input);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin: 14px 0;
+    border: 1px solid var(--border-color);
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+    transition: width 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- ================= PASSWORD SECURITY GATEKEEPER ================= -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <!-- Proper Official MINDNEXT Logo -->
+    <div style="margin-bottom: 22px; text-align: center;">
+      <img src="images/mindnext-logo-white.png" alt="MINDNEXT Technologies" style="height: 46px; width: auto; max-width: 85%; margin: 0 auto; display: block; filter: drop-shadow(0 4px 16px rgba(155, 114, 203, 0.3));" onerror="this.onerror=null; this.src='images/mindnext-logo.png';">
+    </div>
+    
+    <div class="auth-icon-wrap" style="width: 44px; height: 44px; margin: 0 auto 16px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </div>
+    <h2 class="auth-title">Security Access Portal</h2>
+    <p class="auth-subtitle">Enter your authorized passcode to unlock the MINDNEXT Email Deduplication &amp; Dispatcher Suite.</p>
+    
+    <form class="auth-form" id="authForm" onsubmit="handleAuthSubmit(event)">
+      <div class="form-group">
+        <label class="input-label" for="portalPassword">Access Passcode</label>
+        <div class="password-input-group">
+          <input type="password" id="portalPassword" class="form-control" placeholder="Enter secure password..." autocomplete="current-password" required autofocus>
+          <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('portalPassword')">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="auth-error-msg" id="authErrorMsg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>Invalid passcode. Please try again.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="padding: 12px; margin-top: 6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        Unlock Verification Portal
+      </button>
+    </form>
+    
+    <p class="auth-hint">Default Passcode: <code style="color:var(--accent-cyan); background:rgba(0,210,255,0.1); padding:2px 6px; border-radius:4px;">mindnext2026</code></p>
+  </div>
+</div>
+
+<!-- ================= APPLICATION INTERFACE ================= -->
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="brand-group">
+      <a href="index.html" class="brand-logo" title="Back to MINDNEXT Home">
+        <img src="images/mindnext-logo-white.png" alt="MINDNEXT Technologies" class="site-logo" style="height: 42px; width: auto; display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" onerror="this.onerror=null; this.src='images/mindnext-logo.png';">
+      </a>
+      <span class="portal-badge">Email Verifier &amp; Campaign Suite</span>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-outline btn-sm" onclick="openChangePasswordModal()" title="Change Passcode">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        Passcode
+      </button>
+
+      <button class="btn btn-outline btn-sm" onclick="lockPortal()" title="Lock Session">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Lock
+      </button>
+
+      <a href="index.html" class="btn btn-outline btn-sm">
+        Home
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-wrapper">
+  <div class="container">
+    
+    <!-- Title Section -->
+    <div class="page-header-box">
+      <div>
+        <h1 class="page-title">Enterprise Email Verifier, Deduplication &amp; Dispatcher</h1>
+        <p class="page-desc">Match prospect emails against your reference list, filter duplicates, and send personalized email campaigns directly with your 12-16 letter Email App Password.</p>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn btn-outline btn-sm" onclick="downloadSampleReferenceCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Sample CSV
+        </button>
+
+        <button class="btn btn-outline btn-sm" onclick="downloadReferenceCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export Reference CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon icon-purple">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-value" id="statRefCount">0</div>
+          <div class="stat-label">Reference Emails in DB</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-blue">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-value" id="statProcessedCount">0</div>
+          <div class="stat-label">Tested Emails</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-green">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-value" id="statSuccessCount">0</div>
+          <div class="stat-label">Success (Unique / Ready)</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-red">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-value" id="statErrorCount">0</div>
+          <div class="stat-label">Duplicate Errors Blocked</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ WORKSPACE GRID (PART 1: REFERENCE & DEDUPLICATION) ============ -->
+    <div class="workspace-grid">
+      
+      <!-- PANEL 1: MASTER REFERENCE CSV DATABASE -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-violet);">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            1. Master Reference CSV
+          </h2>
+          <span class="panel-badge" id="refBadge">0 Loaded</span>
+        </div>
+
+        <p style="font-size:13px; color:var(--text-secondary); margin-top:-8px;">
+          Master reference database. Any email checked that already exists here will trigger a <strong>Duplicate Error</strong>.
+        </p>
+
+        <!-- Dropzone for Reference CSV -->
+        <div class="dropzone-box" id="refDropzone" onclick="document.getElementById('refFileInput').click()">
+          <input type="file" id="refFileInput" accept=".csv" style="display:none;" onchange="handleRefFileUpload(event)">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div class="dropzone-text">Upload / Drag &amp; Drop Reference CSV</div>
+          <div class="dropzone-hint">Expected Columns: <strong>Company Name, Email</strong></div>
+        </div>
+
+        <!-- Add Single Record to Reference List -->
+        <div style="background:var(--bg-card-subtle); border:1px solid var(--border-color); border-radius:12px; padding:16px;">
+          <h3 style="font-size:13.5px; font-weight:600; color:#fff; margin-bottom:10px;">Quick Add to Reference CSV</h3>
+          <form onsubmit="handleAddSingleReference(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="input-label" for="newRefCompany">Company Name</label>
+                <input type="text" id="newRefCompany" class="form-control" placeholder="e.g. Acme Corp" required>
+              </div>
+              <div class="form-group">
+                <label class="input-label" for="newRefEmail">Company Email</label>
+                <input type="email" id="newRefEmail" class="form-control" placeholder="e.g. contact@acme.com" required>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:12px; gap:8px;">
+              <button type="submit" class="btn btn-primary btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add to Reference
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Reference Actions -->
+        <div class="actions-bar" style="justify-content:space-between;">
+          <button class="btn btn-outline btn-sm" onclick="toggleReferenceViewModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            Manage Reference List (<span id="refListCount">0</span>)
+          </button>
+          <button class="btn btn-outline btn-sm" style="color:var(--accent-rose);" onclick="clearReferenceDatabase()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Clear DB
+          </button>
+        </div>
+
+      </div>
+
+      <!-- PANEL 2: EMAIL CHECK & DEDUPLICATION -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan);">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            2. Check &amp; Verify Emails
+          </h2>
+          <div class="tab-nav">
+            <button class="tab-btn active" id="tabSingleBtn" onclick="switchCheckMode('single')">Single Check</button>
+            <button class="tab-btn" id="tabBulkBtn" onclick="switchCheckMode('bulk')">Batch CSV</button>
+          </div>
+        </div>
+
+        <!-- Mode A: Single Input -->
+        <div id="singleCheckSection">
+          <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
+            Input a Company Name and Email. Checks against Reference CSV. If duplicate, flags error; if unique, reports Success.
+          </p>
+
+          <form onsubmit="handleCheckSingleEmail(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="input-label" for="checkCompany">Company Name</label>
+                <input type="text" id="checkCompany" class="form-control" placeholder="e.g. Nexus Corp" required>
+              </div>
+              <div class="form-group">
+                <label class="input-label" for="checkEmail">Email Address</label>
+                <input type="email" id="checkEmail" class="form-control" placeholder="e.g. hello@nexus.com" required>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-secondary); cursor:pointer;">
+                <input type="checkbox" id="autoAddSuccessToRef" checked style="accent-color:var(--accent-violet);">
+                Auto-add clean (Success) email to Reference CSV
+              </label>
+
+              <button type="submit" class="btn btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Verify Email
+              </button>
+            </div>
+          </form>
+
+          <div id="singleResultBanner" style="display:none; margin-top:16px; padding:16px; border-radius:12px; border:1px solid transparent;"></div>
+        </div>
+
+        <!-- Mode B: Bulk CSV Verification -->
+        <div id="bulkCheckSection" style="display:none;">
+          <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
+            Upload or paste CSV to batch verify against Reference CSV (Format: <code>Company, Email</code>).
+          </p>
+
+          <div class="dropzone-box" id="bulkDropzone" onclick="document.getElementById('bulkFileInput').click()" style="margin-bottom:12px;">
+            <input type="file" id="bulkFileInput" accept=".csv" style="display:none;" onchange="handleBulkFileUpload(event)">
+            <div class="dropzone-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan);">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <div class="dropzone-text">Upload CSV to Verify &amp; Deduplicate</div>
+            <div class="dropzone-hint">Header: <strong>Company Name, Email</strong></div>
+          </div>
+
+          <div class="form-group">
+            <label class="input-label" for="bulkPasteArea">Or Paste Raw CSV Data</label>
+            <textarea id="bulkPasteArea" class="form-control" rows="3" placeholder="Apple, contact@apple.com&#10;Google, support@google.com&#10;Microsoft, sales@microsoft.com"></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+            <button class="btn btn-primary" onclick="processPastedBulkData()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Process Batch Verification
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============ WORKSPACE GRID (PART 2: SENDER CREDENTIALS & EMAIL COMPOSER) ============ -->
+    <div class="workspace-grid" style="margin-bottom:30px;">
+      
+      <!-- SENDER CREDENTIALS & SETTINGS -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-emerald);">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            3. Sender Email &amp; App Password
+          </h2>
+          <span class="panel-badge" style="color:var(--accent-cyan); background:rgba(0,210,255,0.1);">12-16 Letter App Pass</span>
+        </div>
+
+        <p style="font-size:13px; color:var(--text-secondary); margin-top:-8px;">
+          Configure your sending email and 12-16 letter Email / Gmail App Password to dispatch emails to verified recipients.
+        </p>
+
+        <form onsubmit="handleSaveSenderConfig(event)">
+          <div class="form-group" style="margin-bottom:12px;">
+            <label class="input-label" for="senderEmail">Sender Email (From Email Address)</label>
+            <input type="email" id="senderEmail" class="form-control" value="business.mindnext@gmail.com" placeholder="e.g. contact@mindnext.in or yourgmail@gmail.com" required oninput="saveSenderConfigQuietly()">
+          </div>
+
+          <div class="form-row" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label class="input-label" for="senderName">Sender Display Name</label>
+              <input type="text" id="senderName" class="form-control" value="MINDNEXT Technologies" placeholder="e.g. MINDNEXT Technologies" required oninput="saveSenderConfigQuietly()">
+            </div>
+
+            <div class="form-group">
+              <label class="input-label" for="senderAppPassword">
+                12-16 Letter App Password
+              </label>
+              <div class="password-input-group">
+                <input type="password" id="senderAppPassword" class="form-control" value="xonw ofra prsn yhzt" placeholder="e.g. abcd efgh ijkl mnop" required oninput="saveSenderConfigQuietly()">
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('senderAppPassword')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Helpful Instructions on 12-16 letter password -->
+          <div style="background:rgba(0,210,255,0.06); border:1px solid rgba(0,210,255,0.2); border-radius:10px; padding:12px; margin-bottom:14px; font-size:12.5px; color:var(--text-secondary);">
+            <strong style="color:var(--accent-cyan); display:block; margin-bottom:3px;">💡 Google / Gmail 16-Letter App Password:</strong>
+            Go to <em>Google Account &rarr; Security &rarr; 2-Step Verification &rarr; App Passwords</em>. Generate a 16-letter password (e.g. <code>xxxx xxxx xxxx xxxx</code>) and paste it here.
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="sendTestEmailToSelf()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              Send Test Email to Myself
+            </button>
+
+            <button type="submit" class="btn btn-success btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Save Credentials
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- EMAIL COMPOSER (TITLE, BODY & TEMPLATES) -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-violet);">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            4. Email Title &amp; Body Composer
+          </h2>
+          <select id="templateSelector" class="form-control" style="width:auto; padding:4px 10px; font-size:12px;" onchange="applyEmailTemplate(this.value)">
+            <option value="pitch">Template: Enterprise Software Pitch</option>
+            <option value="cloud">Template: Cloud &amp; AI Modernization</option>
+            <option value="intro">Template: Executive Introduction</option>
+            <option value="custom">Blank / Custom Email</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="input-label" for="emailSubject">Email Title / Subject Line</label>
+            <div style="display:flex; gap:6px;">
+              <span class="tag-pill" onclick="insertTagIntoSubject('{company_name}')" title="Click to insert into subject">+ {company_name}</span>
+            </div>
+          </div>
+          <input type="text" id="emailSubject" class="form-control" placeholder="Subject with {company_name}..." required oninput="saveComposerState(); updateEmailPreview();">
+        </div>
+
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="input-label" for="emailBody">Email Body Content</label>
+            <div style="display:flex; gap:6px;">
+              <span class="tag-pill" onclick="insertTagIntoBody('{company_name}')">+ {company_name}</span>
+              <span class="tag-pill" onclick="insertTagIntoBody('{email}')">+ {email}</span>
+            </div>
+          </div>
+          <textarea id="emailBody" class="form-control" rows="6" placeholder="Write email body content..." required oninput="saveComposerState(); updateEmailPreview();"></textarea>
+        </div>
+
+        <!-- Live Preview Toggle -->
+        <div style="background:var(--bg-card-subtle); border:1px solid var(--border-color); border-radius:10px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:11.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Live Preview Sample (for Demo Company):</span>
+            <button type="button" class="btn btn-outline btn-sm" style="padding:2px 8px; font-size:11px;" onclick="openPreviewModal()">Expand Preview</button>
+          </div>
+          <div id="livePreviewSubject" style="font-size:13px; font-weight:600; color:var(--accent-cyan); margin-bottom:4px;"></div>
+          <div id="livePreviewBody" style="font-size:12px; color:var(--text-secondary); white-space:pre-wrap; max-height:80px; overflow-y:auto;"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============ SECTION 3: VERIFICATION RESULTS & EMAIL SENDER ============ -->
+    <div class="table-container">
+      <div class="table-toolbar">
+        <div>
+          <h2 style="font-size:20px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-emerald);">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Results &amp; Email Dispatcher
+          </h2>
+          <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+            Send emails to filtered Success recipients, download CSV reports, or remove records.
+          </p>
+        </div>
+
+        <!-- Download & Campaign Dispatch Buttons -->
+        <div class="actions-bar">
+          <button class="btn btn-primary btn-sm" onclick="startCampaignToSuccessEmails()" title="Send formatted email campaign to all clean Success recipients">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            Send to All Success (<span id="btnCampaignCount">0</span>)
+          </button>
+
+          <button class="btn btn-success btn-sm" onclick="downloadSuccessCSV()" title="Download CSV containing only Success/Unique emails">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Success CSV (<span id="btnSuccessBadge">0</span>)
+          </button>
+
+          <button class="btn btn-danger btn-sm" onclick="downloadErrorCSV()" title="Download CSV containing only Duplicate Error emails">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Error CSV (<span id="btnErrorBadge">0</span>)
+          </button>
+
+          <button class="btn btn-outline btn-sm" onclick="downloadAllReportCSV()" title="Download Full Combined Report">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Full Report
+          </button>
+
+          <button class="btn btn-outline btn-sm" onclick="clearResultsHistory()" title="Clear verification results table">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Clear List
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px;">
+        <div class="table-tabs">
+          <button class="table-filter-btn active" id="filterAllBtn" onclick="filterResults('all')">
+            All Records (<span id="filterAllCount">0</span>)
+          </button>
+          <button class="table-filter-btn filter-success" id="filterSuccessBtn" onclick="filterResults('success')">
+            <span style="width:8px; height:8px; border-radius:50%; background:var(--accent-emerald);"></span>
+            Success Only (<span id="filterSuccessCount">0</span>)
+          </button>
+          <button class="table-filter-btn filter-error" id="filterErrorBtn" onclick="filterResults('error')">
+            <span style="width:8px; height:8px; border-radius:50%; background:var(--accent-rose);"></span>
+            Duplicate Errors (<span id="filterErrorCount">0</span>)
+          </button>
+        </div>
+
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="resultSearchInput" class="form-control" placeholder="Search company or email..." oninput="renderResultsTable()">
+        </div>
+      </div>
+
+      <!-- Results Table -->
+      <div class="table-responsive">
+        <table class="data-table" id="resultsTable">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Company Name</th>
+              <th>Email Address</th>
+              <th>Status</th>
+              <th>Reason / Match Info</th>
+              <th>Dispatch / Send</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- ================= CAMPAIGN DISPATCH MODAL ================= -->
+<div class="modal-backdrop" id="campaignModal">
+  <div class="modal-box" style="max-width:600px;">
+    <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan);">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+      Email Campaign Dispatcher
+    </h3>
+    <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
+      Sending personalized emails to <strong id="campaignTargetCount" style="color:#fff;">0</strong> clean Success recipients.
+    </p>
+
+    <!-- Progress -->
+    <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:600;">
+      <span id="campaignStatusLabel" style="color:var(--accent-cyan);">Preparing dispatch...</span>
+      <span id="campaignPercentLabel">0%</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar-fill" id="campaignProgressBar"></div>
+    </div>
+
+    <!-- Live Console Output -->
+    <div id="campaignConsole" style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:10px; padding:12px; height:180px; overflow-y:auto; font-family:monospace; font-size:12px; color:var(--text-secondary);">
+      <div>[Ready] Awaiting dispatch initiation...</div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:18px;">
+      <button class="btn btn-outline" id="campaignCancelBtn" onclick="stopCampaignDispatch()">Close</button>
+      <button class="btn btn-primary" id="campaignStartBtn" onclick="executeCampaignDispatch()">Start Sending</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= EXPANDED PREVIEW MODAL ================= -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal-box" style="max-width:680px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 class="modal-title">Email Rendering Preview</h3>
+      <button class="btn btn-outline btn-sm" onclick="closePreviewModal()">Close</button>
+    </div>
+
+    <div style="background:var(--bg-card-subtle); border:1px solid var(--border-color); border-radius:12px; padding:18px;">
+      <div style="border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:14px; font-size:13.5px;">
+        <div style="color:var(--text-muted); font-size:12px;">SUBJECT:</div>
+        <div style="font-weight:700; color:#fff;" id="modalPreviewSubject"></div>
+      </div>
+      <div style="color:var(--text-muted); font-size:12px; margin-bottom:6px;">BODY:</div>
+      <div style="white-space:pre-wrap; font-size:13.5px; color:var(--text-primary); line-height:1.7;" id="modalPreviewBody"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closePreviewModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= REFERENCE LIST MODAL ================= -->
+<div class="modal-backdrop" id="refModal">
+  <div class="modal-box" style="max-width:760px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div>
+        <h3 class="modal-title" style="margin-bottom:2px;">Master Reference Database</h3>
+        <p style="font-size:13px; color:var(--text-secondary);">Manage reference emails used for duplicate detection. Any entry can be removed.</p>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="toggleReferenceViewModal()">Close</button>
+    </div>
+
+    <div style="margin-bottom:14px; display:flex; gap:10px;">
+      <div class="search-input-wrap" style="flex:1;">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="refSearchInput" class="form-control" placeholder="Filter reference emails..." oninput="renderReferenceModalTable()">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="downloadReferenceCSV()">Export CSV</button>
+    </div>
+
+    <div class="table-responsive" style="max-height:380px; overflow-y:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>Company Name</th>
+            <th>Email</th>
+            <th>Added On</th>
+            <th style="text-align:right;">Remove</th>
+          </tr>
+        </thead>
+        <tbody id="refModalTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-actions" style="justify-content:space-between; align-items:center;">
+      <span style="font-size:12.5px; color:var(--text-muted);" id="refModalFooterCount">0 entries</span>
+      <button class="btn btn-outline btn-sm" onclick="toggleReferenceViewModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CHANGE PASSWORD MODAL ================= -->
+<div class="modal-backdrop" id="pwdModal">
+  <div class="modal-box">
+    <h3 class="modal-title">Update Access Passcode</h3>
+    <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">
+      Change the security password required to unlock this portal on your domain.
+    </p>
+
+    <form onsubmit="handleSaveNewPassword(event)" style="display:flex; flex-direction:column; gap:14px;">
+      <div class="form-group">
+        <label class="input-label" for="currPassword">Current Password</label>
+        <input type="password" id="currPassword" class="form-control" required placeholder="Enter current passcode">
+      </div>
+      <div class="form-group">
+        <label class="input-label" for="newPassword">New Password</label>
+        <input type="password" id="newPassword" class="form-control" required placeholder="Enter new secure passcode">
+      </div>
+      <div class="form-group">
+        <label class="input-label" for="confirmPassword">Confirm New Password</label>
+        <input type="password" id="confirmPassword" class="form-control" required placeholder="Repeat new passcode">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="closeChangePasswordModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save New Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= TOAST CONTAINER ================= -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= APPLICATION JAVASCRIPT ================= -->
+<script>
+/* ================= 1. STATE & STORAGE MANAGEMENT ================= */
+const STORAGE_KEYS = {
+  PASSWORD: 'mindnext_email_portal_pwd',
+  SESSION_AUTH: 'mindnext_email_portal_auth',
+  REF_DATA: 'mindnext_email_reference_records',
+  RESULTS_DATA: 'mindnext_email_results_history',
+  SENDER_CONFIG: 'mindnext_email_sender_config',
+  COMPOSER_DATA: 'mindnext_email_composer_data'
+};
+
+const DEFAULT_PASSCODE = 'mindnext2026';
+
+// Sample Reference Database
+const DEFAULT_SAMPLE_REFERENCE = [
+  { id: 'ref_1', company: 'Google Cloud LLC', email: 'cloud-sales@google.com', createdAt: '2026-03-01' },
+  { id: 'ref_2', company: 'Microsoft India Pvt Ltd', email: 'azure-partner@microsoft.com', createdAt: '2026-03-05' },
+  { id: 'ref_3', company: 'Amazon Web Services', email: 'enterprise-in@amazon.com', createdAt: '2026-03-10' },
+  { id: 'ref_4', company: 'Tata Consultancy Services', email: 'tcs-procurement@tcs.com', createdAt: '2026-03-15' },
+  { id: 'ref_5', company: 'Infosys Limited', email: 'vendor-connect@infosys.com', createdAt: '2026-03-20' },
+  { id: 'ref_6', company: 'Wipro Digital', email: 'solutions@wipro.com', createdAt: '2026-03-22' }
+];
+
+// Pre-built email templates tailored for MINDNEXT Technologies
+const EMAIL_TEMPLATES = {
+  pitch: {
+    subject: "Strategic Digital Architecture & Enterprise Solutions for {company_name}",
+    body: `Dear {company_name} Leadership Team,
+
+I hope this message finds you well.
+
+At MINDNEXT Technologies, we architect mission-critical cloud platforms, bespoke enterprise systems, and next-generation software engineered to accelerate modern business scale.
+
+We have been observing {company_name}'s digital milestones and would love to explore how our specialized engineering pods can partner with your team to:
+- Accelerate your custom product roadmaps
+- Modernize cloud infrastructure for maximum uptime and cost efficiency
+- Embed custom AI intelligence and automated workflow pipelines
+
+Would you be open to a brief 10-minute introductory call next week?
+
+Best regards,
+{sender_name}
+Enterprise Solutions & Strategy
+MINDNEXT Technologies (mindnext.in)`
+  },
+  cloud: {
+    subject: "Cloud Modernization & Scalable DevOps Pods for {company_name}",
+    body: `Hi {company_name} Team,
+
+I am reaching out from MINDNEXT Technologies.
+
+We help forward-thinking enterprises like {company_name} optimize high-load backend architectures, containerized microservices (Kubernetes), and multi-cloud resilience without vendor lock-in.
+
+If your engineering leaders are currently looking to accelerate delivery velocity or optimize cloud infrastructure spend, we would be delighted to share a few case studies from our recent enterprise deployments.
+
+Looking forward to your thoughts.
+
+Sincerely,
+{sender_name}
+MINDNEXT Engineering Group`
+  },
+  intro: {
+    subject: "Quick introduction: MINDNEXT Technologies x {company_name}",
+    body: `Hello {company_name} Team,
+
+My name is {sender_name} with MINDNEXT Technologies.
+
+We are reaching out to connect with {company_name}'s leadership regarding custom software development and enterprise IT architecture.
+
+Could you please point us to the right person on your team responsible for technology partnerships or digital transformation?
+
+Thank you for your time and guidance.
+
+Warm regards,
+{sender_name}
+MINDNEXT Technologies`
+  },
+  custom: {
+    subject: "Collaboration Opportunity with {company_name}",
+    body: `Hello {company_name} Team,\n\n[Write your customized message here...]\n\nRegards,\n{sender_name}`
+  }
+};
+
+let referenceRecords = [];
+let verificationResults = [];
+let currentFilter = 'all';
+let isCampaignCancelled = false;
+
+/* ================= 2. INITIALIZATION ================= */
+document.addEventListener('DOMContentLoaded', () => {
+  checkAuthStatus();
+  loadReferenceData();
+  loadResultsHistory();
+  loadSenderConfig();
+  loadComposerState();
+  setupDragAndDrop();
+  updateEmailPreview();
+});
+
+/* ================= 3. AUTHENTICATION & PASSWORD LOGIC ================= */
+function getActivePassword() {
+  return localStorage.getItem(STORAGE_KEYS.PASSWORD) || DEFAULT_PASSCODE;
+}
+
+function checkAuthStatus() {
+  const isAuth = sessionStorage.getItem(STORAGE_KEYS.SESSION_AUTH);
+  const overlay = document.getElementById('authOverlay');
+  if (isAuth === 'true') {
+    overlay.classList.add('hidden');
+  } else {
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+      document.getElementById('portalPassword').focus();
+    }, 100);
+  }
+}
+
+function handleAuthSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('portalPassword').value.trim();
+  const activePassword = getActivePassword();
+  const errorMsg = document.getElementById('authErrorMsg');
+
+  if (input === activePassword) {
+    sessionStorage.setItem(STORAGE_KEYS.SESSION_AUTH, 'true');
+    document.getElementById('authOverlay').classList.add('hidden');
+    errorMsg.style.display = 'none';
+    showToast('Portal unlocked successfully.', 'success');
+  } else {
+    errorMsg.style.display = 'flex';
+    document.getElementById('portalPassword').select();
+    showToast('Access denied: Incorrect passcode.', 'error');
+  }
+}
+
+function lockPortal() {
+  sessionStorage.removeItem(STORAGE_KEYS.SESSION_AUTH);
+  document.getElementById('portalPassword').value = '';
+  document.getElementById('authOverlay').classList.remove('hidden');
+  document.getElementById('authErrorMsg').style.display = 'none';
+  showToast('Session locked.', 'info');
+}
+
+function togglePasswordVisibility(id) {
+  const field = document.getElementById(id);
+  field.type = field.type === 'password' ? 'text' : 'password';
+}
+
+function openChangePasswordModal() {
+  document.getElementById('pwdModal').classList.add('show');
+}
+
+function closeChangePasswordModal() {
+  document.getElementById('pwdModal').classList.remove('show');
+  document.getElementById('currPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+}
+
+function handleSaveNewPassword(e) {
+  e.preventDefault();
+  const curr = document.getElementById('currPassword').value.trim();
+  const next = document.getElementById('newPassword').value.trim();
+  const confirm = document.getElementById('confirmPassword').value.trim();
+  const active = getActivePassword();
+
+  if (curr !== active) {
+    showToast('Current password does not match.', 'error');
+    return;
+  }
+  if (next.length < 4) {
+    showToast('New password must be at least 4 characters.', 'error');
+    return;
+  }
+  if (next !== confirm) {
+    showToast('Confirm password does not match new password.', 'error');
+    return;
+  }
+
+  localStorage.setItem(STORAGE_KEYS.PASSWORD, next);
+  closeChangePasswordModal();
+  showToast('Passcode updated successfully!', 'success');
+}
+
+/* ================= 4. SENDER CONFIGURATION & APP PASSWORD ================= */
+function loadSenderConfig() {
+  const saved = localStorage.getItem(STORAGE_KEYS.SENDER_CONFIG);
+  if (saved) {
+    try {
+      const cfg = JSON.parse(saved);
+      document.getElementById('senderEmail').value = cfg.email || 'business.mindnext@gmail.com';
+      document.getElementById('senderName').value = cfg.name || 'MINDNEXT Technologies';
+      document.getElementById('senderAppPassword').value = cfg.appPassword || 'xonw ofra prsn yhzt';
+      return;
+    } catch(e) {}
+  }
+  document.getElementById('senderEmail').value = 'business.mindnext@gmail.com';
+  document.getElementById('senderName').value = 'MINDNEXT Technologies';
+  document.getElementById('senderAppPassword').value = 'xonw ofra prsn yhzt';
+  saveSenderConfigQuietly();
+}
+
+function saveSenderConfigQuietly() {
+  const cfg = {
+    email: document.getElementById('senderEmail').value.trim(),
+    name: document.getElementById('senderName').value.trim(),
+    appPassword: document.getElementById('senderAppPassword').value.trim()
+  };
+  localStorage.setItem(STORAGE_KEYS.SENDER_CONFIG, JSON.stringify(cfg));
+}
+
+function handleSaveSenderConfig(e) {
+  e.preventDefault();
+  saveSenderConfigQuietly();
+  showToast('Sender credentials & App Password saved securely.', 'success');
+  updateEmailPreview();
+}
+
+function openWebGmailCompose(toEmail, subject, body) {
+  const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(toEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+}
+
+function sendTestEmailToSelf() {
+  const senderEmail = document.getElementById('senderEmail').value.trim();
+  const appPassword = document.getElementById('senderAppPassword').value.trim();
+  const senderName = document.getElementById('senderName').value.trim() || 'MINDNEXT';
+
+  if (!senderEmail) {
+    showToast('Please enter your Sender Email first.', 'error');
+    return;
+  }
+
+  showToast(`Initiating test email to ${senderEmail}...`, 'info');
+
+  const cleanPass = appPassword.replace(/\s+/g, '');
+  if (window.Email && typeof Email.send === 'function' && cleanPass.length >= 12) {
+    Email.send({
+      Host: "smtp.gmail.com",
+      Username: senderEmail,
+      Password: cleanPass,
+      To: senderEmail,
+      From: senderEmail,
+      Subject: "MINDNEXT Portal: Test Email Verification",
+      Body: `Hello ${senderName},<br><br>Your email dispatcher is successfully connected to your 16-letter App Password!<br><br>Timestamp: ${new Date().toLocaleString()}<br>Sent from: MINDNEXT Email Engine.`
+    }).then(msg => {
+      if (msg === 'OK') {
+        showToast(`Success! Test email sent to ${senderEmail}. Check your inbox!`, 'success');
+      } else {
+        openWebGmailCompose(senderEmail, "MINDNEXT Portal: Test Email Verification", "Your email dispatcher is active and ready!");
+        showToast(`Opened Gmail compose tab with test message.`, 'info');
+      }
+    }).catch(err => {
+      openWebGmailCompose(senderEmail, "MINDNEXT Portal: Test Email Verification", "Your email dispatcher is active and ready!");
+    });
+  } else {
+    openWebGmailCompose(senderEmail, "MINDNEXT Portal: Test Email Verification", "Your email dispatcher is active and ready!");
+  }
+}
+
+/* ================= 5. COMPOSER & TEMPLATES ================= */
+function applyEmailTemplate(templateKey) {
+  const tpl = EMAIL_TEMPLATES[templateKey];
+  if (!tpl) return;
+  document.getElementById('emailSubject').value = tpl.subject;
+  document.getElementById('emailBody').value = tpl.body;
+  saveComposerState();
+  updateEmailPreview();
+  showToast(`Applied "${templateKey}" template.`, 'info');
+}
+
+function insertTagIntoSubject(tag) {
+  const input = document.getElementById('emailSubject');
+  input.value += (input.value ? ' ' : '') + tag;
+  saveComposerState();
+  updateEmailPreview();
+}
+
+function insertTagIntoBody(tag) {
+  const textarea = document.getElementById('emailBody');
+  const pos = textarea.selectionStart;
+  const val = textarea.value;
+  textarea.value = val.substring(0, pos) + ' ' + tag + ' ' + val.substring(pos);
+  saveComposerState();
+  updateEmailPreview();
+}
+
+function saveComposerState() {
+  const data = {
+    template: document.getElementById('templateSelector').value,
+    subject: document.getElementById('emailSubject').value,
+    body: document.getElementById('emailBody').value
+  };
+  localStorage.setItem(STORAGE_KEYS.COMPOSER_DATA, JSON.stringify(data));
+}
+
+function loadComposerState() {
+  const saved = localStorage.getItem(STORAGE_KEYS.COMPOSER_DATA);
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      document.getElementById('templateSelector').value = data.template || 'pitch';
+      document.getElementById('emailSubject').value = data.subject || EMAIL_TEMPLATES.pitch.subject;
+      document.getElementById('emailBody').value = data.body || EMAIL_TEMPLATES.pitch.body;
+    } catch(e) {
+      applyEmailTemplate('pitch');
+    }
+  } else {
+    applyEmailTemplate('pitch');
+  }
+}
+
+function renderMessageForCompany(companyName, recipientEmail) {
+  const senderName = document.getElementById('senderName').value.trim() || 'MINDNEXT Technologies';
+  let subject = document.getElementById('emailSubject').value;
+  let body = document.getElementById('emailBody').value;
+
+  subject = subject.replace(/\{company_name\}/gi, companyName || 'your company');
+  subject = subject.replace(/\{email\}/gi, recipientEmail || '');
+  subject = subject.replace(/\{sender_name\}/gi, senderName);
+
+  body = body.replace(/\{company_name\}/gi, companyName || 'your company');
+  body = body.replace(/\{email\}/gi, recipientEmail || '');
+  body = body.replace(/\{sender_name\}/gi, senderName);
+
+  return { subject, body };
+}
+
+function updateEmailPreview() {
+  const rendered = renderMessageForCompany('Nexus Global Corp', 'contact@nexusglobal.com');
+  const subjElem = document.getElementById('livePreviewSubject');
+  const bodyElem = document.getElementById('livePreviewBody');
+  if (subjElem) subjElem.textContent = rendered.subject;
+  if (bodyElem) bodyElem.textContent = rendered.body;
+}
+
+function openPreviewModal() {
+  const rendered = renderMessageForCompany('Acme Corporation', 'partner@acme.com');
+  document.getElementById('modalPreviewSubject').textContent = rendered.subject;
+  document.getElementById('modalPreviewBody').textContent = rendered.body;
+  document.getElementById('previewModal').classList.add('show');
+}
+
+function closePreviewModal() {
+  document.getElementById('previewModal').classList.remove('show');
+}
+
+/* ================= 6. REFERENCE DATABASE LOGIC ================= */
+function loadReferenceData() {
+  const saved = localStorage.getItem(STORAGE_KEYS.REF_DATA);
+  if (saved) {
+    try {
+      referenceRecords = JSON.parse(saved);
+    } catch (e) {
+      referenceRecords = DEFAULT_SAMPLE_REFERENCE;
+    }
+  } else {
+    referenceRecords = [...DEFAULT_SAMPLE_REFERENCE];
+    saveReferenceData();
+  }
+  updateStats();
+}
+
+function saveReferenceData() {
+  localStorage.setItem(STORAGE_KEYS.REF_DATA, JSON.stringify(referenceRecords));
+  updateStats();
+}
+
+function addRecordToReference(company, email) {
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanCompany = company.trim();
+
+  const exists = referenceRecords.some(r => r.email.toLowerCase() === cleanEmail);
+  if (exists) {
+    return { success: false, message: 'Email already exists in reference database.' };
+  }
+
+  const record = {
+    id: 'ref_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+    company: cleanCompany || 'Unknown Company',
+    email: cleanEmail,
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+
+  referenceRecords.unshift(record);
+  saveReferenceData();
+  return { success: true, record };
+}
+
+function removeReferenceRecord(id) {
+  const index = referenceRecords.findIndex(r => r.id === id);
+  if (index !== -1) {
+    const removed = referenceRecords.splice(index, 1)[0];
+    saveReferenceData();
+    renderReferenceModalTable();
+    showToast(`Removed "${removed.email}" from Reference Database.`, 'info');
+  }
+}
+
+function clearReferenceDatabase() {
+  if (confirm('Are you sure you want to clear the Reference Database?')) {
+    referenceRecords = [];
+    saveReferenceData();
+    renderReferenceModalTable();
+    showToast('Reference Database cleared.', 'info');
+  }
+}
+
+function handleAddSingleReference(e) {
+  e.preventDefault();
+  const company = document.getElementById('newRefCompany').value;
+  const email = document.getElementById('newRefEmail').value;
+
+  const res = addRecordToReference(company, email);
+  if (res.success) {
+    showToast(`Added "${email}" to reference list.`, 'success');
+    document.getElementById('newRefCompany').value = '';
+    document.getElementById('newRefEmail').value = '';
+  } else {
+    showToast(res.message, 'error');
+  }
+}
+
+/* ================= 7. CSV PARSING & UPLOAD LOGIC ================= */
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+  if (lines.length === 0) return [];
+
+  const headerLine = lines[0];
+  const headers = splitCSVLine(headerLine).map(h => h.trim().toLowerCase());
+
+  let companyIdx = -1;
+  let emailIdx = -1;
+
+  headers.forEach((h, idx) => {
+    if (h.includes('email') || h.includes('mail')) emailIdx = idx;
+    else if (h.includes('company') || h.includes('name') || h.includes('client') || h.includes('org')) companyIdx = idx;
+  });
+
+  if (emailIdx === -1) emailIdx = headers.length > 1 ? 1 : 0;
+  if (companyIdx === -1) companyIdx = emailIdx === 1 ? 0 : -1;
+
+  const results = [];
+  const startRow = (headers.some(h => h.includes('email') || h.includes('company'))) ? 1 : 0;
+
+  for (let i = startRow; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    if (cols.length === 0) continue;
+
+    const email = (emailIdx !== -1 && cols[emailIdx]) ? cols[emailIdx].trim() : '';
+    const company = (companyIdx !== -1 && cols[companyIdx]) ? cols[companyIdx].trim() : 'Unknown';
+
+    if (email && email.includes('@')) {
+      results.push({ company, email });
+    }
+  }
+
+  return results;
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"' || char === "'") inQuotes = !inQuotes;
+    else if (char === ',' && !inQuotes) {
+      result.push(current.trim().replace(/^["']|["']$/g, ''));
+      current = '';
+    } else current += char;
+  }
+  result.push(current.trim().replace(/^["']|["']$/g, ''));
+  return result;
+}
+
+function handleRefFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const records = parseCSV(event.target.result);
+      if (records.length === 0) {
+        showToast('No valid email rows found in CSV.', 'error');
+        return;
+      }
+
+      let addedCount = 0;
+      let dupCount = 0;
+
+      records.forEach(r => {
+        const res = addRecordToReference(r.company, r.email);
+        if (res.success) addedCount++;
+        else dupCount++;
+      });
+
+      showToast(`Reference CSV Loaded! ${addedCount} added, ${dupCount} already present.`, 'success');
+      document.getElementById('refFileInput').value = '';
+    } catch (err) {
+      showToast('Error reading CSV file.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function setupDragAndDrop() {
+  const setupBox = (boxId, inputId, onDropHandler) => {
+    const box = document.getElementById(boxId);
+    if (!box) return;
+
+    ['dragenter', 'dragover'].forEach(name => {
+      box.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        box.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+      box.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        box.classList.remove('dragover');
+      });
+    });
+
+    box.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        const input = document.getElementById(inputId);
+        input.files = files;
+        onDropHandler({ target: { files: files } });
+      }
+    });
+  };
+
+  setupBox('refDropzone', 'refFileInput', handleRefFileUpload);
+  setupBox('bulkDropzone', 'bulkFileInput', handleBulkFileUpload);
+}
+
+/* ================= 8. VERIFICATION ENGINE & DEDUPLICATION ================= */
+function verifyEmailAgainstReference(company, email) {
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanCompany = company.trim() || 'Unknown Company';
+
+  const matchedRef = referenceRecords.find(r => r.email.toLowerCase() === cleanEmail);
+
+  if (matchedRef) {
+    return {
+      status: 'ERROR',
+      isDuplicate: true,
+      company: cleanCompany,
+      email: cleanEmail,
+      reason: `Duplicate: Already in Reference CSV ("${matchedRef.company}")`,
+      matchedCompany: matchedRef.company
+    };
+  } else {
+    return {
+      status: 'SUCCESS',
+      isDuplicate: false,
+      company: cleanCompany,
+      email: cleanEmail,
+      reason: 'Success: Clean Unique Email (Not in Reference CSV)',
+      matchedCompany: null
+    };
+  }
+}
+
+function handleCheckSingleEmail(e) {
+  e.preventDefault();
+  const company = document.getElementById('checkCompany').value;
+  const email = document.getElementById('checkEmail').value;
+  const autoAdd = document.getElementById('autoAddSuccessToRef').checked;
+
+  const result = verifyEmailAgainstReference(company, email);
+
+  const newResultItem = {
+    id: 'res_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+    company: result.company,
+    email: result.email,
+    status: result.status,
+    reason: result.reason,
+    matchedCompany: result.matchedCompany,
+    sentStatus: 'Pending',
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  };
+
+  verificationResults.unshift(newResultItem);
+  saveResultsHistory();
+
+  if (result.status === 'SUCCESS' && autoAdd) {
+    addRecordToReference(result.company, result.email);
+  }
+
+  displaySingleResultBanner(result);
+  renderResultsTable();
+
+  if (result.status === 'SUCCESS') {
+    showToast(`Success! Email "${result.email}" is clean and unique.`, 'success');
+  } else {
+    showToast(`DUPLICATE ERROR: "${result.email}" already exists in reference database!`, 'error');
+  }
+}
+
+function displaySingleResultBanner(result) {
+  const banner = document.getElementById('singleResultBanner');
+  banner.style.display = 'block';
+
+  if (result.status === 'SUCCESS') {
+    banner.style.background = 'rgba(16, 185, 129, 0.12)';
+    banner.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+    banner.innerHTML = `
+      <div style="display:flex; align-items:flex-start; gap:12px;">
+        <div style="color:var(--accent-emerald); font-size:20px; line-height:1;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="color:#34d399; font-size:15px;">SUCCESS: Clean &amp; Unique Email</strong>
+            <span class="badge badge-success">SUCCESS</span>
+          </div>
+          <p style="color:var(--text-primary); font-size:13.5px; margin-top:4px;">
+            <strong>${escapeHtml(result.company)}</strong> &middot; <code>${escapeHtml(result.email)}</code>
+          </p>
+          <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+            No duplicate was found in Reference CSV. Ready for email campaign dispatch.
+          </p>
+        </div>
+      </div>
+    `;
+  } else {
+    banner.style.background = 'rgba(244, 63, 94, 0.12)';
+    banner.style.borderColor = 'rgba(244, 63, 94, 0.35)';
+    banner.innerHTML = `
+      <div style="display:flex; align-items:flex-start; gap:12px;">
+        <div style="color:var(--accent-rose); font-size:20px; line-height:1;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="color:#fb7185; font-size:15px;">DUPLICATE ERROR: Already in Database</strong>
+            <span class="badge badge-error">DUPLICATE ERROR</span>
+          </div>
+          <p style="color:var(--text-primary); font-size:13.5px; margin-top:4px;">
+            <strong>${escapeHtml(result.company)}</strong> &middot; <code>${escapeHtml(result.email)}</code>
+          </p>
+          <p style="font-size:12.5px; color:#fca5a5; margin-top:2px;">
+            Matched with existing reference company: <strong>${escapeHtml(result.matchedCompany)}</strong>
+          </p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function handleBulkFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    processBulkRecords(event.target.result);
+    document.getElementById('bulkFileInput').value = '';
+  };
+  reader.readAsText(file);
+}
+
+function processPastedBulkData() {
+  const text = document.getElementById('bulkPasteArea').value.trim();
+  if (!text) {
+    showToast('Please paste CSV rows to verify.', 'error');
+    return;
+  }
+  processBulkRecords(text);
+  document.getElementById('bulkPasteArea').value = '';
+}
+
+function processBulkRecords(csvText) {
+  const records = parseCSV(csvText);
+  if (records.length === 0) {
+    showToast('No valid email rows found to process.', 'error');
+    return;
+  }
+
+  let successCount = 0;
+  let errorCount = 0;
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  records.forEach(r => {
+    const verified = verifyEmailAgainstReference(r.company, r.email);
+    const item = {
+      id: 'res_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      company: verified.company,
+      email: verified.email,
+      status: verified.status,
+      reason: verified.reason,
+      matchedCompany: verified.matchedCompany,
+      sentStatus: 'Pending',
+      timestamp: now
+    };
+
+    verificationResults.unshift(item);
+    if (verified.status === 'SUCCESS') successCount++;
+    else errorCount++;
+  });
+
+  saveResultsHistory();
+  renderResultsTable();
+  showToast(`Batch Complete: ${successCount} Success, ${errorCount} Duplicate Errors.`, 'info');
+}
+
+function switchCheckMode(mode) {
+  const singleBtn = document.getElementById('tabSingleBtn');
+  const bulkBtn = document.getElementById('tabBulkBtn');
+  const singleSec = document.getElementById('singleCheckSection');
+  const bulkSec = document.getElementById('bulkCheckSection');
+
+  if (mode === 'single') {
+    singleBtn.classList.add('active');
+    bulkBtn.classList.remove('active');
+    singleSec.style.display = 'block';
+    bulkSec.style.display = 'none';
+  } else {
+    singleBtn.classList.remove('active');
+    bulkBtn.classList.add('active');
+    singleSec.style.display = 'none';
+    bulkSec.style.display = 'block';
+  }
+}
+
+/* ================= 9. EMAIL SENDING & CAMPAIGN DISPATCHER ================= */
+function sendSingleEmailNow(itemId) {
+  const item = verificationResults.find(r => r.id === itemId);
+  if (!item) return;
+
+  const senderEmail = document.getElementById('senderEmail').value.trim();
+  const appPassword = document.getElementById('senderAppPassword').value.trim();
+  const senderName = document.getElementById('senderName').value.trim() || 'MINDNEXT';
+
+  const { subject, body } = renderMessageForCompany(item.company, item.email);
+
+  if (!senderEmail || !appPassword) {
+    // If SMTP credentials not provided, trigger 1-click mailto client composer with prefilled Subject & Body
+    const mailtoUrl = `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    showToast(`Opened email client for ${item.company}. Fill in credentials above for direct SMTP sending!`, 'info');
+    return;
+  }
+
+  showToast(`Sending to ${item.email}...`, 'info');
+
+  if (window.Email && typeof Email.send === 'function') {
+    Email.send({
+      Host: "smtp.gmail.com",
+      Username: senderEmail,
+      Password: appPassword.replace(/\s+/g, ''),
+      To: item.email,
+      From: senderEmail,
+      Subject: subject,
+      Body: body.replace(/\n/g, '<br>')
+    }).then(msg => {
+      if (msg === 'OK') {
+        item.sentStatus = 'Sent';
+        saveResultsHistory();
+        renderResultsTable();
+        showToast(`Email delivered to ${item.email}!`, 'success');
+      } else {
+        openWebGmailCompose(item.email, subject, body);
+        item.sentStatus = 'Sent';
+        saveResultsHistory();
+        renderResultsTable();
+        showToast(`Opened Gmail compose tab for ${item.company}!`, 'info');
+      }
+    }).catch(err => {
+      openWebGmailCompose(item.email, subject, body);
+      item.sentStatus = 'Sent';
+      saveResultsHistory();
+      renderResultsTable();
+    });
+  } else {
+    openWebGmailCompose(item.email, subject, body);
+    item.sentStatus = 'Sent';
+    saveResultsHistory();
+    renderResultsTable();
+  }
+}
+
+function startCampaignToSuccessEmails() {
+  const successItems = verificationResults.filter(r => r.status === 'SUCCESS');
+  if (successItems.length === 0) {
+    showToast('No clean Success emails available to send. Test some emails first!', 'error');
+    return;
+  }
+
+  document.getElementById('campaignTargetCount').textContent = successItems.length;
+  document.getElementById('campaignStatusLabel').textContent = `Ready to dispatch to ${successItems.length} recipients.`;
+  document.getElementById('campaignPercentLabel').textContent = '0%';
+  document.getElementById('campaignProgressBar').style.width = '0%';
+  
+  const consoleElem = document.getElementById('campaignConsole');
+  consoleElem.innerHTML = `<div>[Ready] Target: ${successItems.length} Success recipients. Click "Start Sending" below.</div>`;
+  
+  document.getElementById('campaignStartBtn').style.display = 'inline-flex';
+  document.getElementById('campaignStartBtn').textContent = 'Start Sending';
+  document.getElementById('campaignModal').classList.add('show');
+}
+
+function stopCampaignDispatch() {
+  isCampaignCancelled = true;
+  document.getElementById('campaignModal').classList.remove('show');
+}
+
+async function executeCampaignDispatch() {
+  const successItems = verificationResults.filter(r => r.status === 'SUCCESS');
+  if (successItems.length === 0) return;
+
+  const senderEmail = document.getElementById('senderEmail').value.trim();
+  const appPassword = document.getElementById('senderAppPassword').value.trim();
+  const senderName = document.getElementById('senderName').value.trim() || 'MINDNEXT';
+
+  if (!senderEmail || !appPassword) {
+    alert('Please enter your Sender Email and 12-16 letter App Password in section 3 before dispatching the campaign.');
+    return;
+  }
+
+  isCampaignCancelled = false;
+  const startBtn = document.getElementById('campaignStartBtn');
+  startBtn.disabled = true;
+  startBtn.textContent = 'Sending...';
+
+  const consoleElem = document.getElementById('campaignConsole');
+  consoleElem.innerHTML += `<div style="color:var(--accent-cyan);">[Started] Initiating automated email campaign sequence...</div>`;
+
+  let sentCount = 0;
+  const total = successItems.length;
+
+  for (let i = 0; i < total; i++) {
+    if (isCampaignCancelled) {
+      consoleElem.innerHTML += `<div style="color:var(--accent-rose);">[Paused] Campaign sequence stopped by user.</div>`;
+      break;
+    }
+
+    const item = successItems[i];
+    const { subject, body } = renderMessageForCompany(item.company, item.email);
+
+    consoleElem.innerHTML += `<div>Sending [${i + 1}/${total}] &rarr; ${escapeHtml(item.company)} (${escapeHtml(item.email)})...</div>`;
+    consoleElem.scrollTop = consoleElem.scrollHeight;
+
+    try {
+      if (window.Email && typeof Email.send === 'function') {
+        const res = await Email.send({
+          Host: "smtp.gmail.com",
+          Username: senderEmail,
+          Password: appPassword.replace(/\s+/g, ''),
+          To: item.email,
+          From: senderEmail,
+          Subject: subject,
+          Body: body.replace(/\n/g, '<br>')
+        });
+
+        if (res === 'OK') {
+          item.sentStatus = 'Sent';
+          consoleElem.innerHTML += `<div style="color:var(--accent-emerald);">&check; Delivered to ${escapeHtml(item.email)}</div>`;
+        } else {
+          item.sentStatus = 'Error';
+          consoleElem.innerHTML += `<div style="color:var(--accent-rose);">&#9888; Server response: ${escapeHtml(res)}</div>`;
+        }
+      } else {
+        item.sentStatus = 'Sent';
+        consoleElem.innerHTML += `<div style="color:var(--accent-emerald);">&check; Prepared for ${escapeHtml(item.email)}</div>`;
+      }
+    } catch (err) {
+      item.sentStatus = 'Error';
+      consoleElem.innerHTML += `<div style="color:var(--accent-rose);">&#9888; Error sending to ${escapeHtml(item.email)}: ${err.message || err}</div>`;
+    }
+
+    sentCount++;
+    const percent = Math.round((sentCount / total) * 100);
+    document.getElementById('campaignProgressBar').style.width = percent + '%';
+    document.getElementById('campaignPercentLabel').textContent = percent + '%';
+    document.getElementById('campaignStatusLabel').textContent = `Processed ${sentCount} of ${total}`;
+    consoleElem.scrollTop = consoleElem.scrollHeight;
+
+    // Small delay between emails to respect SMTP limits
+    if (i < total - 1) {
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+
+  saveResultsHistory();
+  renderResultsTable();
+
+  startBtn.disabled = false;
+  startBtn.style.display = 'none';
+  document.getElementById('campaignCancelBtn').textContent = 'Done';
+  showToast(`Campaign dispatch finished: ${sentCount} processed.`, 'success');
+}
+
+/* ================= 10. RESULTS TABLE & FILTERING ================= */
+function loadResultsHistory() {
+  const saved = localStorage.getItem(STORAGE_KEYS.RESULTS_DATA);
+  if (saved) {
+    try {
+      verificationResults = JSON.parse(saved);
+    } catch (e) {
+      verificationResults = [];
+    }
+  }
+  renderResultsTable();
+}
+
+function saveResultsHistory() {
+  localStorage.setItem(STORAGE_KEYS.RESULTS_DATA, JSON.stringify(verificationResults));
+  updateStats();
+}
+
+function filterResults(filterType) {
+  currentFilter = filterType;
+  document.getElementById('filterAllBtn').classList.toggle('active', filterType === 'all');
+  document.getElementById('filterSuccessBtn').classList.toggle('active', filterType === 'success');
+  document.getElementById('filterErrorBtn').classList.toggle('active', filterType === 'error');
+  renderResultsTable();
+}
+
+function renderResultsTable() {
+  const tbody = document.getElementById('resultsTableBody');
+  const search = (document.getElementById('resultSearchInput')?.value || '').toLowerCase().trim();
+
+  let filtered = verificationResults.filter(item => {
+    if (currentFilter === 'success' && item.status !== 'SUCCESS') return false;
+    if (currentFilter === 'error' && item.status !== 'ERROR') return false;
+    if (search) {
+      const matchComp = (item.company || '').toLowerCase().includes(search);
+      const matchEmail = (item.email || '').toLowerCase().includes(search);
+      return matchComp || matchEmail;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="empty-state">
+          <div class="empty-state-text">No verification records found.</div>
+          <p style="font-size:12.5px; color:var(--text-muted); margin-top:4px;">
+            Check a single email or upload a CSV above to see verification results.
+          </p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((item, idx) => {
+    const isSuccess = item.status === 'SUCCESS';
+    const statusBadge = isSuccess
+      ? `<span class="badge badge-success"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>SUCCESS</span>`
+      : `<span class="badge badge-error"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>DUPLICATE ERROR</span>`;
+
+    const sendAction = isSuccess
+      ? `<button class="btn-send-single" onclick="sendSingleEmailNow('${item.id}')" title="Send email to ${escapeHtml(item.email)}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          ${item.sentStatus === 'Sent' ? '&check; Sent' : 'Send'}
+         </button>`
+      : `<span style="font-size:11.5px; color:var(--text-muted);">&mdash;</span>`;
+
+    return `
+      <tr>
+        <td style="color:var(--text-muted); font-size:12px;">${idx + 1}</td>
+        <td><strong>${escapeHtml(item.company)}</strong></td>
+        <td><code style="color:${isSuccess ? '#34d399' : '#fb7185'}; font-size:13px;">${escapeHtml(item.email)}</code></td>
+        <td>${statusBadge}</td>
+        <td style="font-size:12.5px; color:${isSuccess ? 'var(--text-secondary)' : '#fca5a5'};">${escapeHtml(item.reason)}</td>
+        <td>${sendAction}</td>
+        <td style="text-align:right;">
+          <button class="btn-remove" onclick="removeResultItem('${item.id}')" title="Remove record">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Remove
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function removeResultItem(id) {
+  const index = verificationResults.findIndex(r => r.id === id);
+  if (index !== -1) {
+    verificationResults.splice(index, 1);
+    saveResultsHistory();
+    renderResultsTable();
+    showToast('Record removed.', 'info');
+  }
+}
+
+function clearResultsHistory() {
+  if (verificationResults.length === 0) return;
+  if (confirm('Clear all verification results from the table?')) {
+    verificationResults = [];
+    saveResultsHistory();
+    renderResultsTable();
+    showToast('Results table cleared.', 'info');
+  }
+}
+
+/* ================= 11. CSV EXPORT ENGINE ================= */
+function exportCSVFile(headers, rows, filename) {
+  let csvContent = headers.join(',') + '\r\n';
+
+  rows.forEach(row => {
+    const formatted = row.map(val => {
+      let str = (val === null || val === undefined) ? '' : String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        str = '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    });
+    csvContent += formatted.join(',') + '\r\n';
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function downloadSuccessCSV() {
+  const successRows = verificationResults.filter(r => r.status === 'SUCCESS');
+  if (successRows.length === 0) {
+    showToast('No Success records to download yet.', 'error');
+    return;
+  }
+
+  const headers = ['Company Name', 'Email Address', 'Verification Status', 'Details', 'Dispatch Status', 'Timestamp'];
+  const rows = successRows.map(r => [
+    r.company,
+    r.email,
+    'SUCCESS',
+    'Unique Email (Not in Reference CSV)',
+    r.sentStatus || 'Pending',
+    r.timestamp || ''
+  ]);
+
+  const timestamp = new Date().toISOString().slice(0,10);
+  exportCSVFile(headers, rows, `mindnext_success_emails_${timestamp}.csv`);
+  showToast(`Downloaded Success CSV (${successRows.length} records).`, 'success');
+}
+
+function downloadErrorCSV() {
+  const errorRows = verificationResults.filter(r => r.status === 'ERROR');
+  if (errorRows.length === 0) {
+    showToast('No Duplicate Error records to download.', 'info');
+    return;
+  }
+
+  const headers = ['Company Name', 'Duplicate Email Address', 'Verification Status', 'Matched Reference Company', 'Details', 'Timestamp'];
+  const rows = errorRows.map(r => [
+    r.company,
+    r.email,
+    'DUPLICATE ERROR',
+    r.matchedCompany || 'Reference DB',
+    r.reason,
+    r.timestamp || ''
+  ]);
+
+  const timestamp = new Date().toISOString().slice(0,10);
+  exportCSVFile(headers, rows, `mindnext_duplicate_error_emails_${timestamp}.csv`);
+  showToast(`Downloaded Duplicate Error CSV (${errorRows.length} records).`, 'error');
+}
+
+function downloadAllReportCSV() {
+  if (verificationResults.length === 0) {
+    showToast('No results to export.', 'error');
+    return;
+  }
+
+  const headers = ['Company Name', 'Email Address', 'Status', 'Match Details', 'Dispatch Status', 'Timestamp'];
+  const rows = verificationResults.map(r => [
+    r.company,
+    r.email,
+    r.status,
+    r.reason,
+    r.sentStatus || 'N/A',
+    r.timestamp || ''
+  ]);
+
+  const timestamp = new Date().toISOString().slice(0,10);
+  exportCSVFile(headers, rows, `mindnext_all_verification_report_${timestamp}.csv`);
+  showToast(`Exported full report (${verificationResults.length} records).`, 'success');
+}
+
+function downloadReferenceCSV() {
+  if (referenceRecords.length === 0) {
+    showToast('Reference Database is empty.', 'error');
+    return;
+  }
+
+  const headers = ['Company Name', 'Email Address', 'Date Added'];
+  const rows = referenceRecords.map(r => [r.company, r.email, r.createdAt || '']);
+
+  const timestamp = new Date().toISOString().slice(0,10);
+  exportCSVFile(headers, rows, `mindnext_reference_database_${timestamp}.csv`);
+  showToast(`Exported Reference CSV (${referenceRecords.length} records).`, 'success');
+}
+
+function downloadSampleReferenceCSV() {
+  const headers = ['Company Name', 'Email Address'];
+  const rows = [
+    ['Alphabet Inc', 'sales@abc.xyz'],
+    ['Microsoft Corp', 'contact@microsoft.com'],
+    ['Amazon Global', 'vendor@amazon.com'],
+    ['Apple Worldwide', 'inquiries@apple.com']
+  ];
+  exportCSVFile(headers, rows, 'sample_reference_emails.csv');
+  showToast('Downloaded sample template format CSV.', 'info');
+}
+
+/* ================= 12. STATS & MODAL HELPERS ================= */
+function updateStats() {
+  const refCount = referenceRecords.length;
+  const processedCount = verificationResults.length;
+  const successCount = verificationResults.filter(r => r.status === 'SUCCESS').length;
+  const errorCount = verificationResults.filter(r => r.status === 'ERROR').length;
+
+  document.getElementById('statRefCount').textContent = refCount;
+  document.getElementById('refBadge').textContent = `${refCount} Loaded`;
+  document.getElementById('refListCount').textContent = refCount;
+
+  document.getElementById('statProcessedCount').textContent = processedCount;
+  document.getElementById('statSuccessCount').textContent = successCount;
+  document.getElementById('statErrorCount').textContent = errorCount;
+
+  document.getElementById('btnSuccessBadge').textContent = successCount;
+  document.getElementById('btnErrorBadge').textContent = errorCount;
+  document.getElementById('btnCampaignCount').textContent = successCount;
+
+  document.getElementById('filterAllCount').textContent = processedCount;
+  document.getElementById('filterSuccessCount').textContent = successCount;
+  document.getElementById('filterErrorCount').textContent = errorCount;
+}
+
+function toggleReferenceViewModal() {
+  const modal = document.getElementById('refModal');
+  const isShown = modal.classList.contains('show');
+  if (isShown) {
+    modal.classList.remove('show');
+  } else {
+    modal.classList.add('show');
+    renderReferenceModalTable();
+  }
+}
+
+function renderReferenceModalTable() {
+  const tbody = document.getElementById('refModalTableBody');
+  const search = (document.getElementById('refSearchInput')?.value || '').toLowerCase().trim();
+
+  let filtered = referenceRecords.filter(r => {
+    if (!search) return true;
+    return (r.company || '').toLowerCase().includes(search) || (r.email || '').toLowerCase().includes(search);
+  });
+
+  document.getElementById('refModalFooterCount').textContent = `${filtered.length} of ${referenceRecords.length} records`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-state-text">No reference records found.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, i) => `
+    <tr>
+      <td style="color:var(--text-muted); font-size:12px;">${i + 1}</td>
+      <td><strong>${escapeHtml(r.company)}</strong></td>
+      <td><code style="color:var(--accent-cyan);">${escapeHtml(r.email)}</code></td>
+      <td style="color:var(--text-muted); font-size:12px;">${r.createdAt || '-'}</td>
+      <td style="text-align:right;">
+        <button class="btn-remove" onclick="removeReferenceRecord('${r.id}')" title="Delete email from reference list">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ================= 13. UI UTILITIES ================= */
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+
+  let icon = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+  `;
+
+  if (type === 'success') {
+    icon = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    `;
+  } else if (type === 'error') {
+    icon = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-rose)" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+    `;
+  }
+
+  toast.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(60px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+</script>
+
+</body>
+</html>
