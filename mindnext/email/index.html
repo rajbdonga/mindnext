@@ -108,53 +108,77 @@
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
   }
 
-  /* Main Navigation Tabs */
+  /* Main Navigation Tabs: Pill Outline Buttons matching user screenshots */
   .main-nav-tabs {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: var(--bg-card-subtle);
-    padding: 5px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
+    gap: 12px;
+    background: transparent;
+    padding: 0;
+    border: none;
+    flex-wrap: wrap;
   }
 
-  .nav-tab-btn {
+  .nav-pill-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border-radius: 9px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
+    padding: 7px 18px;
+    border-radius: 9999px;
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.22s ease;
     font-family: inherit;
     white-space: nowrap;
+    text-decoration: none;
+    outline: none;
   }
 
-  .nav-tab-btn:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.04);
+  /* 1. Import Emails (Cyan) - Matching Screenshot 1 */
+  .nav-pill-import {
+    border: 1.5px solid #00bcd4;
+    color: #00bcd4;
   }
-
-  .nav-tab-btn.active {
-    background: var(--bg-card);
+  .nav-pill-import:hover, .nav-pill-import.active {
+    background: rgba(0, 188, 212, 0.16);
+    border-color: #26c6da;
     color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--border-color);
+    box-shadow: 0 0 16px rgba(0, 188, 212, 0.35);
   }
 
-  .nav-tab-btn .tab-badge {
+  /* 2. Send Credentials (Purple) - Matching Screenshot 3 */
+  .nav-pill-send {
+    border: 1.5px solid #8e44ad;
+    color: #a855f7;
+  }
+  .nav-pill-send:hover, .nav-pill-send.active {
+    background: rgba(142, 68, 173, 0.2);
+    border-color: #c084fc;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+  }
+
+  /* 3. View Credentials Status (Green) - Matching Screenshot 5 */
+  .nav-pill-status {
+    border: 1.5px solid #27ae60;
+    color: #2ecc71;
+  }
+  .nav-pill-status:hover, .nav-pill-status.active {
+    background: rgba(39, 174, 96, 0.18);
+    border-color: #2ecc71;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(46, 204, 113, 0.35);
+  }
+
+  .nav-pill-status .tab-badge {
     padding: 2px 7px;
     border-radius: 9999px;
     font-size: 11px;
     font-weight: 700;
-    background: rgba(155, 114, 203, 0.18);
-    color: var(--accent-violet);
+    background: rgba(46, 204, 113, 0.25);
+    color: #2ecc71;
   }
 
   .header-actions {
@@ -893,33 +917,30 @@
       </a>
     </div>
 
-    <!-- 3 MAIN FUNCTIONAL BUTTONS REQUESTED BY USER -->
+    <!-- 3 MAIN PILL BUTTONS MATCHING USER SCREENSHOTS -->
     <nav class="main-nav-tabs">
-      <button class="nav-tab-btn active" id="tabNavImport" onclick="switchMainView('import')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
+      <button class="nav-pill-btn nav-pill-import active" id="tabNavImport" onclick="switchMainView('import')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        Import Emails
+        + Import Emails
       </button>
 
-      <button class="nav-tab-btn" id="tabNavSend" onclick="switchMainView('send')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button class="nav-pill-btn nav-pill-send" id="tabNavSend" onclick="switchMainView('send')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
-        Send Email
+        Send credentials
       </button>
 
-      <button class="nav-tab-btn" id="tabNavManage" onclick="switchMainView('manage')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      <button class="nav-pill-btn nav-pill-status" id="tabNavManage" onclick="switchMainView('manage')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
         </svg>
-        Manage Emails
+        View Credentials Status
         <span class="tab-badge" id="navManageBadge">0</span>
       </button>
     </nav>
@@ -968,65 +989,82 @@
       </div>
     </div>
 
-    <!-- SINGLE UNIFIED UPLOAD & VERIFICATION CARD -->
+    <!-- SINGLE UNIFIED UPLOAD & VERIFICATION CARD (Matching Reference Image 2) -->
     <div class="panel-card" style="max-width: 900px; margin: 0 auto 28px auto;">
-      <div class="panel-header" style="flex-wrap:wrap; gap:12px;">
+      <div class="panel-header" style="flex-wrap:wrap; gap:12px; align-items:flex-start;">
         <div>
-          <h2 class="panel-title" style="font-size: 20px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan);">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-            Upload &amp; Verify Email CSV
+          <h2 class="panel-title" style="font-size: 21px; font-weight:800; color:#fff;">
+            Study Import Emails
           </h2>
-          <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
-            Download Reference CSV template, upload your file, and verify for format errors and duplicate emails.
+          <div style="font-size:13px; font-weight:600; color:var(--accent-cyan); margin-top:3px;">
+            MINDNEXT Campaign Study
+          </div>
+          <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+            Please Upload Email Details.
           </p>
         </div>
         <div>
-          <button class="btn btn-outline btn-sm" onclick="downloadSampleReferenceCSV()" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-cyan);" title="Download standard CSV template">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
+          <button class="btn btn-sm" onclick="downloadSampleReferenceCSV()" style="background:#7c3aed; color:#fff; border-radius:9999px; padding:8px 20px; font-weight:600; border:none; box-shadow:0 4px 14px rgba(124,58,237,0.35);" title="Download standard CSV template">
             Download Reference CSV
           </button>
         </div>
       </div>
 
-      <!-- Dropzone -->
-      <div class="dropzone-box" onclick="document.getElementById('verifyFileInput').click()" style="padding: 38px 24px;">
-        <input type="file" id="verifyFileInput" accept=".csv" style="display:none;" onchange="handleVerifyFileUpload(event)">
-        <div class="dropzone-icon" style="color:var(--accent-cyan); margin-bottom:10px;">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
+      <!-- Upload File Form Area matching Image 2 -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-top: 14px;">
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:inline-block;">
+            <span style="font-size: 13.5px; font-weight:600; background: rgba(124,58,237,0.18); color: #c084fc; padding: 4px 12px; border-radius: 6px;">
+              Upload File :
+            </span>
+          </div>
+          
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <input type="file" id="verifyFileInput" accept=".csv" style="display:none;" onchange="handleFileSelected(event)">
+            <button type="button" class="btn btn-sm" onclick="document.getElementById('verifyFileInput').click()" style="background:#7c3aed; color:#fff; border-radius:6px; padding:7px 16px;">
+              Choose file
+            </button>
+            <span id="chosenFileNameText" style="font-size:13px; color:var(--text-secondary);">No file chosen</span>
+          </div>
+
+          <div>
+            <button type="button" class="btn btn-sm" onclick="submitChosenFile()" style="background:#7c3aed; color:#fff; border-radius:8px; padding:8px 24px; font-weight:600; border:none;">
+              Submit
+            </button>
+          </div>
         </div>
-        <div class="dropzone-text" style="font-size:16px;">Click or Drag &amp; Drop CSV File to Upload</div>
-        <div class="dropzone-hint" style="font-size:13px; margin-top:4px;">Expected Columns: <strong>Company Name, Email</strong> (auto-detected)</div>
       </div>
 
-      <!-- Manual paste option inside expandable block -->
-      <div style="margin-top: 14px;">
-        <details style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 10px 14px;">
-          <summary style="font-size: 13px; color: var(--text-secondary); cursor: pointer; user-select: none;">
-            Or paste rows manually (Company Name, Email)
-          </summary>
-          <div style="margin-top: 10px;">
-            <textarea id="importPasteArea" class="form-control" rows="3" placeholder="Company Name, email@example.com (one per line)"></textarea>
-            <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+      <!-- Numbered Instructions matching Image 2 -->
+      <div style="margin-top: 20px; font-size: 13.5px; line-height: 1.6; color: var(--text-secondary);">
+        <strong style="color: #fff; font-style: italic; font-size:14px;">Instructions:</strong>
+        <ol style="margin: 8px 0 0 20px; padding: 0; color: var(--text-secondary); display:flex; flex-direction:column; gap:4px;">
+          <li>Please upload a file in CSV (comma-delimited) Format only.</li>
+          <li>Please ensure that the column format and the header names match the reference download format.</li>
+          <li>After uploading the file, check the result CSV to see how many emails were successfully uploaded or if there are errors in the "Status" column.</li>
+        </ol>
+      </div>
+
+      <!-- Drag & Drop Zone (Secondary quick drop) -->
+      <div class="dropzone-box" onclick="document.getElementById('verifyFileInput').click()" style="margin-top:16px; padding: 18px;">
+        <div class="dropzone-text" style="font-size:14px;">Or Drag &amp; Drop CSV File Here</div>
+        <div class="dropzone-hint" style="font-size:12px;">Format: Company Name, Email (auto-detected)</div>
+      </div>
+
+      <!-- Optional manual paste -->
+      <div style="margin-top: 12px;">
+        <details style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 8px 14px;">
+          <summary style="font-size: 12.5px; color: var(--text-secondary); cursor: pointer;">Or paste rows manually (Company Name, Email)</summary>
+          <div style="margin-top: 8px;">
+            <textarea id="importPasteArea" class="form-control" rows="2" placeholder="Company Name, email@example.com"></textarea>
+            <div style="display:flex; justify-content:flex-end; margin-top:6px;">
               <button class="btn btn-primary btn-sm" onclick="processImportPastedData()">Verify Pasted Data</button>
             </div>
           </div>
         </details>
       </div>
 
-      <!-- INSTANT STATUS BANNER (Appears/Updates immediately on upload) -->
+      <!-- INSTANT STATUS BANNER (Appears/Updates immediately on upload or submit) -->
       <div id="uploadStatusSection" style="margin-top: 20px; padding: 18px 20px; border-radius: 12px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.35); display: none;">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom: 14px;">
           <div style="display:flex; align-items:center; gap:12px;">
@@ -1063,12 +1101,12 @@
               Download Error CSV (<span id="statusErrorCount">0</span>)
             </button>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="addSuccessRecordsToManageList()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
+          <button class="nav-pill-btn nav-pill-status" onclick="switchMainView('manage')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
             </svg>
-            Add Success to Manage List
+            View Credentials Status &rarr;
           </button>
         </div>
       </div>
@@ -1263,27 +1301,87 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 3. VIEW: MANAGE EMAILS (Full History: Who was added when & Last sent time) -->
+  <!-- 3. VIEW: VIEW CREDENTIALS STATUS                                          -->
   <!-- ========================================================================= -->
   <section id="viewManage" class="view-section">
     <div class="page-header-box">
       <div>
-        <h1 class="page-title">Manage Emails &amp; Contact Registry</h1>
-        <p class="page-desc">Complete record of all emails: Date added (Kon kyare add thaya) &amp; Last time sent status.</p>
+        <h1 class="page-title">View Credentials Status</h1>
+        <p class="page-desc">Real-time credentials delivery monitor: Track how many emails are sent, pending, and live dispatch progress.</p>
       </div>
 
       <div class="actions-bar">
+        <button class="nav-pill-btn nav-pill-send" onclick="openSendConfirmDialog()" title="Send credentials to list">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Send credentials
+        </button>
+
         <button class="btn btn-outline btn-sm" onclick="exportManagedContactsCSV()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          Export Manage List CSV
+          Export Status CSV
         </button>
-        <button class="btn btn-primary btn-sm" onclick="openSendConfirmDialog()">
-          Send Emails
-        </button>
+      </div>
+    </div>
+
+    <!-- 4 Metrics KPI Grid -->
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-label">Total Credentials</div>
+        <div class="stat-value" id="sendTotalCount">0</div>
+        <div class="stat-hint">Total emails in database</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Delivered &amp; Sent</div>
+        <div class="stat-value" style="color:var(--accent-emerald);" id="sendSentCount">0</div>
+        <div class="stat-hint">Successfully delivered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending / Unsent</div>
+        <div class="stat-value" style="color:var(--accent-amber);" id="sendUnsentCount">0</div>
+        <div class="stat-hint">Ready for dispatch</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dispatch Status</div>
+        <div class="stat-value" style="font-size: 20px; font-weight:700; color:var(--accent-cyan);" id="manageDispatchState">Idle / Ready</div>
+        <div class="stat-hint" id="manageDispatchStateHint">System ready for dispatch</div>
+      </div>
+    </div>
+
+    <!-- Live Real-Time Dispatch Monitor Card -->
+    <div id="liveDispatchMonitorBox" class="panel-card" style="margin-bottom: 24px; padding: 20px 24px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.35);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:34px; height:34px; border-radius:50%; background:rgba(16, 185, 129, 0.16); color:#34d399; display:flex; align-items:center; justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <div>
+            <h3 style="font-size:16px; font-weight:700; color:#fff; margin:0;" id="liveDispatchTitle">Real-Time Delivery Monitor</h3>
+            <div style="font-size:13px; color:var(--text-secondary);" id="liveDispatchSub">Watch live sending progress &amp; credentials status below.</div>
+          </div>
+        </div>
+        <div>
+          <span class="badge badge-success" id="liveDispatchPercentBadge">Ready</span>
+        </div>
+      </div>
+
+      <!-- Live Progress Bar -->
+      <div class="progress-wrap" style="height: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.06); border-radius: 9999px; overflow: hidden;">
+        <div class="progress-bar-fill" id="liveDispatchProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #06b6d4, #a855f7); transition: width 0.3s ease;"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--text-secondary); flex-wrap:wrap; gap:8px;">
+        <span id="liveDispatchCountText">0 of 0 emails dispatched</span>
+        <span id="liveDispatchCurrentEmail" style="font-family:monospace; color:#38bdf8;">Idle</span>
       </div>
     </div>
 
@@ -1291,7 +1389,7 @@
     <div class="table-container">
       <div class="table-toolbar">
         <div class="table-tabs">
-          <button class="table-filter-btn active" id="fltManageAll" onclick="filterManagedContacts('all')">All Contacts (<span id="manageCountAll">0</span>)</button>
+          <button class="table-filter-btn active" id="fltManageAll" onclick="filterManagedContacts('all')">All Credentials (<span id="manageCountAll">0</span>)</button>
           <button class="table-filter-btn" id="fltManageUnsent" onclick="filterManagedContacts('unsent')">Unsent (<span id="manageCountUnsent">0</span>)</button>
           <button class="table-filter-btn" id="fltManageSent" onclick="filterManagedContacts('sent')">Sent (<span id="manageCountSent">0</span>)</button>
         </div>
@@ -1314,7 +1412,7 @@
               <th>Email Address</th>
               <th>Date Added</th>
               <th>Last Time Sent</th>
-              <th>Status</th>
+              <th>Delivery Status</th>
               <th style="text-align:right;">Actions</th>
             </tr>
           </thead>
@@ -1814,6 +1912,27 @@ function verifyImportedRows(rows) {
   });
 
   importResults = [...newResults, ...importResults];
+  // Automatically populate successful records into managedContacts so they appear in View Credentials Status!
+  let autoAdded = 0;
+  const now = new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+  newResults.filter(r => r.status === 'SUCCESS').forEach(r => {
+    if (!managedContacts.some(m => m.email.toLowerCase() === r.email.toLowerCase())) {
+      managedContacts.unshift({
+        id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        company: r.company,
+        email: r.email,
+        createdAt: now,
+        lastSentAt: null,
+        status: 'Unsent'
+      });
+      autoAdded++;
+    }
+  });
+  if (autoAdded > 0) {
+    saveData(STORAGE_KEYS.MANAGED, managedContacts);
+    renderManageTable();
+  }
+
   saveData(STORAGE_KEYS.IMPORT_RESULTS, importResults);
   renderImportTable();
 
@@ -1827,17 +1946,43 @@ function verifyImportedRows(rows) {
   }
 }
 
-function handleVerifyFileUpload(e) {
+let selectedVerifyFile = null;
+
+function handleFileSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
+  selectedVerifyFile = file;
+  const nameEl = document.getElementById('chosenFileNameText');
+  if (nameEl) nameEl.textContent = file.name;
+  processFileVerification(file);
+}
+
+function submitChosenFile() {
+  if (!selectedVerifyFile) {
+    const input = document.getElementById('verifyFileInput');
+    if (input && input.files && input.files[0]) {
+      selectedVerifyFile = input.files[0];
+    }
+  }
+  if (!selectedVerifyFile) {
+    showToast('Please choose a CSV file first.', 'error');
+    return;
+  }
+  processFileVerification(selectedVerifyFile);
+}
+
+function processFileVerification(file) {
   const reader = new FileReader();
   reader.onload = ev => {
     const rows = parseCSVRows(ev.target.result);
     if (rows.length === 0) { showToast('No rows found in CSV.', 'error'); return; }
     verifyImportedRows(rows);
-    document.getElementById('verifyFileInput').value = '';
   };
   reader.readAsText(file);
+}
+
+function handleVerifyFileUpload(e) {
+  handleFileSelected(e);
 }
 
 function processImportPastedData() {
@@ -2067,10 +2212,12 @@ function renderManageTable() {
           ${c.lastSentAt ? `<span style="color:#34d399;">${c.lastSentAt}</span>` : `<span style="color:var(--text-muted);">Never Sent</span>`}
         </td>
         <td>
-          <span class="badge ${isSent ? 'badge-success' : 'badge-amber'}">${isSent ? 'Sent' : 'Unsent'}</span>
+          ${c.status === 'Sending...' 
+            ? '<span class="badge" style="background:rgba(56, 189, 248, 0.2); color:#38bdf8; border:1px solid #38bdf8;">&bull; Sending...</span>' 
+            : `<span class="badge ${isSent ? 'badge-success' : 'badge-amber'}">${isSent ? '&check; Delivered' : 'Unsent'}</span>`}
         </td>
         <td style="text-align:right;">
-          <button class="btn btn-outline btn-sm" onclick="sendSingleContact('${c.id}')" style="margin-right:6px;">Send</button>
+          <button class="btn btn-outline btn-sm" onclick="sendSingleContact('${c.id}')" style="margin-right:6px;" title="Resend single email">Resend</button>
           <button class="btn-remove" onclick="removeManagedContact('${c.id}')">Delete</button>
         </td>
       </tr>
@@ -2169,6 +2316,28 @@ async function executeCampaignDispatch(mode) {
     targetList = [...managedContacts];
   }
 
+  // Switch directly to View Credentials Status view so the user can watch live delivery!
+  switchMainView('manage');
+
+  // Update live page monitor
+  const liveTitle = document.getElementById('liveDispatchTitle');
+  const liveSub = document.getElementById('liveDispatchSub');
+  const liveBadge = document.getElementById('liveDispatchPercentBadge');
+  const liveBar = document.getElementById('liveDispatchProgressBar');
+  const liveCount = document.getElementById('liveDispatchCountText');
+  const liveEmail = document.getElementById('liveDispatchCurrentEmail');
+  const stateVal = document.getElementById('manageDispatchState');
+  const stateHint = document.getElementById('manageDispatchStateHint');
+
+  if (stateVal) stateVal.innerHTML = '<span style="color:var(--accent-amber);">Dispatching...</span>';
+  if (stateHint) stateHint.textContent = 'Emails being delivered in real time';
+  if (liveTitle) liveTitle.textContent = `Dispatching ${targetList.length} Credentials...`;
+  if (liveSub) liveSub.textContent = 'Live email dispatch sequence running.';
+  if (liveBadge) liveBadge.textContent = '0%';
+  if (liveBar) liveBar.style.width = '0%';
+  if (liveCount) liveCount.textContent = `0 of ${targetList.length} dispatched`;
+  if (liveEmail) liveEmail.textContent = 'Connecting to mail server...';
+
   // Open Progress Modal
   document.getElementById('progressModal').classList.add('show');
   document.getElementById('progressDesc').textContent = `Dispatching to ${targetList.length} recipient(s)...`;
@@ -2187,10 +2356,14 @@ async function executeCampaignDispatch(mode) {
 
   for (let i = 0; i < targetList.length; i++) {
     const contact = targetList[i];
-    const { subject, body } = renderMessage(contact.company, contact.email);
+    contact.status = 'Sending...';
+    renderManageTable();
 
+    if (liveEmail) liveEmail.textContent = `Sending to ${contact.email}...`;
     logBox.innerHTML += `<div>Sending [${i + 1}/${targetList.length}] &rarr; ${escapeHtml(contact.company)} (${escapeHtml(contact.email)})</div>`;
     logBox.scrollTop = logBox.scrollHeight;
+
+    const { subject, body } = renderMessage(contact.company, contact.email);
 
     try {
       if (window.Email && typeof Email.send === 'function' && appPassword.length >= 12) {
@@ -2215,20 +2388,39 @@ async function executeCampaignDispatch(mode) {
 
     processed++;
     const pct = Math.round((processed / targetList.length) * 100);
+    
+    // Update live page monitor
+    if (liveBar) liveBar.style.width = pct + '%';
+    if (liveBadge) liveBadge.textContent = pct + '%';
+    if (liveCount) liveCount.textContent = `${processed} of ${targetList.length} dispatched`;
+    if (liveEmail) liveEmail.innerHTML = `<span style="color:#34d399;">&check; Delivered to ${escapeHtml(contact.email)}</span>`;
+
+    // Update modal
     document.getElementById('progressBar').style.width = pct + '%';
     document.getElementById('progressPercent').textContent = pct + '%';
     document.getElementById('progressStatus').textContent = `${processed} of ${targetList.length} processed`;
     logBox.scrollTop = logBox.scrollHeight;
 
+    updateAllCounts();
+    renderManageTable();
+
     if (i < targetList.length - 1) {
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 1100));
     }
   }
 
   saveData(STORAGE_KEYS.MANAGED, managedContacts);
+  updateAllCounts();
   renderManageTable();
+
+  if (stateVal) stateVal.innerHTML = '<span style="color:var(--accent-emerald);">Completed</span>';
+  if (stateHint) stateHint.textContent = `All ${processed} emails sent`;
+  if (liveTitle) liveTitle.textContent = 'Credentials Delivery Finished';
+  if (liveBadge) liveBadge.textContent = '100% Done';
+  if (liveEmail) liveEmail.textContent = 'All credentials delivered successfully';
+
   logBox.innerHTML += `<div style="color:#34d399; font-weight:700; margin-top:6px;">[Completed] Campaign finished successfully!</div>`;
-  showToast(`Campaign finished: ${processed} emails processed.`, 'success');
+  showToast(`Campaign finished: ${processed} credentials emails sent!`, 'success');
 }
 
 function closeProgressModal() {
