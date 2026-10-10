@@ -2309,7 +2309,7 @@ function sendSingleContact(id) {
     fetch(scriptUrl, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         to: contact.email,
         subject: rendered.subject,
@@ -2476,7 +2476,7 @@ async function executeCampaignDispatch(mode) {
         await fetch(scriptUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             to: contact.email,
             subject: subject,
@@ -2589,7 +2589,7 @@ async function sendTestEmailToSelf() {
       await fetch(scriptUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           to: email,
           subject: "MINDNEXT Portal: Test Verification",
