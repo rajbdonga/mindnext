@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MINDNEXT | Enterprise Email Manager & Dispatcher</title>
-<meta name="description" content="MINDNEXT Enterprise Email Management Suite: Import & verify CSVs, deduplicate records, manage contacts, and dispatch automated campaigns.">
+<title>MindNext | Enterprise Email Manager & Dispatcher</title>
+<meta name="description" content="MindNext Enterprise Email Management Suite: Import & verify CSVs, deduplicate records, manage contacts, and dispatch automated campaigns.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="images/mindnext-icon.png?v=4">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="images/mindnext-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="images/mindnext-icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <!-- Clean URL normalizer: removes .html from address bar automatically -->
 <script>
   (function() {
@@ -1060,7 +1063,7 @@
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
     <div style="margin-bottom: 22px; text-align: center;">
-      <img src="images/mindnext-logo-white.png" alt="MINDNEXT Technologies" style="height: 46px; width: auto; max-width: 85%; margin: 0 auto; display: block; filter: drop-shadow(0 4px 16px rgba(155, 114, 203, 0.3));" onerror="this.onerror=null; this.src='images/mindnext-logo.png';">
+      <img src="images/mindnext-logo-white.png" alt="MindNext Technologies" style="height: 46px; width: auto; max-width: 85%; margin: 0 auto; display: block; filter: drop-shadow(0 4px 16px rgba(155, 114, 203, 0.3));" onerror="this.onerror=null; this.src='images/mindnext-logo.png';">
     </div>
     
     <div style="width: 44px; height: 44px; margin: 0 auto 16px; background: rgba(155, 114, 203, 0.12); border: 1px solid rgba(155, 114, 203, 0.3); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent-violet);">
@@ -1070,7 +1073,7 @@
       </svg>
     </div>
     <h2 class="auth-title">Security Access Portal</h2>
-    <p class="auth-subtitle">Enter your authorized passcode to unlock the MINDNEXT Email Management Suite.</p>
+    <p class="auth-subtitle">Enter your authorized passcode to unlock the MindNext Email Management Suite.</p>
     
     <form class="auth-form" onsubmit="handleAuthSubmit(event)">
       <div class="form-group">
@@ -1111,8 +1114,8 @@
 <header class="site-header">
   <div class="container header-inner">
     <div class="brand-group">
-      <a href="/" class="brand-logo" title="Back to MINDNEXT Home">
-        <img src="images/mindnext-logo-white.png" alt="MINDNEXT Technologies" onerror="this.onerror=null; this.src='images/mindnext-logo.png';">
+      <a href="/" class="brand-logo" title="Back to MindNext Home">
+        <img src="images/mindnext-logo-white.png" alt="MindNext Technologies" onerror="this.onerror=null; this.src='images/mindnext-logo.png';">
       </a>
     </div>
 
@@ -1196,7 +1199,7 @@
             Study Import Emails
           </h2>
           <div style="font-size:13px; font-weight:600; color:var(--accent-cyan); margin-top:3px;">
-            MINDNEXT Campaign Study
+            MindNext Campaign Study
           </div>
           <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
             Please Upload Email Details.
@@ -1621,7 +1624,7 @@
 
       <div class="form-group" style="margin-bottom:12px;">
         <label class="input-label" for="accSenderName">Sender Display Name</label>
-        <input type="text" id="accSenderName" class="form-control" value="MINDNEXT Technologies" required>
+        <input type="text" id="accSenderName" class="form-control" value="MindNext Technologies" required>
       </div>
 
       <div class="form-group" style="margin-bottom:12px;">
@@ -1689,7 +1692,7 @@ function doPost(e) {
   var html = d.htmlBody || d.html || d.body;
   var plain = d.plainBody || (html ? html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "");
   GmailApp.sendEmail(d.to, d.subject, plain, {
-    name: d.senderName || "MINDNEXT Technologies",
+    name: d.senderName || "MindNext Technologies",
     htmlBody: html,
     replyTo: "business.mindnext@gmail.com"
   });
@@ -1760,7 +1763,7 @@ const PRESET_TEMPLATES = {
   },
   intro: {
     subject: "Quick introduction: MINDNEXT Technologies x {company_name}",
-    body: `<p>Hello {company_name} Team,</p><p>My name is <strong>{sender_name}</strong> with MINDNEXT Technologies. We would love to connect with your team.</p><div style="margin-top:20px;">Best,<br><strong>{sender_name}</strong></div>`
+    body: `<p>Hello {company_name} Team,</p><p>My name is <strong>{sender_name}</strong> with MindNext Technologies. We would love to connect with your team.</p><div style="margin-top:20px;">Best,<br><strong>{sender_name}</strong></div>`
   },
   custom: {
     subject: "Collaboration Opportunity with {company_name}",
@@ -1851,7 +1854,7 @@ function loadData() {
     try {
       const acc = JSON.parse(savedAcc);
       document.getElementById('accSenderEmail').value = acc.email || 'business.mindnext@gmail.com';
-      document.getElementById('accSenderName').value = acc.name || 'MINDNEXT Technologies';
+      document.getElementById('accSenderName').value = acc.name || 'MindNext Technologies';
       document.getElementById('accAppPassword').value = acc.appPassword || 'xonw ofra prsn yhzt';
       document.getElementById('accPortalPassword').value = acc.portalPassword || 'mindnext2026';
       if (document.getElementById('accGoogleScriptUrl')) {
@@ -2425,7 +2428,7 @@ function sendSingleContact(id) {
   const contact = managedContacts.find(c => c.id === id);
   if (!contact) return;
   const scriptUrl = (document.getElementById('accGoogleScriptUrl')?.value || DEFAULT_GATEWAY_URL).trim();
-  const senderName = document.getElementById('accSenderName')?.value || 'MINDNEXT Technologies';
+  const senderName = document.getElementById('accSenderName')?.value || 'MindNext Technologies';
   const rendered = renderMessage(contact.company, contact.email);
 
   if (scriptUrl && scriptUrl.startsWith('https://script.google.com')) {
@@ -2782,7 +2785,7 @@ async function executeCampaignDispatch(mode) {
   }
 
   const scriptUrl = (document.getElementById('accGoogleScriptUrl')?.value || DEFAULT_GATEWAY_URL).trim();
-  const senderName = document.getElementById('accSenderName')?.value || 'MINDNEXT Technologies';
+  const senderName = document.getElementById('accSenderName')?.value || 'MindNext Technologies';
 
   if (!scriptUrl || !scriptUrl.startsWith('https://script.google.com')) {
     const wantGuide = confirm(
@@ -2982,7 +2985,7 @@ async function sendTestEmailToSelf() {
     }
   } else {
     showToast('Google Gateway URL not set. Opening Gmail compose...', 'info');
-    openWebGmail(email, "MINDNEXT Test Email", "Your email dispatcher is active!");
+    openWebGmail(email, "MindNext Test Email", "Your email dispatcher is active!");
   }
 }
 
