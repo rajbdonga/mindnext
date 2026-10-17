@@ -1047,6 +1047,22 @@
       justify-content: center;
       padding: 24px;
       transition: opacity 0.35s ease, visibility 0.35s ease;
+    /* ========================================================= */
+    /* 9. SIMPLE & CLEAN ADMIN LOGIN GATEWAY                     */
+    /* ========================================================= */
+    .lock-screen-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #07090e;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .lock-screen-overlay.unlocked {
       opacity: 0;
@@ -1056,129 +1072,95 @@
 
     .lock-container {
       width: 100%;
-      max-width: 440px;
-      background: rgba(14, 18, 30, 0.85);
-      border: 1px solid rgba(155, 114, 203, 0.3);
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px -5px rgba(155, 114, 203, 0.15);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 36px 32px;
+      max-width: 380px;
+      background: #0f1523;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      border-radius: var(--radius-lg);
+      padding: 34px 28px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
     }
 
-    .lock-shield-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(155, 114, 203, 0.25) 0%, rgba(244, 63, 94, 0.15) 100%);
-      border: 1px solid rgba(155, 114, 203, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      color: #e9d5ff;
-      box-shadow: 0 0 24px rgba(155, 114, 203, 0.25);
+    .lock-header {
+      margin-bottom: 22px;
+    }
+
+    .lock-brand-img {
+      height: 38px;
+      width: auto;
+      margin: 0 auto 14px;
+      display: block;
     }
 
     .lock-title {
       font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 21px;
+      font-weight: 700;
       color: #ffffff;
-      letter-spacing: -0.3px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    .lock-domain {
-      font-size: 13px;
+    .lock-subtitle {
+      font-size: 12.5px;
       color: var(--accent-cyan);
       font-family: monospace;
-      margin-bottom: 22px;
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: var(--radius-full);
-      background: rgba(0, 210, 255, 0.08);
-      border: 1px solid rgba(0, 210, 255, 0.2);
     }
 
     .passcode-input-wrap {
       position: relative;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .passcode-input {
       width: 100%;
-      padding: 14px 46px 14px 16px;
+      padding: 12px 42px 12px 16px;
       background: var(--bg-input);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       color: #ffffff;
-      font-size: 17px;
-      letter-spacing: 2px;
-      text-align: center;
+      font-size: 15px;
       outline: none;
       font-family: inherit;
       transition: all 0.2s ease;
     }
     .passcode-input:focus {
       border-color: var(--accent-violet);
-      box-shadow: 0 0 0 4px var(--accent-violet-glow);
+      box-shadow: 0 0 0 3px var(--accent-violet-glow);
     }
 
     .toggle-pass-eye {
       position: absolute;
-      right: 14px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
       background: transparent;
       border: none;
       color: var(--text-dim);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .toggle-pass-eye:hover {
       color: #ffffff;
     }
 
-    .keypad-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .keypad-btn {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: var(--radius-sm);
-      color: #ffffff;
-      font-size: 18px;
+    .lock-submit-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
       font-weight: 600;
-      padding: 12px 0;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-family: var(--font-display);
-    }
-    .keypad-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: translateY(-1px);
-    }
-    .keypad-btn:active {
-      transform: scale(0.96);
     }
 
     .lock-error-msg {
       color: #f87171;
-      font-size: 13px;
-      margin-bottom: 14px;
+      font-size: 12.5px;
+      margin-bottom: 12px;
       display: none;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      animation: shake 0.4s ease;
+      animation: shake 0.35s ease;
     }
 
     @keyframes shake {
@@ -1187,11 +1169,26 @@
       40%, 80% { transform: translateX(6px); }
     }
 
-    .lock-footer-info {
-      font-size: 11.5px;
+    .lock-footer-simple {
+      font-size: 12px;
       color: var(--text-dim);
-      margin-top: 14px;
-      line-height: 1.4;
+      margin-top: 18px;
+    }
+
+    .default-pass-chip {
+      color: var(--accent-cyan);
+      background: rgba(0, 210, 255, 0.08);
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+    .default-pass-chip:hover {
+      background: rgba(0, 210, 255, 0.18);
+      color: #ffffff;
     }
 
     /* Toast Notifications */
@@ -1260,26 +1257,21 @@
   <!-- ========================================================= -->
   <!-- HIGH-SECURITY LOCK GATEWAY (LOCKED BY DEFAULT)           -->
   <!-- ========================================================= -->
+  <!-- ========================================================= -->
+  <!-- SIMPLE & CLEAN ADMIN LOGIN GATEWAY                       -->
+  <!-- ========================================================= -->
   <div class="lock-screen-overlay" id="lockOverlay">
     <div class="lock-container">
-      <div class="lock-shield-icon">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
+      <div class="lock-header">
+        <img src="images/mindnext-logo.png" alt="MindNext" class="lock-brand-img" onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo.png';}else{this.src='../images/mindnext-icon.png';}">
+        <h1 class="lock-title">Admin Login</h1>
+        <p class="lock-subtitle">admin.mindnext.in</p>
       </div>
-
-      <h1 class="lock-title">MindNext Security Gate</h1>
-      <span class="lock-domain">admin.mindnext.in &bull; Executive Portal</span>
-
-      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">
-        This portal is locked. Please authenticate with your executive security passcode to view "Get In Touch" inquiries.
-      </p>
 
       <form id="lockForm" onsubmit="handleUnlockSubmit(event)">
         <div class="passcode-input-wrap">
-          <input type="password" id="passcodeInput" class="passcode-input" placeholder="Enter passcode..." autocomplete="current-password" autofocus required>
-          <button type="button" class="toggle-pass-eye" onclick="togglePassVisibility()" title="Show/Hide Passcode">
+          <input type="password" id="passcodeInput" class="passcode-input" placeholder="Enter password..." autocomplete="current-password" autofocus required>
+          <button type="button" class="toggle-pass-eye" onclick="togglePassVisibility()" title="Show/Hide Password">
             <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
@@ -1293,37 +1285,16 @@
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
-          <span id="lockErrorText">Incorrect passcode. Access denied.</span>
+          <span id="lockErrorText">Incorrect password. Please try again.</span>
         </div>
 
-        <!-- Quick PIN Keypad -->
-        <div class="keypad-grid">
-          <button type="button" class="keypad-btn" onclick="appendKeypad('1')">1</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('2')">2</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('3')">3</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('4')">4</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('5')">5</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('6')">6</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('7')">7</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('8')">8</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('9')">9</button>
-          <button type="button" class="keypad-btn" onclick="clearKeypad()" style="font-size:12px; color:var(--accent-rose);">CLR</button>
-          <button type="button" class="keypad-btn" onclick="appendKeypad('0')">0</button>
-          <button type="button" class="keypad-btn" onclick="backspaceKeypad()" style="font-size:14px;">&larr;</button>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          Unlock Admin Console
+        <button type="submit" class="btn btn-primary lock-submit-btn">
+          Login to Admin &rarr;
         </button>
       </form>
 
-      <div class="lock-footer-info">
-        Default passcode: <code onclick="fillDefaultPasscode()" title="Click to fill default passcode" style="color:var(--accent-cyan); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:4px; cursor:pointer; text-decoration:underline;">mindnext2026</code>
-        <div style="margin-top:6px; opacity:0.75;">Passcode can be customized in Admin Settings once logged in.</div>
+      <div class="lock-footer-simple">
+        Default passcode: <span onclick="fillDefaultPasscode()" class="default-pass-chip" title="Click to auto-fill">mindnext2026</span>
       </div>
     </div>
   </div>
