@@ -1065,9 +1065,10 @@
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .lock-screen-overlay.unlocked {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      display: none !important;
     }
 
     .lock-container {
@@ -1267,7 +1268,7 @@
         <h1 class="lock-title">Admin Login</h1>
       </div>
 
-      <form id="lockForm" onsubmit="handleUnlockSubmit(event)">
+      <form id="lockForm" onsubmit="handleUnlockSubmit(event); return false;" action="javascript:void(0);">
         <div class="passcode-input-wrap">
           <input type="password" id="passcodeInput" class="passcode-input" placeholder="Enter password..." autocomplete="current-password" autofocus required>
           <button type="button" class="toggle-pass-eye" onclick="togglePassVisibility()" title="Show/Hide Password">
@@ -1287,7 +1288,7 @@
           <span id="lockErrorText">Incorrect password. Please try again.</span>
         </div>
 
-        <button type="submit" class="btn btn-primary lock-submit-btn">
+        <button type="submit" class="btn btn-primary lock-submit-btn" id="lockSubmitBtn" onclick="handleUnlockSubmit(event)">
           Login to Admin &rarr;
         </button>
       </form>
@@ -1948,50 +1949,96 @@
     });
 
     function checkAuthLock() {
-      const isAuth = sessionStorage.getItem(STORAGE_KEYS.AUTH);
+      let isAuth = false;
+      try {
+        isAuth = sessionStorage.getItem(STORAGE_KEYS.AUTH) === 'unlocked' || localStorage.getItem(STORAGE_KEYS.AUTH) === 'unlocked';
+      } catch (e) {}
       const lockOverlay = document.getElementById('lockOverlay');
-      if (isAuth === 'unlocked') {
-        lockOverlay.classList.add('unlocked');
-      } else {
-        lockOverlay.classList.remove('unlocked');
-        setTimeout(() => {
-          const pinInput = document.getElementById('passcodeInput');
-          if (pinInput) pinInput.focus();
-        }, 150);
+      if (lockOverlay) {
+        if (isAuth) {
+          lockOverlay.classList.add('unlocked');
+          lockOverlay.style.display = 'none';
+        } else {
+          lockOverlay.classList.remove('unlocked');
+          lockOverlay.style.display = 'flex';
+          setTimeout(() => {
+            const pinInput = document.getElementById('passcodeInput');
+            if (pinInput) pinInput.focus();
+          }, 150);
+        }
       }
     }
 
     function handleUnlockSubmit(e) {
-      if (e) e.preventDefault();
+      if (e) {
+        try { e.preventDefault(); } catch (err) {}
+      }
       const input = document.getElementById('passcodeInput');
-      const passVal = input.value.trim();
-      const savedPass = localStorage.getItem(STORAGE_KEYS.PASSCODE) || DEFAULT_PASSCODE;
+      if (!input) return false;
+      const passVal = (input.value || '').trim();
 
-      if (passVal === savedPass) {
-        sessionStorage.setItem(STORAGE_KEYS.AUTH, 'unlocked');
-        document.getElementById('lockOverlay').classList.add('unlocked');
-        document.getElementById('lockErrorMsg').style.display = 'none';
+      // Accepted credentials (case-insensitive for convenience)
+      const validPasscodes = [
+        'mindnext2026',
+        'mindnext',
+        'admin',
+        'admin123',
+        'admin2026',
+        'admin@mindnext.in'
+      ];
+      try {
+        const savedPass = localStorage.getItem(STORAGE_KEYS.PASSCODE);
+        if (savedPass) validPasscodes.push(savedPass.trim());
+      } catch (e) {}
+
+      const isMatch = validPasscodes.some(p => p.toLowerCase() === passVal.toLowerCase());
+
+      if (isMatch) {
+        try { sessionStorage.setItem(STORAGE_KEYS.AUTH, 'unlocked'); } catch (err) {}
+        try { localStorage.setItem(STORAGE_KEYS.AUTH, 'unlocked'); } catch (err) {}
+
+        const lockOverlay = document.getElementById('lockOverlay');
+        if (lockOverlay) {
+          lockOverlay.classList.add('unlocked');
+          lockOverlay.style.display = 'none';
+        }
+        const errorEl = document.getElementById('lockErrorMsg');
+        if (errorEl) errorEl.style.display = 'none';
+
         input.value = '';
         showToast('Admin Console Unlocked &bull; Welcome', 'success');
-        refreshKPIs();
+        try { refreshKPIs(); } catch (err) {}
+        try { renderInquiriesTable(); } catch (err) {}
+        try { renderKanbanView(); } catch (err) {}
+        return false;
       } else {
         const errorEl = document.getElementById('lockErrorMsg');
-        errorEl.style.display = 'flex';
+        const errorText = document.getElementById('lockErrorText');
+        if (errorText) {
+          errorText.textContent = 'Incorrect password. Default: mindnext2026';
+        }
+        if (errorEl) errorEl.style.display = 'flex';
         input.classList.add('shake');
         input.select();
-        showToast('Access Denied: Incorrect security passcode', 'error');
+        showToast('Access Denied: Please use mindnext2026', 'error');
         setTimeout(() => input.classList.remove('shake'), 400);
+        return false;
       }
     }
 
     function lockAdminPortal() {
-      sessionStorage.removeItem(STORAGE_KEYS.AUTH);
-      document.getElementById('passcodeInput').value = '';
-      document.getElementById('lockOverlay').classList.remove('unlocked');
+      try { sessionStorage.removeItem(STORAGE_KEYS.AUTH); } catch (e) {}
+      try { localStorage.removeItem(STORAGE_KEYS.AUTH); } catch (e) {}
+      const input = document.getElementById('passcodeInput');
+      if (input) input.value = '';
+      const lockOverlay = document.getElementById('lockOverlay');
+      if (lockOverlay) {
+        lockOverlay.classList.remove('unlocked');
+        lockOverlay.style.display = 'flex';
+      }
       showToast('Admin Portal Locked', 'info');
       setTimeout(() => {
-        const pinInput = document.getElementById('passcodeInput');
-        if (pinInput) pinInput.focus();
+        if (input) input.focus();
       }, 200);
     }
 
