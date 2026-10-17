@@ -191,6 +191,39 @@
       var timeline = (formEl.querySelector('#hf-timeline') || {}).value || '';
       var message = (formEl.querySelector('#hf-message') || {}).value || '';
 
+      // Save inquiry for MindNext Admin Portal (admin.mindnext.in)
+      try {
+        var existing = JSON.parse(localStorage.getItem('mindnext_inquiries') || '[]');
+        var comp = 'Direct Client';
+        if (email && email.indexOf('@') !== -1) {
+          var dom = email.split('@')[1].toLowerCase();
+          if (['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com'].indexOf(dom) === -1) {
+            comp = dom.split('.')[0].toUpperCase() + ' Corp';
+          }
+        }
+        var newInquiry = {
+          id: 'inq_' + Date.now(),
+          name: name,
+          email: email,
+          company: comp,
+          interest: interest,
+          timeline: timeline,
+          message: message,
+          timestamp: new Date().toISOString(),
+          status: 'New',
+          priority: (timeline && timeline.indexOf('Immediate') !== -1) ? 'High' : 'Normal',
+          notes: []
+        };
+        existing.unshift(newInquiry);
+        localStorage.setItem('mindnext_inquiries', JSON.stringify(existing));
+
+        // Real-time broadcast to Admin Portal
+        if (typeof BroadcastChannel !== 'undefined') {
+          var bc = new BroadcastChannel('mindnext_inquiries_channel');
+          bc.postMessage({ type: 'NEW_INQUIRY', data: newInquiry });
+        }
+      } catch (e) {}
+
       var gatewayUrl = 'https://script.google.com/macros/s/AKfycbyY2QQt9z9M-gklnij7wSA5OsQV18lfMUoZlrrfMrNn28Qx1oXr3w_fDLpIrNqJf-JH/exec';
       try {
         fetch(gatewayUrl, {
