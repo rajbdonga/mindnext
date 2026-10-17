@@ -1032,30 +1032,13 @@
     }
 
     /* ========================================================= */
-    /* 9. HIGH-SECURITY LOCK GATEWAY SCREEN                     */
-    /* ========================================================= */
-    .lock-screen-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #05070d;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
-    /* ========================================================= */
     /* 9. SIMPLE & CLEAN ADMIN LOGIN GATEWAY                     */
     /* ========================================================= */
     .lock-screen-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       background: #07090e;
       z-index: 9999;
       display: flex;
@@ -1232,20 +1215,538 @@
       to { transform: translateX(0); opacity: 1; }
     }
 
+    /* ========================================================= */
+    /* RESPONSIVE DESIGN SYSTEM (MOBILE, TABLET, DESKTOP)        */
+    /* ========================================================= */
+    .modal-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .nav-tab-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Small laptops & tablets landscape (<= 1024px) */
+    @media (max-width: 1024px) {
+      .app-container {
+        padding: 0 18px 40px;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      .data-table th,
+      .data-table td {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+      .badge-solution {
+        max-width: 150px;
+      }
+    }
+
+    /* Tablets & Mobile devices (<= 768px) */
     @media (max-width: 768px) {
+      .top-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
       .header-inner {
         height: auto;
-        padding: 14px 16px;
+        padding: 10px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .brand-group {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        width: 100%;
+      }
+      .brand-logo-img {
+        height: 30px;
+      }
+      .brand-title {
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
         flex-wrap: wrap;
       }
+      .domain-badge {
+        font-size: 10px;
+        padding: 1px 6px;
+      }
+      .brand-subtitle {
+        font-size: 10.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+      .header-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        width: 100%;
+      }
+      .header-actions .btn,
+      .header-actions .lock-trigger-btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 8px;
+        font-size: 11.5px;
+        white-space: nowrap;
+      }
+      .header-actions svg {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+      }
+
       .app-container {
-        padding: 0 14px 40px;
+        padding: 0 12px 32px;
+      }
+
+      /* Nav Tabs & Actions */
+      .nav-tabs-bar {
+        margin: 16px 0 14px;
+        gap: 10px;
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: 10px;
+      }
+      .tabs-group {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        white-space: nowrap;
+        display: flex;
+        gap: 6px;
+        padding: 4px;
+      }
+      .tabs-group::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-tab-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+      .nav-tab-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+      .nav-tab-actions .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 12px;
+        padding: 7px 10px;
+      }
+
+      /* KPI Metric Cards (2x2 Grid) */
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .kpi-card {
+        padding: 12px 14px;
+        border-radius: var(--radius-md);
+      }
+      .kpi-label {
+        font-size: 10.5px;
+        letter-spacing: 0.1px;
+      }
+      .kpi-icon-wrap {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+      }
+      .kpi-icon-wrap svg {
+        width: 14px;
+        height: 14px;
+      }
+      .kpi-value {
+        font-size: 22px;
+        margin-bottom: 2px;
+      }
+      .kpi-footer {
+        font-size: 10.5px;
+        line-height: 1.25;
+      }
+
+      /* Inbox Toolbar & Filters */
+      .inbox-toolbar {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .search-wrapper {
+        min-width: 100%;
+        max-width: 100%;
+        width: 100%;
+      }
+      .search-input {
+        width: 100%;
+        font-size: 13px;
+        padding: 9px 12px 9px 38px;
+      }
+      .filters-cluster {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .filter-select {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 130px;
+        font-size: 12px;
+        padding: 7px 10px;
+      }
+      .filters-cluster .btn {
+        flex: 0 0 auto;
+        padding: 7px 14px;
+        font-size: 12px;
+      }
+
+      /* Status Filter Pills */
+      .status-filter-pills {
+        padding: 10px 14px;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        white-space: nowrap;
+      }
+      .status-filter-pills::-webkit-scrollbar {
+        display: none;
+      }
+      .status-pill {
+        flex-shrink: 0;
+        font-size: 11.5px;
+        padding: 5px 10px;
+      }
+
+      /* ========================================================= */
+      /* REVOLUTIONARY MOBILE CARD VIEW FOR INQUIRIES              */
+      /* ========================================================= */
+      .table-responsive {
+        overflow-x: visible;
+        padding: 0;
+      }
+      .data-table thead {
+        display: none;
+      }
+      .data-table,
+      .data-table tbody {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        padding: 10px 12px;
+      }
+      .data-table tr {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px 10px;
+        background: rgba(15, 21, 35, 0.75);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+        position: relative;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      }
+      .data-table tr:hover,
+      .data-table tr:active {
+        background: rgba(22, 30, 49, 0.95);
+        border-color: rgba(155, 114, 203, 0.45);
+        transform: translateY(-1px);
+      }
+      .data-table td {
+        display: block;
+        padding: 0;
+        border: none;
+        min-width: 0;
+      }
+
+      /* Client info (Top Left) */
+      .data-table td.col-client {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+      }
+      .client-cell {
+        gap: 10px;
+      }
+      .client-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+      }
+      .client-name {
+        font-size: 13.5px;
+      }
+      .client-company {
+        font-size: 11.5px;
+      }
+
+      /* Checkbox (Top Right) */
+      .data-table td.col-check {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding-top: 2px;
+      }
+      .data-table td.col-check input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent-violet);
+        cursor: pointer;
+      }
+
+      /* Email (Left) & Date (Right) in Row 2 */
+      .data-table td.col-email {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+        overflow: hidden;
+      }
+      .data-table td.col-email .email-link {
+        font-size: 12px;
+        color: var(--accent-cyan);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        gap: 5px;
+      }
+      .data-table td.col-date {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+        font-size: 11px;
+        color: var(--text-dim);
+        text-align: right;
+        white-space: nowrap;
+        align-self: center;
+      }
+
+      /* Tags: Solution (Left) & Timeline (Right) in Row 3 */
+      .data-table td.col-solution {
+        grid-column: 1 / 2;
+        grid-row: 3 / 4;
+        display: flex;
+        align-items: center;
+      }
+      .data-table td.col-solution .badge {
+        max-width: 100%;
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+      .data-table td.col-timeline {
+        grid-column: 2 / 3;
+        grid-row: 3 / 4;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      .data-table td.col-timeline .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        white-space: nowrap;
+      }
+
+      /* Row 4: Status Selector (Left) & Action Buttons (Right) */
+      .data-table td.col-status {
+        grid-column: 1 / 2;
+        grid-row: 4 / 5;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .data-table td.col-status select {
+        width: auto;
+        max-width: 140px;
+        font-size: 11px;
+        padding: 5px 8px;
+        border-radius: var(--radius-sm);
+      }
+      .data-table td.col-actions {
+        grid-column: 2 / 3;
+        grid-row: 4 / 5;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .action-icons-wrap {
+        gap: 6px;
+        justify-content: flex-end;
+      }
+      .icon-btn {
+        width: 30px;
+        height: 30px;
+      }
+
+      /* Empty State Row */
+      .data-table tr.empty-row,
+      .data-table tr:has(.empty-state) {
+        display: block !important;
+        padding: 24px 16px !important;
+      }
+      .data-table tr.empty-row td,
+      .data-table tr:has(.empty-state) td {
+        display: block !important;
+        width: 100% !important;
+      }
+
+      /* Bulk Selection Floating Bar */
+      #bulkBar {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
+        padding: 12px 14px !important;
+      }
+      #bulkBar > div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+      }
+      #bulkBar > div .btn {
+        flex: 1;
+        font-size: 11.5px;
+        padding: 6px 8px;
+        justify-content: center;
+      }
+
+      /* Pipeline Funnel / Kanban View: Smooth Horizontal Carousel */
+      .kanban-view {
+        display: none;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        gap: 12px;
+        padding: 4px 4px 16px;
+      }
+      .kanban-view.active-view {
+        display: flex;
+      }
+      .kanban-col {
+        flex: 0 0 82vw;
+        max-width: 320px;
+        scroll-snap-align: center;
+        min-height: 400px;
+        padding: 14px;
+      }
+
+      /* Settings Tab */
+      .settings-box {
+        padding: 16px 14px;
+        margin-bottom: 16px;
+        border-radius: var(--radius-md);
+      }
+      .settings-box-title {
+        font-size: 16px;
+      }
+      .settings-box-desc {
+        font-size: 12px;
+      }
+      #changePassForm {
+        max-width: 100% !important;
+      }
+
+      /* Modals Responsive */
+      .modal-backdrop {
+        padding: 10px;
+      }
+      .modal-card {
+        max-height: 94vh;
+        border-radius: var(--radius-md);
+      }
+      .modal-header {
+        padding: 14px 16px;
+      }
+      .modal-title {
+        font-size: 16px;
+      }
+      .modal-body {
+        padding: 16px;
       }
       .detail-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
       }
-      .search-wrapper {
+      .modal-form-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .modal-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+        padding: 12px 16px;
+      }
+      .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .modal-footer > div {
+        display: flex;
+        width: 100%;
+        gap: 8px;
+      }
+      .modal-footer > div .btn {
+        flex: 1;
+      }
+
+      /* Toasts on mobile */
+      .toast-container {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+      }
+      .toast {
         max-width: 100%;
+        font-size: 12.5px;
+        padding: 10px 14px;
+      }
+    }
+
+    /* Ultra-small phones (<= 380px) */
+    @media (max-width: 380px) {
+      .header-actions .btn,
+      .header-actions .lock-trigger-btn {
+        font-size: 11px;
+        padding: 6px 6px;
+        gap: 4px;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .data-table td.col-solution .badge {
+        max-width: 120px;
+      }
+      .lock-container {
+        padding: 22px 16px;
+      }
+      .lock-title {
+        font-size: 18px;
+      }
+      .passcode-input {
+        font-size: 14px;
       }
     }
   </style>
@@ -1255,9 +1756,6 @@
   <!-- Ambient Glow Background -->
   <div class="ambient-glow"></div>
 
-  <!-- ========================================================= -->
-  <!-- HIGH-SECURITY LOCK GATEWAY (LOCKED BY DEFAULT)           -->
-  <!-- ========================================================= -->
   <!-- ========================================================= -->
   <!-- SIMPLE & CLEAN ADMIN LOGIN GATEWAY                       -->
   <!-- ========================================================= -->
@@ -1376,7 +1874,7 @@
         </button>
       </div>
 
-      <div style="display:flex; align-items:center; gap:8px;">
+      <div class="nav-tab-actions">
         <button class="btn btn-outline btn-sm" onclick="exportInquiriesCSV()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -1804,7 +2302,7 @@
 
       <form onsubmit="handleManualLeadSubmit(event)">
         <div class="modal-body">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="modal-form-grid">
             <div class="form-group">
               <label class="form-label">Full Name *</label>
               <input type="text" id="manName" class="form-control" required placeholder="Dr. John Doe">
@@ -1815,7 +2313,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="modal-form-grid">
             <div class="form-group">
               <label class="form-label">Solution of Interest</label>
               <select id="manInterest" class="form-control">
@@ -2254,7 +2752,7 @@
 
       if (filtered.length === 0) {
         tbody.innerHTML = `
-          <tr>
+          <tr class="empty-row">
             <td colspan="8">
               <div class="empty-state">
                 <div class="empty-icon">&#128269;</div>
@@ -2275,11 +2773,11 @@
         const isImmediate = item.timeline && item.timeline.includes('Immediate');
 
         return `
-          <tr data-id="${item.id}">
-            <td>
+          <tr data-id="${item.id}" class="inquiry-row" onclick="handleRowCardClick(event, '${item.id}')">
+            <td class="col-check">
               <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectInquiry('${item.id}', this.checked)">
             </td>
-            <td>
+            <td class="col-client">
               <div class="client-cell">
                 <div class="client-avatar">${initials}</div>
                 <div class="client-info">
@@ -2291,7 +2789,7 @@
                 </div>
               </div>
             </td>
-            <td>
+            <td class="col-email">
               <a href="mailto:${escapeHtml(item.email)}" class="email-link" title="Click to email client">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -2300,17 +2798,17 @@
                 ${escapeHtml(item.email || 'N/A')}
               </a>
             </td>
-            <td>
+            <td class="col-solution">
               <span class="badge badge-solution" title="${escapeHtml(item.interest || 'Not Specified')}">
                 ${escapeHtml(item.interest || 'General Software')}
               </span>
             </td>
-            <td>
+            <td class="col-timeline">
               <span class="badge ${isImmediate ? 'badge-timeline-immediate' : 'badge-solution'}">
                 ${escapeHtml(item.timeline || 'Flexible')}
               </span>
             </td>
-            <td>
+            <td class="col-status">
               <select class="filter-select" style="padding:4px 8px; font-size:12px;" onchange="updateInquiryStatus('${item.id}', this.value)">
                 <option value="New" ${item.status === 'New' ? 'selected' : ''}>New</option>
                 <option value="Contacted" ${item.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
@@ -2320,10 +2818,10 @@
                 <option value="Archived" ${item.status === 'Archived' ? 'selected' : ''}>Archived</option>
               </select>
             </td>
-            <td style="font-size:12px; color:var(--text-muted);" title="${new Date(item.timestamp).toLocaleString()}">
+            <td class="col-date" style="font-size:12px; color:var(--text-muted);" title="${new Date(item.timestamp).toLocaleString()}">
               ${relativeTime}
             </td>
-            <td style="text-align:right;">
+            <td class="col-actions" style="text-align:right;">
               <div class="action-icons-wrap">
                 <button class="icon-btn" onclick="openDetailModal('${item.id}')" title="View Full Scope & Requirements">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2348,6 +2846,11 @@
           </tr>
         `;
       }).join('');
+    }
+
+    function handleRowCardClick(event, id) {
+      if (event.target.closest('input, select, button, a')) return;
+      openDetailModal(id);
     }
 
     /* ========================================================= */
