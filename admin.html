@@ -1713,15 +1713,24 @@
         <!-- Rendered dynamically -->
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-outline btn-sm" onclick="closeDetailModal()">Close</button>
-        <button class="btn btn-primary btn-sm" id="detailReplyBtn" onclick="openReplyFromDetail()">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteFromDetailModal()" style="display: inline-flex; align-items: center; gap: 6px; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 17 4 12 9 7"></polyline>
-            <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           </svg>
-          Draft Client Reply
+          Delete Inquiry
         </button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeDetailModal()">Close</button>
+          <button type="button" class="btn btn-primary btn-sm" id="detailReplyBtn" onclick="openReplyFromDetail()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 17 4 12 9 7"></polyline>
+              <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
+            </svg>
+            Draft Client Reply
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1842,6 +1851,51 @@
     </div>
   </div>
 
+  <!-- ========================================================= -->
+  <!-- MODAL: DELETE CONFIRMATION                                -->
+  <!-- ========================================================= -->
+  <div class="modal-backdrop" id="deleteConfirmModal" onclick="if(event.target===this)closeDeleteConfirmModal()">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(239, 68, 68, 0.25);">
+        <div class="modal-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          <span id="deleteModalTitleText">Delete Inquiry</span>
+        </div>
+        <button type="button" class="modal-close" onclick="closeDeleteConfirmModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <p style="font-size: 14px; color: #e2e8f0; margin-bottom: 10px; line-height: 1.5;" id="deleteModalPromptText">
+          Are you sure you want to permanently delete this inquiry?
+        </p>
+        <div id="deleteTargetCard" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+          <div id="deleteTargetClient" style="font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">-</div>
+          <div id="deleteTargetEmail" style="font-size: 12.5px; color: var(--accent-cyan);"></div>
+          <div id="deleteTargetInterest" style="font-size: 11.5px; color: var(--text-dim); margin-top: 4px;"></div>
+        </div>
+        <div style="font-size: 11.5px; color: #f87171; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 6px; padding: 10px 12px; line-height: 1.4;">
+          &#9888; This action is immediate and will remove this inquiry from your portal database.
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeDeleteConfirmModal()">Cancel</button>
+        <button type="button" class="btn btn-sm" id="confirmDeleteBtn" onclick="executeConfirmedDelete()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border: none; font-weight: 600; padding: 8px 18px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete Permanently
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Root -->
   <div class="toast-container" id="toastContainer"></div>
 
@@ -1935,6 +1989,9 @@
     let currentFilterStatus = 'all';
     let selectedInquiryId = null;
     let selectedInquiryIds = new Set();
+    let pendingDeleteId = null;
+    let isBulkDeletePending = false;
+    let isResetDataPending = false;
     let autoLockTimer = null;
     const AUTO_LOCK_MINUTES = 20;
 
@@ -2280,7 +2337,7 @@
                     <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
                   </svg>
                 </button>
-                <button class="icon-btn icon-btn-danger" onclick="deleteInquiry('${item.id}')" title="Delete Inquiry">
+                <button type="button" class="icon-btn icon-btn-danger" onclick="event.stopPropagation(); requestDeleteInquiry('${item.id}', event);" title="Delete Inquiry">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -2320,7 +2377,15 @@
           cardEl.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
               <strong style="color:#ffffff; font-size:13.5px;">${escapeHtml(item.name || 'Anonymous')}</strong>
-              ${isImmediate ? '<span class="badge badge-timeline-immediate" style="font-size:10px;">Urgent</span>' : ''}
+              <div style="display:flex; align-items:center; gap:6px;">
+                ${isImmediate ? '<span class="badge badge-timeline-immediate" style="font-size:10px;">Urgent</span>' : ''}
+                <button type="button" class="icon-btn icon-btn-danger" onclick="event.stopPropagation(); requestDeleteInquiry('${item.id}', event);" title="Delete Lead" style="width:22px; height:22px; padding:0; display:inline-flex; align-items:center; justify-content:center; opacity:0.75;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">${escapeHtml(item.company || extractCompanyFromEmail(item.email))}</div>
             <div style="font-size:11px; color:#cbd5e1; background:rgba(255,255,255,0.03); padding:4px 8px; border-radius:4px; margin-bottom:8px;">
@@ -2650,26 +2715,163 @@
       showToast(`Selected inquiries marked as "${newStatus}"`, 'success');
     }
 
+    function requestDeleteInquiry(id, event) {
+      if (event) {
+        try { event.stopPropagation(); } catch (e) {}
+        try { event.preventDefault(); } catch (e) {}
+      }
+      const cleanId = String(id || '').trim();
+      if (!cleanId) return;
+
+      // Pro-tip: Shift-click deletes immediately without confirmation modal
+      if (event && event.shiftKey) {
+        executeDeleteById(cleanId);
+        return;
+      }
+
+      pendingDeleteId = cleanId;
+      isBulkDeletePending = false;
+      isResetDataPending = false;
+
+      const item = inquiries.find(i => String(i.id).trim() === cleanId);
+      const titleEl = document.getElementById('deleteModalTitleText');
+      const promptEl = document.getElementById('deleteModalPromptText');
+      const clientEl = document.getElementById('deleteTargetClient');
+      const emailEl = document.getElementById('deleteTargetEmail');
+      const interestEl = document.getElementById('deleteTargetInterest');
+      const targetCard = document.getElementById('deleteTargetCard');
+
+      if (titleEl) titleEl.textContent = 'Delete Inquiry';
+      if (promptEl) promptEl.textContent = 'Are you sure you want to permanently delete this inquiry?';
+      if (targetCard) targetCard.style.display = 'block';
+
+      if (item) {
+        if (clientEl) clientEl.textContent = item.name || 'Anonymous Client';
+        if (emailEl) emailEl.textContent = item.email || 'No email provided';
+        if (interestEl) interestEl.textContent = 'Service: ' + (item.interest || 'General Software');
+      } else {
+        if (clientEl) clientEl.textContent = 'Selected Inquiry';
+        if (emailEl) emailEl.textContent = 'ID: ' + cleanId;
+        if (interestEl) interestEl.textContent = '';
+      }
+
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeDeleteConfirmModal() {
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.remove('open');
+      pendingDeleteId = null;
+      isBulkDeletePending = false;
+      isResetDataPending = false;
+    }
+
+    function executeConfirmedDelete() {
+      if (isResetDataPending) {
+        inquiries = [...INITIAL_SEED_INQUIRIES];
+        saveInquiriesData();
+        refreshKPIs();
+        renderInquiriesTable();
+        renderKanbanView();
+        closeDeleteConfirmModal();
+        showToast('Database reset to sample inquiries.', 'info');
+        return;
+      }
+
+      if (isBulkDeletePending) {
+        executeBulkDelete();
+        closeDeleteConfirmModal();
+        return;
+      }
+
+      if (pendingDeleteId) {
+        executeDeleteById(pendingDeleteId);
+        closeDeleteConfirmModal();
+      }
+    }
+
+    function executeDeleteById(id) {
+      const targetId = String(id || '').trim();
+      if (!targetId) return;
+
+      const deletedItem = inquiries.find(i => String(i.id).trim() === targetId);
+      const clientName = deletedItem ? (deletedItem.name || 'Inquiry') : 'Inquiry';
+
+      // Robust string comparison filter to avoid any type mismatch
+      inquiries = inquiries.filter(i => String(i.id).trim() !== targetId);
+
+      // Clean up selection set
+      selectedInquiryIds.delete(targetId);
+      selectedInquiryIds.delete(id);
+      updateBulkBar();
+
+      // Persist to localStorage and sync
+      saveInquiriesData();
+
+      // Refresh UI components
+      refreshKPIs();
+      renderInquiriesTable();
+      renderKanbanView();
+
+      // Close detail modal if open for this item
+      if (selectedInquiryId && String(selectedInquiryId).trim() === targetId) {
+        closeDetailModal();
+      }
+
+      showToast(`"${clientName}" deleted successfully.`, 'info');
+    }
+
+    // Direct and alias methods
+    function deleteInquiry(id) {
+      requestDeleteInquiry(id);
+    }
+
+    function deleteFromDetailModal() {
+      if (selectedInquiryId) {
+        requestDeleteInquiry(selectedInquiryId);
+      }
+    }
+
     function bulkDeleteSelected() {
-      if (!confirm(`Are you sure you want to delete ${selectedInquiryIds.size} inquiries?`)) return;
-      inquiries = inquiries.filter(i => !selectedInquiryIds.has(i.id));
+      if (selectedInquiryIds.size === 0) {
+        showToast('No inquiries selected.', 'error');
+        return;
+      }
+      isBulkDeletePending = true;
+      pendingDeleteId = null;
+      isResetDataPending = false;
+
+      const titleEl = document.getElementById('deleteModalTitleText');
+      const promptEl = document.getElementById('deleteModalPromptText');
+      const clientEl = document.getElementById('deleteTargetClient');
+      const emailEl = document.getElementById('deleteTargetEmail');
+      const interestEl = document.getElementById('deleteTargetInterest');
+      const targetCard = document.getElementById('deleteTargetCard');
+
+      if (titleEl) titleEl.textContent = `Bulk Delete (${selectedInquiryIds.size} inquiries)`;
+      if (promptEl) promptEl.textContent = `Are you sure you want to delete ${selectedInquiryIds.size} selected inquiry records?`;
+      if (targetCard) targetCard.style.display = 'block';
+
+      if (clientEl) clientEl.textContent = `${selectedInquiryIds.size} inquiries will be removed`;
+      if (emailEl) emailEl.textContent = 'Selected records from your pipeline';
+      if (interestEl) interestEl.textContent = '';
+
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.add('open');
+    }
+
+    function executeBulkDelete() {
+      const idsToRemove = new Set(Array.from(selectedInquiryIds).map(id => String(id).trim()));
+      const count = idsToRemove.size;
+      inquiries = inquiries.filter(i => !idsToRemove.has(String(i.id).trim()));
       selectedInquiryIds.clear();
       updateBulkBar();
       saveInquiriesData();
       refreshKPIs();
       renderInquiriesTable();
       renderKanbanView();
-      showToast('Selected inquiries deleted.', 'info');
-    }
-
-    function deleteInquiry(id) {
-      if (!confirm('Are you sure you want to delete this inquiry?')) return;
-      inquiries = inquiries.filter(i => i.id !== id);
-      saveInquiriesData();
-      refreshKPIs();
-      renderInquiriesTable();
-      renderKanbanView();
-      showToast('Inquiry removed.', 'info');
+      showToast(`${count} inquiries deleted successfully.`, 'info');
     }
 
     function exportInquiriesCSV() {
@@ -2738,14 +2940,27 @@
     }
 
     function confirmResetData() {
-      if (confirm('Reset database to default sample inquiries? This will replace current records.')) {
-        inquiries = [...INITIAL_SEED_INQUIRIES];
-        saveInquiriesData();
-        refreshKPIs();
-        renderInquiriesTable();
-        renderKanbanView();
-        showToast('Database reset to demo inquiries.', 'info');
-      }
+      isResetDataPending = true;
+      isBulkDeletePending = false;
+      pendingDeleteId = null;
+
+      const titleEl = document.getElementById('deleteModalTitleText');
+      const promptEl = document.getElementById('deleteModalPromptText');
+      const clientEl = document.getElementById('deleteTargetClient');
+      const emailEl = document.getElementById('deleteTargetEmail');
+      const interestEl = document.getElementById('deleteTargetInterest');
+      const targetCard = document.getElementById('deleteTargetCard');
+
+      if (titleEl) titleEl.textContent = 'Reset Database';
+      if (promptEl) promptEl.textContent = 'Reset database to default sample inquiries? Current records will be replaced.';
+      if (targetCard) targetCard.style.display = 'block';
+
+      if (clientEl) clientEl.textContent = 'All inquiries will be reset';
+      if (emailEl) emailEl.textContent = 'Default enterprise sample leads will be restored';
+      if (interestEl) interestEl.textContent = '';
+
+      const modal = document.getElementById('deleteConfirmModal');
+      if (modal) modal.classList.add('open');
     }
 
     /* ========================================================= */
