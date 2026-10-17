@@ -198,19 +198,19 @@
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            to: 'business.mindnext@gmail.com',
+            to: 'helpdesk.mindnext@gmail.com',
             subject: 'New Website Inquiry: ' + name + ' (' + interest + ')',
             body: 'New website inquiry from MINDNEXT:\n\n' +
-                  'Name: ' + name + '\n' +
-                  'Email: ' + email + '\n' +
-                  'Solution of Interest: ' + interest + '\n' +
-                  'Estimated Timeline: ' + timeline + '\n\n' +
-                  'Requirements:\n' + message + '\n\n' +
-                  'Submitted: ' + new Date().toLocaleString(),
+              'Name: ' + name + '\n' +
+              'Email: ' + email + '\n' +
+              'Solution of Interest: ' + interest + '\n' +
+              'Estimated Timeline: ' + timeline + '\n\n' +
+              'Requirements:\n' + message + '\n\n' +
+              'Submitted: ' + new Date().toLocaleString(),
             senderName: 'MINDNEXT Inquiry'
           })
-        }).catch(function () {});
-      } catch(err) {}
+        }).catch(function () { });
+      } catch (err) { }
 
       formEl.reset();
     });
@@ -221,3 +221,4 @@
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 })();
+

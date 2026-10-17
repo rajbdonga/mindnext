@@ -53,7 +53,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="templatemo-628-lumen-style.css">
 <!-- Clean URL normalizer: removes .html from address bar automatically -->
 <script>
@@ -68,11 +68,14 @@
 </head>
 <body>
 
+<!-- ============ TOP ACCENT BAR (JPMORGAN CHASE SIGNATURE) ============ -->
+<div class="top-accent-bar"></div>
+
 <!-- ============ HEADER ============ -->
 <header class="site-header">
   <div class="container header-inner">
-    <a href="#home" class="brand brand-logo">
-      <img src="images/mindnext-logo.png" alt="MindNext" class="site-logo">
+    <a href="#home" class="brand brand-text-logo" aria-label="MindNext Home">
+      <span class="jpm-brand-wordmark">MindNext</span>
     </a>
 
     <!-- Simple 3-line to Cross (X) Toggle Button -->
@@ -119,11 +122,11 @@
     </div>
   </div>
 
-  <!-- Philosophy quote over 80-degree diagonal slate -->
-  <div class="band band-quote band-violet" id="philosophy">
+  <!-- Philosophy quote in J.P. Morgan executive dark navy band -->
+  <div class="band band-quote" id="philosophy">
     <div class="container reveal">
       <span class="quote-mark">&ldquo;</span>
-      <p class="editorial-title big-quote">True digital architecture is not just writing code: <span class="editorial-italic" style="color:var(--accent-violet);">it is crafting resilient, scalable systems that empower organizations without friction.</span></p>
+      <p class="editorial-title big-quote">True digital architecture is not just writing code: <span class="editorial-italic quote-highlight">it is crafting resilient, scalable systems that empower organizations without friction.</span></p>
       <p class="quote-attr">MindNext Engineering &middot; Technology Practice</p>
     </div>
   </div>
@@ -320,13 +323,13 @@
     </div>
   </div>
 
-  <!-- Contact Us section with diagonal crimson band -->
-  <div class="band band-slice band-crimson" id="contact">
+  <!-- Contact Us section -->
+  <div class="band band-slice" id="contact">
     <div class="container">
       <div class="section-head reveal" style="margin-bottom:40px;">
         <div>
           <span class="eyebrow">Get In Touch</span>
-          <h2 class="editorial-title section-title">Let's build something <span class="editorial-italic" style="color:var(--accent-violet);">extraordinary</span></h2>
+          <h2 class="editorial-title section-title">Let's build something <span class="editorial-italic section-highlight">extraordinary</span></h2>
         </div>
       </div>
       <div class="inquire-grid" style="padding:0;">
@@ -334,7 +337,7 @@
         <h3>Technology Headquarters</h3>
         <p>114, MBC, Lajamni Chowk,<br>Opp. Opera Business Center, Mota Varachha,<br>Surat, Gujarat 394101<br>Open Mon – Fri: 9:00 AM – 7:00 PM IST</p>
         <h3>Direct Inquiries</h3>
-        <p><a href="mailto:contact@mindnext.in">contact@mindnext.in</a><br><a href="mailto:support@mindnext.in">support@mindnext.in</a></p>
+        <p><a href="https://mail.google.com/mail/?view=cm&fs=1&to=helpdesk.mindnext@gmail.com" target="_blank" rel="noopener noreferrer">contact@mindnext.in</a><br><a href="https://mail.google.com/mail/?view=cm&fs=1&to=helpdesk.mindnext@gmail.com" target="_blank" rel="noopener noreferrer">support@mindnext.in</a></p>
         <h3>Engagement Models</h3>
         <p>Dedicated Engineering Pods, Fixed-Scope Deliveries, and Managed Cloud &amp; AI Operations.</p>
         <h3>Enterprise Partnerships</h3>
@@ -394,14 +397,14 @@
     <div class="footer-grid">
       <!-- Column 1: Brand & Contact -->
       <div class="footer-brand">
-        <a href="#home" class="brand brand-logo">
-          <img src="images/mindnext-logo.png" alt="MindNext Technologies" class="site-logo">
+        <a href="#home" class="brand brand-text-logo" aria-label="MindNext Home">
+          <span class="jpm-brand-wordmark footer-logo-wordmark">MindNext</span>
         </a>
         <p class="footer-tagline">Empowering modern businesses with bespoke software architecture, resilient cloud systems, and intelligent digital transformation.</p>
         <div class="footer-contact-details">
           <div class="footer-contact-item">
             <span class="contact-lbl">Inquiries:</span>
-            <a href="mailto:contact@mindnext.in" class="contact-val">contact@mindnext.in</a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=helpdesk.mindnext@gmail.com" target="_blank" rel="noopener noreferrer" class="contact-val">contact@mindnext.in</a>
           </div>
           <div class="footer-contact-item">
             <span class="contact-lbl">Location:</span>
