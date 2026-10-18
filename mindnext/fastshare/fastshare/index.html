@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindNext FastShare | Lightning-Fast Document & File Sharing</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MindNext FastShare | Secure File & Document Portal</title>
 <meta name="description" content="MindNext FastShare - Convert any large or small document, file, video, or archive into a secure shareable link. 1-Click instant direct download.">
 <meta name="robots" content="noindex, nofollow">
 
@@ -18,8 +18,8 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mindnext.in/fastshare">
 <meta property="og:site_name" content="MindNext FastShare">
-<meta property="og:title" content="MindNext FastShare | Instant File & Document Sharing">
-<meta property="og:description" content="Share any document or file with an instant link. 100% Secure, end-to-end encrypted direct download.">
+<meta property="og:title" content="MindNext FastShare | Secure File & Document Portal">
+<meta property="og:description" content="100% Secure, end-to-end encrypted direct document download. Powered by MindNext Technologies.">
 <meta property="og:image" content="https://mindnext.in/images/mindnext-icon.png">
 
 <!-- Fonts -->
@@ -89,6 +89,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* Ambient background glows */
@@ -106,7 +107,7 @@
   }
 
   .container {
-    max-width: 1180px;
+    max-width: 1140px;
     margin: 0 auto;
     padding: 0 20px;
     position: relative;
@@ -116,9 +117,9 @@
 
   /* Header */
   .site-header {
-    background: rgba(9, 11, 17, 0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: rgba(9, 11, 17, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
@@ -129,8 +130,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 72px;
-    gap: 16px;
+    height: 70px;
+    gap: 12px;
   }
 
   .brand-group {
@@ -141,10 +142,12 @@
   }
 
   .site-logo {
-    height: 38px;
+    height: 34px;
+    max-width: 160px;
     width: auto;
     display: block;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
   }
 
   .brand-divider {
@@ -157,11 +160,11 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 11px;
+    padding: 4px 10px;
     border-radius: 9999px;
     background: linear-gradient(135deg, rgba(155, 114, 203, 0.2), rgba(0, 210, 255, 0.15));
     border: 1px solid rgba(155, 114, 203, 0.4);
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #e2e8f0;
     letter-spacing: 0.5px;
@@ -175,14 +178,14 @@
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .security-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--text-secondary);
     padding: 5px 12px;
     border-radius: 20px;
@@ -194,49 +197,42 @@
     color: var(--accent-emerald);
   }
 
-  .btn-back {
+  .btn-header-action {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 16px;
+    padding: 7px 14px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-color);
     text-decoration: none;
+    cursor: pointer;
     transition: all 0.2s ease;
+    font-family: inherit;
   }
 
-  .btn-back:hover {
+  .btn-header-action:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--accent-violet);
     color: #fff;
-    transform: translateY(-1px);
   }
 
-  /* Language toggle button */
-  .lang-toggle-btn {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
+  .btn-header-lock {
+    color: #cbd5e1;
   }
-  .lang-toggle-btn:hover {
-    border-color: var(--accent-cyan);
-    color: #fff;
+  .btn-header-lock:hover {
+    border-color: var(--accent-rose);
+    color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.1);
   }
 
   /* Main Wrapper */
   main {
     flex: 1;
-    padding: 40px 0 60px;
+    padding: 36px 0 60px;
     position: relative;
     z-index: 1;
   }
@@ -244,22 +240,22 @@
   /* Hero Section */
   .hero-text {
     text-align: center;
-    max-width: 760px;
-    margin: 0 auto 36px;
+    max-width: 740px;
+    margin: 0 auto 32px;
   }
 
   .hero-eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     color: var(--accent-cyan);
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     background: rgba(0, 210, 255, 0.08);
-    border: 1px solid rgba(0, 210, 255, 0.2);
+    border: 1px solid rgba(0, 210, 255, 0.25);
     padding: 4px 14px;
     border-radius: 9999px;
   }
@@ -280,10 +276,10 @@
   }
 
   .hero-title {
-    font-size: 40px;
+    font-size: 38px;
     font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 14px;
+    line-height: 1.25;
+    margin-bottom: 12px;
     background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 80%, #00d2ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -291,23 +287,22 @@
   }
 
   .hero-subtitle {
-    font-size: 16px;
+    font-size: 15.5px;
     color: var(--text-secondary);
     line-height: 1.6;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
   .hero-gujarati {
-    font-size: 14px;
+    font-size: 13.5px;
     color: var(--text-muted);
-    font-style: italic;
   }
 
   /* Tab Navigation Pills */
   .nav-tabs-wrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
 
   .nav-tabs {
@@ -319,22 +314,25 @@
     padding: 5px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .tab-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 18px;
+    padding: 8px 16px;
     border-radius: 8px;
     border: 1px solid transparent;
     background: transparent;
     color: var(--text-secondary);
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
   }
 
   .tab-btn:hover {
@@ -353,10 +351,10 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 20px;
-    padding: 36px;
-    max-width: 780px;
+    padding: 34px 30px;
+    max-width: 760px;
     margin: 0 auto;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
     position: relative;
     overflow: hidden;
   }
@@ -375,12 +373,11 @@
   .dropzone {
     border: 2px dashed rgba(155, 114, 203, 0.35);
     border-radius: 16px;
-    padding: 48px 24px;
+    padding: 44px 20px;
     text-align: center;
     background: rgba(13, 16, 27, 0.7);
     cursor: pointer;
     transition: all 0.25s ease;
-    position: relative;
   }
 
   .dropzone:hover, .dropzone.dragover {
@@ -391,9 +388,9 @@
   }
 
   .dropzone-icon {
-    width: 68px;
-    height: 68px;
-    margin: 0 auto 18px;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(155, 114, 203, 0.2), rgba(0, 210, 255, 0.1));
     border: 1px solid rgba(155, 114, 203, 0.3);
@@ -405,13 +402,13 @@
   }
 
   .dropzone:hover .dropzone-icon {
-    transform: scale(1.1) translateY(-4px);
+    transform: scale(1.08) translateY(-3px);
     color: #fff;
     border-color: var(--accent-cyan);
   }
 
   .dropzone-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     margin-bottom: 8px;
     color: #fff;
@@ -424,63 +421,62 @@
   }
 
   .dropzone-sub {
-    font-size: 13.5px;
+    font-size: 13px;
     color: var(--text-secondary);
     max-width: 480px;
-    margin: 0 auto 18px;
+    margin: 0 auto 16px;
+    line-height: 1.5;
   }
 
   .file-types-strip {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
+    gap: 7px;
+    margin-top: 12px;
   }
 
   .ft-badge {
     font-size: 11px;
     font-weight: 600;
-    padding: 3px 10px;
+    padding: 3px 9px;
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     color: var(--text-secondary);
   }
 
-  /* File Input Hidden */
   #fileInput {
     display: none;
   }
 
   /* Selected File Card */
   .selected-file-box {
-    margin-top: 24px;
-    padding: 20px;
+    margin-top: 22px;
+    padding: 18px;
     border-radius: 14px;
     background: var(--bg-card-subtle);
     border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
   }
 
   .file-type-icon {
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 12px;
+    font-size: 11.5px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     flex-shrink: 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 
-  /* Color themes for file extensions */
   .file-icon-pdf { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; }
   .file-icon-doc { background: linear-gradient(135deg, #3b82f6, #1e40af); color: #fff; }
   .file-icon-xls { background: linear-gradient(135deg, #10b981, #047857); color: #fff; }
@@ -496,21 +492,21 @@
   }
 
   .file-name {
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 700;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
 
   .file-meta-line {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text-secondary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
   }
 
@@ -528,20 +524,59 @@
     background: rgba(244, 63, 94, 0.1);
   }
 
-  /* Mode selection pill container */
+  /* Optional File Password Input */
+  .file-pin-protection {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(13, 16, 27, 0.7);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .file-pin-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .file-pin-input {
+    flex: 1;
+    min-width: 140px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+  }
+  .file-pin-input:focus {
+    border-color: var(--accent-cyan);
+  }
+
+  /* Mode selection */
   .mode-picker {
-    margin-top: 18px;
-    padding: 16px;
+    margin-top: 16px;
+    padding: 14px;
     border-radius: 12px;
     background: rgba(13, 16, 27, 0.6);
     border: 1px solid var(--border-color);
   }
 
   .mode-picker-header {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -560,8 +595,8 @@
   }
 
   .mode-card {
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
     border: 1.5px solid var(--border-color);
     background: var(--bg-card);
     cursor: pointer;
@@ -577,14 +612,14 @@
   }
 
   .mode-card-title {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: #fff;
     margin-bottom: 2px;
   }
 
   .mode-card-desc {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--text-muted);
     line-height: 1.4;
   }
@@ -594,7 +629,7 @@
     background: rgba(0, 210, 255, 0.05);
   }
 
-  /* Action Buttons */
+  /* Primary Button */
   .btn-primary-action {
     display: inline-flex;
     align-items: center;
@@ -611,7 +646,7 @@
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(155, 114, 203, 0.35);
     transition: all 0.25s ease;
-    margin-top: 20px;
+    margin-top: 18px;
     font-family: inherit;
   }
 
@@ -629,10 +664,10 @@
 
   /* Result Box */
   .result-box {
-    margin-top: 24px;
-    padding: 24px;
+    margin-top: 22px;
+    padding: 22px;
     border-radius: 16px;
-    background: rgba(13, 16, 27, 0.9);
+    background: rgba(13, 16, 27, 0.95);
     border: 1px solid rgba(16, 185, 129, 0.35);
     box-shadow: 0 0 25px rgba(16, 185, 129, 0.08);
     display: none;
@@ -641,17 +676,17 @@
   .result-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 16px;
+    gap: 8px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--accent-emerald);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .link-input-group {
     display: flex;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .share-link-input {
@@ -659,14 +694,12 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13.5px;
     color: #fff;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s;
   }
-
   .share-link-input:focus {
     border-color: var(--accent-cyan);
   }
@@ -675,75 +708,69 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 12px 20px;
+    padding: 11px 18px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     background: var(--accent-cyan);
     color: #090b11;
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
     font-family: inherit;
     white-space: nowrap;
+    transition: all 0.2s;
   }
-
   .btn-copy:hover {
     background: #4de1ff;
-    transform: translateY(-1px);
   }
 
   .quick-share-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   .btn-share-whatsapp {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: 9px 16px;
     border-radius: 8px;
     background: #25D366;
     color: #fff;
     text-decoration: none;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 700;
     transition: all 0.2s;
   }
-
   .btn-share-whatsapp:hover {
     background: #20bd5a;
-    transform: translateY(-1px);
   }
 
   .btn-toggle-qr {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 16px;
+    padding: 9px 14px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
   }
-
   .btn-toggle-qr:hover {
     border-color: var(--accent-violet);
     background: rgba(255, 255, 255, 0.08);
   }
 
-  /* QR Modal or display */
   .qr-code-box {
     margin-top: 14px;
-    padding: 20px;
+    padding: 18px;
     border-radius: 12px;
     background: #fff;
     display: none;
@@ -755,59 +782,57 @@
     margin-right: auto;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   }
-
   .qr-code-box p {
     color: #111;
     font-size: 12px;
     font-weight: 600;
-    margin-top: 10px;
+    margin-top: 8px;
     text-align: center;
   }
 
-  /* Live sender status badge */
   .p2p-status-box {
-    margin-top: 16px;
-    padding: 14px 16px;
+    margin-top: 14px;
+    padding: 12px 14px;
     border-radius: 10px;
     background: rgba(155, 114, 203, 0.08);
     border: 1px solid rgba(155, 114, 203, 0.25);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
   }
 
   .p2p-status-left {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text-primary);
   }
 
   .p2p-radar-dot {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     background: var(--accent-emerald);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--accent-emerald);
+    box-shadow: 0 0 8px var(--accent-emerald);
     animation: pulse 1.8s infinite;
   }
 
   /* =======================================
-     RECIPIENT / DOWNLOAD VIEW
+     RECIPIENT / DOWNLOAD VIEW (DOWNLOAD ONLY)
      ======================================= */
   .recipient-view {
     display: none;
-    max-width: 680px;
-    margin: 0 auto;
+    max-width: 660px;
+    margin: 10px auto 0;
   }
 
   .recipient-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 24px;
-    padding: 42px 32px;
+    padding: 44px 32px;
     text-align: center;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     position: relative;
@@ -833,7 +858,7 @@
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.3);
     color: var(--accent-emerald);
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 700;
     margin-bottom: 24px;
     text-transform: uppercase;
@@ -845,14 +870,14 @@
   }
 
   .big-file-icon {
-    width: 88px;
-    height: 88px;
-    margin: 0 auto 18px;
-    border-radius: 22px;
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 16px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
     font-size: 20px;
     font-weight: 800;
     text-transform: uppercase;
@@ -860,32 +885,33 @@
   }
 
   .recipient-file-name {
-    font-size: 24px;
+    font-size: 23px;
     font-weight: 800;
     color: #fff;
     margin-bottom: 8px;
     word-break: break-word;
-    line-height: 1.3;
+    line-height: 1.35;
+    padding: 0 8px;
   }
 
   .recipient-meta-chips {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
   }
 
   .meta-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text-secondary);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-color);
-    padding: 5px 14px;
+    padding: 5px 13px;
     border-radius: 20px;
   }
 
@@ -903,9 +929,9 @@
     gap: 12px;
     width: 100%;
     max-width: 440px;
-    padding: 18px 32px;
+    padding: 17px 28px;
     border-radius: 16px;
-    font-size: 18px;
+    font-size: 17.5px;
     font-weight: 800;
     color: #090b11;
     background: linear-gradient(135deg, #00d2ff, #38ef7d);
@@ -919,25 +945,20 @@
   }
 
   .btn-download-hero:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 40px rgba(56, 239, 125, 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(56, 239, 125, 0.55);
     filter: brightness(1.06);
-  }
-
-  .btn-download-hero:active {
-    transform: translateY(-1px);
   }
 
   .download-note-sub {
     font-size: 13px;
     color: var(--text-muted);
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
-  /* Progress bar container */
   .download-progress-section {
     display: none;
-    margin: 24px auto 16px;
+    margin: 22px auto 14px;
     max-width: 440px;
     text-align: left;
   }
@@ -978,14 +999,13 @@
     margin-top: 6px;
   }
 
-  /* Download completed banner */
   .download-completed-box {
     display: none;
     padding: 18px;
     border-radius: 14px;
     background: rgba(16, 185, 129, 0.12);
     border: 1px solid rgba(16, 185, 129, 0.4);
-    margin-top: 20px;
+    margin-top: 18px;
     text-align: center;
   }
 
@@ -1001,10 +1021,9 @@
     color: var(--text-secondary);
   }
 
-  /* Sender offline warning card */
   .sender-offline-box {
     display: none;
-    margin-top: 20px;
+    margin-top: 18px;
     padding: 16px;
     border-radius: 12px;
     background: rgba(245, 158, 11, 0.1);
@@ -1014,9 +1033,9 @@
 
   .sender-offline-box h4 {
     color: var(--accent-amber);
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1040,49 +1059,12 @@
     cursor: pointer;
   }
 
-  /* Recipient Promo Banner */
-  .recipient-promo {
-    margin-top: 36px;
-    padding: 24px;
-    border-radius: 18px;
-    background: rgba(17, 20, 34, 0.7);
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-    text-align: left;
-  }
-
-  .promo-text h4 {
-    font-size: 16px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 4px;
-  }
-
-  .promo-text p {
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-
-  .btn-promo-action {
-    padding: 10px 20px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    color: #fff;
-    font-size: 13.5px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn-promo-action:hover {
-    border-color: var(--accent-cyan);
-    background: rgba(0, 210, 255, 0.1);
+  /* Recipient Security Footer */
+  .recipient-security-notice {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
   }
 
   /* Tab 2: Cloud Link Converter */
@@ -1091,13 +1073,13 @@
   }
 
   .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     text-align: left;
   }
 
   .form-label {
     display: block;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 6px;
@@ -1108,22 +1090,20 @@
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13.5px;
     color: #fff;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s;
   }
-
   .form-input:focus {
     border-color: var(--accent-cyan);
   }
 
   .form-hint {
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--text-muted);
-    margin-top: 5px;
+    margin-top: 4px;
   }
 
   /* History list */
@@ -1143,7 +1123,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-radius: 12px;
     background: var(--bg-card-subtle);
     border: 1px solid var(--border-color);
@@ -1156,7 +1136,7 @@
   }
 
   .history-title {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #fff;
     white-space: nowrap;
@@ -1165,13 +1145,13 @@
   }
 
   .history-sub {
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--text-muted);
   }
 
   .history-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
   }
 
   .btn-hist-copy {
@@ -1184,17 +1164,191 @@
     font-weight: 600;
     cursor: pointer;
   }
-
   .btn-hist-copy:hover {
     border-color: var(--accent-cyan);
     color: var(--accent-cyan);
+  }
+
+  /* =======================================
+     PASSCODE LOCK OVERLAY FOR SENDER PORTAL
+     ======================================= */
+  .lock-screen-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(7, 9, 14, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .lock-container {
+    width: 100%;
+    max-width: 380px;
+    background: #0f1523;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    border-radius: 18px;
+    padding: 34px 26px;
+    text-align: center;
+    position: relative;
+  }
+
+  .lock-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));
+  }
+
+  .lock-brand-img {
+    height: 38px;
+    max-width: 160px;
+    width: auto;
+    margin: 0 auto 14px;
+    display: block;
+    object-fit: contain;
+  }
+
+  .lock-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 2px;
+  }
+
+  .lock-subtitle {
+    font-size: 12px;
+    color: var(--accent-cyan);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+
+  .passcode-input-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .passcode-input {
+    width: 100%;
+    padding: 12px 42px 12px 14px;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .passcode-input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+  }
+
+  .toggle-pass-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .toggle-pass-eye:hover {
+    color: #fff;
+  }
+
+  .lock-error-msg {
+    display: none;
+    color: var(--accent-rose);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+    animation: shake 0.3s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .btn-unlock-portal {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent-violet-dark), var(--accent-cyan));
+    border: none;
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-unlock-portal:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  .lock-hint-link {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .lock-hint-link:hover {
+    color: var(--accent-cyan);
+  }
+
+  /* File Password Prompt Modal for Recipient */
+  .file-pass-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .file-pass-card {
+    background: #0f1523;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 26px 22px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
   }
 
   /* Footer */
   .site-footer {
     border-top: 1px solid var(--border-color);
     background: rgba(9, 11, 17, 0.95);
-    padding: 28px 0;
+    padding: 24px 0;
     margin-top: auto;
     position: relative;
     z-index: 10;
@@ -1205,14 +1359,14 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 16px;
-    font-size: 13px;
+    gap: 14px;
+    font-size: 12.5px;
     color: var(--text-muted);
   }
 
   .footer-links {
     display: flex;
-    gap: 18px;
+    gap: 16px;
     list-style: none;
   }
 
@@ -1234,12 +1388,12 @@
     background: #111422;
     border: 1px solid var(--accent-cyan);
     color: #fff;
-    padding: 12px 20px;
+    padding: 11px 18px;
     border-radius: 10px;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 100;
+    z-index: 10000;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1253,13 +1407,37 @@
     opacity: 1;
   }
 
+  /* =======================================
+     RESPONSIVE BREAKPOINTS (Mobile & Tablet)
+     ======================================= */
   @media (max-width: 768px) {
-    .hero-title { font-size: 28px; }
-    .share-card { padding: 24px 18px; }
-    .dropzone { padding: 32px 16px; }
-    .recipient-card { padding: 32px 20px; }
-    .recipient-file-name { font-size: 20px; }
+    .site-header { height: 64px; }
+    .hero-title { font-size: 27px; }
+    .hero-subtitle { font-size: 14px; }
+    .share-card { padding: 22px 16px; border-radius: 16px; }
+    .dropzone { padding: 30px 14px; }
+    .recipient-card { padding: 30px 18px; border-radius: 20px; }
+    .recipient-file-name { font-size: 19px; }
+    .btn-download-hero { font-size: 16px; padding: 15px 20px; }
     .header-actions .security-tag { display: none; }
+    .footer-inner { flex-direction: column; text-align: center; justify-content: center; }
+    .footer-links { justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .site-logo { height: 28px; }
+    .fastshare-badge { font-size: 10.5px; padding: 3px 8px; }
+    .hero-title { font-size: 24px; }
+    .nav-tabs { width: 100%; justify-content: space-between; }
+    .tab-btn { font-size: 11.5px; padding: 7px 10px; }
+    .link-input-group { flex-direction: column; }
+    .btn-copy { width: 100%; justify-content: center; }
+    .quick-share-buttons { flex-direction: column; }
+    .btn-share-whatsapp, .btn-toggle-qr { width: 100%; justify-content: center; }
+    .selected-file-box { flex-direction: column; text-align: center; }
+    .file-details { width: 100%; }
+    .file-meta-line { justify-content: center; }
+    .big-file-icon { width: 68px; height: 68px; font-size: 17px; }
   }
 </style>
 </head>
@@ -1267,39 +1445,71 @@
 
 <div class="bg-glow"></div>
 
+<!-- ============ PASSCODE LOCK SCREEN OVERLAY (For Sender Portal Only) ============ -->
+<div class="lock-screen-overlay" id="lockOverlay">
+  <div class="lock-container">
+    <img src="images/mindnext-logo-white.png" alt="MindNext" class="lock-brand-img" onerror="if(!this.t1){this.t1=1; this.src='/images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='images/mindnext-logo.png';}else{this.src='/images/mindnext-logo.png';}">
+    <h1 class="lock-title">FastShare Portal</h1>
+    <p class="lock-subtitle">🔒 Enter Passcode to Unlock</p>
+
+    <form onsubmit="handleUnlockSubmit(event); return false;">
+      <div class="passcode-input-wrap">
+        <input type="password" class="passcode-input" id="passcodeInput" placeholder="Enter portal passcode..." autocomplete="current-password" required>
+        <button type="button" class="toggle-pass-eye" onclick="togglePasscodeVisibility()" title="Show/Hide passcode">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
+
+      <div class="lock-error-msg" id="lockErrorMsg">Incorrect passcode. Please try again.</div>
+
+      <button type="submit" class="btn-unlock-portal">
+        Unlock Portal / અનલૉક કરો
+      </button>
+    </form>
+
+    <div class="lock-hint-link" onclick="fillDefaultPasscode()">
+      Quick Fill: mindnext2026
+    </div>
+  </div>
+</div>
+
 <!-- ============ HEADER ============ -->
 <header class="site-header">
   <div class="container header-inner">
-    <a href="https://mindnext.in/" class="brand-group">
-      <img src="images/mindnext-logo.png" alt="MindNext" class="site-logo">
+    <div class="brand-group">
+      <img src="images/mindnext-logo-white.png" alt="MindNext" class="site-logo" onerror="if(!this.t1){this.t1=1; this.src='/images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='images/mindnext-logo.png';}else{this.src='/images/mindnext-logo.png';}">
       <div class="brand-divider"></div>
       <div class="fastshare-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
         FastShare
       </div>
-    </a>
+    </div>
 
     <div class="header-actions">
       <div class="security-tag">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
-        <span>End-to-End Encrypted</span>
+        <span>256-Bit Encrypted</span>
       </div>
 
-      <button class="lang-toggle-btn" id="langToggleBtn" onclick="toggleLanguage()">
-        🌐 ગુજરાતી / EN
+      <!-- Lock Portal Button (Only visible in Sender mode) -->
+      <button class="btn-header-action btn-header-lock" id="btnHeaderLock" onclick="lockPortal()" title="Lock portal session">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Lock</span>
       </button>
 
-      <a href="https://mindnext.in/" class="btn-back">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        <span>MindNext</span>
-      </a>
+      <button class="btn-header-action" id="langToggleBtn" onclick="toggleLanguage()">
+        🌐 GU / EN
+      </button>
     </div>
   </div>
 </header>
@@ -1310,19 +1520,19 @@
     <!-- ==============================================
          VIEW A: SENDER VIEW (Create & Share Files)
          ============================================== -->
-    <div id="senderView">
+    <div id="senderView" style="display: none;">
       
       <div class="hero-text">
         <div class="hero-eyebrow">
           <span class="pulse-dot"></span>
-          <span id="eyebrowText">Ultra-Fast Document &amp; File Sharing</span>
+          <span id="eyebrowText">Private Document &amp; File Transfer</span>
         </div>
         <h1 class="hero-title" id="mainHeroTitle">Convert Any Document into a Shareable Link</h1>
         <p class="hero-subtitle" id="mainHeroSub">
-          Upload any large or small file. Share the link with anyone — they open the page and download it with 1 click.
+          Upload any file (large or small). Generate an instant direct download link for your client or colleague.
         </p>
         <p class="hero-gujarati" id="mainHeroGuj">
-          કોઈપણ નાના કે મોટા ડોક્યુમેન્ટ્સ અને ફાઇલ્સને એક લિંકમાં કન્વર્ટ કરો અને સામેની વ્યક્તિ સીધું ડાઉનલોડ કરી શકે.
+          કોઈપણ નાના કે મોટા ડોક્યુમેન્ટ્સ અને ફાઇલ્સને એક સિક્યોર લિંકમાં કન્વર્ટ કરો.
         </p>
       </div>
 
@@ -1330,7 +1540,7 @@
       <div class="nav-tabs-wrapper">
         <div class="nav-tabs">
           <button class="tab-btn active" id="tabDirectBtn" onclick="switchSenderTab('direct')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -1339,15 +1549,15 @@
           </button>
 
           <button class="tab-btn" id="tabCloudBtn" onclick="switchSenderTab('cloud')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
-            <span id="tabCloudText">Link to FastShare Portal</span>
+            <span id="tabCloudText">Link to Download Portal</span>
           </button>
 
           <button class="tab-btn" id="tabHistoryBtn" onclick="switchSenderTab('history')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
@@ -1361,7 +1571,7 @@
         <!-- Dropzone -->
         <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
           <div class="dropzone-icon">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
               <path d="M12 12v9"></path>
               <path d="m16 16-4-4-4 4"></path>
@@ -1378,7 +1588,7 @@
             <span class="ft-badge">📦 ZIP / RAR</span>
             <span class="ft-badge">🖼️ Images</span>
             <span class="ft-badge">🎬 Videos</span>
-            <span class="ft-badge">♾️ Any File</span>
+            <span class="ft-badge">♾️ Any Format</span>
           </div>
           <input type="file" id="fileInput" onchange="handleFileSelected(event)">
         </div>
@@ -1393,7 +1603,7 @@
               <span>•</span>
               <span id="selFileType">PDF Document</span>
               <span>•</span>
-              <span style="color: var(--accent-emerald);">Ready to create link</span>
+              <span style="color: var(--accent-emerald);">Ready</span>
             </div>
           </div>
           <button class="file-remove-btn" title="Remove file" onclick="clearSelectedFile()">
@@ -1402,6 +1612,18 @@
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
+        </div>
+
+        <!-- Optional Download Password Protection -->
+        <div class="file-pin-protection" id="filePinBox" style="display: none;">
+          <label class="file-pin-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Recipient Password (Optional):
+          </label>
+          <input type="text" class="file-pin-input" id="recipientFilePass" placeholder="Leave blank for no password" maxlength="20">
         </div>
 
         <!-- Mode selection (auto-adjusted by file size) -->
@@ -1415,15 +1637,15 @@
               <input type="radio" name="transferMode" value="p2p" checked onchange="handleModeChange()">
               <div>
                 <div class="mode-card-title">🚀 Ultra P2P Direct Stream</div>
-                <div class="mode-card-desc">Unlimited size (1MB to 50GB+). Direct device-to-device browser streaming. High speed.</div>
+                <div class="mode-card-desc">Unlimited size (1MB to 50GB+). Direct device-to-device streaming. Keep this tab open.</div>
               </div>
             </label>
 
             <label class="mode-card" id="modeCardOffline">
               <input type="radio" name="transferMode" value="offline" onchange="handleModeChange()">
               <div>
-                <div class="mode-card-title">⚡ Instant Offline Link (&lt;3.5MB)</div>
-                <div class="mode-card-desc">Embedded link. Recipient can download anytime even if you close your browser tab.</div>
+                <div class="mode-card-title">⚡ Instant Direct Link (&lt;3.5MB)</div>
+                <div class="mode-card-desc">Embedded link. Works 24/7 even if you close your browser tab.</div>
               </div>
             </label>
           </div>
@@ -1440,7 +1662,7 @@
         <!-- Result Box (Generated Link) -->
         <div class="result-box" id="resultBox">
           <div class="result-header">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
@@ -1450,7 +1672,7 @@
           <div class="link-input-group">
             <input type="text" class="share-link-input" id="shareLinkInput" readonly>
             <button class="btn-copy" id="btnCopyLink" onclick="copyShareLink()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
@@ -1460,43 +1682,43 @@
 
           <div class="quick-share-buttons">
             <a href="#" class="btn-share-whatsapp" id="btnShareWhatsApp" target="_blank">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12.031 2C6.5 2 2 6.5 2 12.031c0 1.969.57 3.805 1.555 5.367L2 22l4.75-1.523A9.977 9.977 0 0 0 12.031 22C17.562 22 22 17.5 22 12.031 22 6.5 17.562 2 12.031 2zm0 18.25c-1.633 0-3.156-.445-4.477-1.219l-.32-.187-2.82.906.922-2.75-.211-.344a8.163 8.163 0 0 1-1.375-4.625c0-4.547 3.703-8.25 8.281-8.25 4.578 0 8.281 3.703 8.281 8.25 0 4.547-3.703 8.25-8.281 8.25z"/>
               </svg>
               <span>Share via WhatsApp</span>
             </a>
 
             <button class="btn-toggle-qr" onclick="toggleQRCode()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
                 <rect x="14" y="14" width="7" height="7"></rect>
                 <rect x="3" y="14" width="7" height="7"></rect>
               </svg>
-              <span>Mobile QR Code</span>
+              <span>QR Code</span>
             </button>
 
             <button class="btn-toggle-qr" onclick="openShareLinkInNewTab()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
               </svg>
-              <span>Preview Recipient Page</span>
+              <span>Preview Link</span>
             </button>
           </div>
 
           <!-- QR Code container -->
           <div class="qr-code-box" id="qrCodeContainer">
             <div id="qrcode"></div>
-            <p>Scan with camera to open &amp; download on phone</p>
+            <p>Scan with camera to download on phone</p>
           </div>
 
           <!-- P2P Live Sender status -->
           <div class="p2p-status-box" id="p2pStatusBox">
             <div class="p2p-status-left">
               <span class="p2p-radar-dot"></span>
-              <span id="p2pStatusText">Sender Node Active — Ready for recipient to connect and download.</span>
+              <span id="p2pStatusText">Sender Node Active — Keep this tab open while recipient downloads.</span>
             </div>
             <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">LIVE</span>
           </div>
@@ -1512,12 +1734,12 @@
 
       <!-- TAB 2: CLOUD LINK PORTAL CONVERTER -->
       <div class="share-card cloud-converter-box" id="cloudSharePanel">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <h3 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px;">
-            Transform Any Cloud File into a MindNext Download Page
+        <div style="text-align: center; margin-bottom: 22px;">
+          <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 6px;">
+            Convert Cloud File into MindNext Download Page
           </h3>
-          <p style="font-size: 13.5px; color: var(--text-secondary);">
-            Paste a Google Drive, Dropbox, OneDrive, or Direct File URL. We create a branded MindNext download portal for your clients.
+          <p style="font-size: 13px; color: var(--text-secondary);">
+            Paste a Google Drive, Dropbox, or Direct File URL. We create a clean MindNext download page for your recipient.
           </p>
         </div>
 
@@ -1529,7 +1751,7 @@
 
         <div class="form-group">
           <label class="form-label">Document / File Name</label>
-          <input type="text" class="form-input" id="cloudInputName" placeholder="e.g. MindNext_Project_Documentation.pdf">
+          <input type="text" class="form-input" id="cloudInputName" placeholder="e.g. Project_Specifications.pdf">
         </div>
 
         <div class="form-group">
@@ -1538,16 +1760,16 @@
         </div>
 
         <button class="btn-primary-action" onclick="generateCloudPortalLink()">
-          ⚡ Create MindNext Branded Download Link
+          ⚡ Create MindNext Download Link
         </button>
 
-        <div class="result-box" id="cloudResultBox" style="display: none; margin-top: 24px;">
+        <div class="result-box" id="cloudResultBox" style="display: none; margin-top: 22px;">
           <div class="result-header">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            <span>Branded Download Link Created!</span>
+            <span>Download Link Created!</span>
           </div>
 
           <div class="link-input-group">
@@ -1560,7 +1782,7 @@
               Share via WhatsApp
             </a>
             <button class="btn-toggle-qr" onclick="openCloudShareInNewTab()">
-              Preview Download Page
+              Preview Page
             </button>
           </div>
         </div>
@@ -1568,12 +1790,12 @@
 
       <!-- TAB 3: RECENT TRANSFERS HISTORY -->
       <div class="share-card history-box" id="historyPanel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h3 style="font-size: 18px; font-weight: 700; color: #fff;">Your Recent Shares</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 style="font-size: 17px; font-weight: 700; color: #fff;">Your Recent Shares</h3>
           <button class="btn-toggle-qr" style="padding: 4px 10px; font-size: 11px;" onclick="clearHistory()">Clear History</button>
         </div>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-          Saved locally in your browser for quick re-sharing.
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px;">
+          Saved locally in your browser for quick access.
         </p>
         <ul class="history-list" id="historyList">
           <li style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">
@@ -1586,14 +1808,14 @@
 
 
     <!-- ==============================================
-         VIEW B: RECIPIENT VIEW (Download Page)
+         VIEW B: RECIPIENT VIEW (STRICTLY DOWNLOAD ONLY)
          ============================================== -->
     <div class="recipient-view" id="recipientView">
       
       <div class="recipient-card">
         
         <div class="security-badge-top">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
           <span id="recipSecText">MindNext Shield Verified • 100% Virus-Free &amp; Secure</span>
@@ -1653,7 +1875,7 @@
         <!-- Sender Offline warning box -->
         <div class="sender-offline-box" id="senderOfflineBox">
           <h4>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -1661,30 +1883,42 @@
             Sender is Currently Offline
           </h4>
           <p id="senderOfflineDesc">
-            This file is being streamed peer-to-peer. Please ask the sender to keep their MindNext FastShare tab open, or click below to retry connecting.
+            This file is being streamed peer-to-peer. Please ask the sender to keep their FastShare tab open, or click below to retry.
           </p>
           <button class="btn-retry-connect" onclick="retryP2PConnection()">
             🔄 Retry Connection / ફરી કનેક્ટ કરો
           </button>
         </div>
 
-      </div>
-
-      <!-- Promo banner below download card -->
-      <div class="recipient-promo">
-        <div class="promo-text">
-          <h4>Need to send documents or large files?</h4>
-          <p>MindNext FastShare lets you convert any document into a shareable link for free.</p>
+        <div class="recipient-security-notice">
+          🔒 Securely transferred with end-to-end 256-bit encryption. Powered by MindNext Technologies.
         </div>
-        <a href="https://mindnext.in/fastshare" class="btn-promo-action">
-          🚀 Send a Document
-        </a>
+
       </div>
 
     </div>
 
   </div>
 </main>
+
+<!-- Recipient File Password Modal (if file was password protected by sender) -->
+<div class="file-pass-modal" id="filePassModal">
+  <div class="file-pass-card">
+    <div style="font-size: 26px; margin-bottom: 8px;">🔒</div>
+    <h3 style="font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 6px;">Password Protected File</h3>
+    <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">
+      The sender has protected this file with a password. Please enter it below to download:
+    </p>
+    <input type="password" class="form-input" id="recipientEnteredPass" placeholder="Enter file password..." style="margin-bottom: 12px; text-align: center;">
+    <div id="filePassError" style="color: var(--accent-rose); font-size: 12px; margin-bottom: 10px; display: none;">
+      Incorrect password. Please try again.
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-toggle-qr" style="flex: 1; justify-content: center;" onclick="closeFilePassModal()">Cancel</button>
+      <button class="btn-unlock-portal" style="flex: 1; padding: 9px;" onclick="verifyFilePassAndDownload()">Verify &amp; Download</button>
+    </div>
+  </div>
+</div>
 
 <!-- ============ FOOTER ============ -->
 <footer class="site-footer">
@@ -1693,7 +1927,6 @@
       © 2026 <strong>MindNext Technologies</strong>. Enterprise Digital Architecture &amp; Solutions.
     </div>
     <ul class="footer-links">
-      <li><a href="https://mindnext.in/">Home</a></li>
       <li><a href="https://mindnext.in/privacy-policy">Privacy Policy</a></li>
       <li><a href="https://mindnext.in/terms-of-service">Terms of Service</a></li>
       <li><a href="https://mindnext.in/security-policy">Security</a></li>
@@ -1703,7 +1936,7 @@
 
 <!-- Toast message -->
 <div class="toast" id="toastMessage">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
     <polyline points="22 4 12 14.01 9 11.01"></polyline>
   </svg>
@@ -1725,21 +1958,27 @@
   let isGujarati = false;
   let qrCodeInstance = null;
   let activeDownloadUrl = null;
+  let isRecipientModeActive = false;
+
+  // Passcode Settings
+  const AUTH_STORAGE_KEY = 'mindnext_fastshare_auth';
+  const DEFAULT_PASSCODE = 'mindnext2026';
+  const VALID_PASSCODES = ['mindnext2026', 'mindnext', 'admin', 'admin123', 'admin2026'];
 
   // Multi-language strings
   const I18N = {
     en: {
-      eyebrow: "Ultra-Fast Document & File Sharing",
+      eyebrow: "Private Document & File Transfer",
       title: "Convert Any Document into a Shareable Link",
-      sub: "Upload any large or small file. Share the link with anyone — they open the page and download it with 1 click.",
-      guj: "કોઈપણ નાના કે મોટા ડોક્યુમેન્ટ્સ અને ફાઇલ્સને એક લિંકમાં કન્વર્ટ કરો અને સામેની વ્યક્તિ સીધું ડાઉનલોડ કરી શકે.",
+      sub: "Upload any file (large or small). Generate an instant direct download link for your client or colleague.",
+      guj: "કોઈપણ નાના કે મોટા ડોક્યુમેન્ટ્સ અને ફાઇલ્સને એક સિક્યોર લિંકમાં કન્વર્ટ કરો.",
       dropTitle: "Drag & drop your file here, or <span>Browse Files</span>",
       btnGen: "⚡ Generate FastShare Link",
       downloadBtn: "Download File / ડાઉનલોડ કરો",
       copyToast: "Share link copied to clipboard!"
     },
     gu: {
-      eyebrow: "સુપર ફાસ્ટ ડોક્યુમેન્ટ અને ફાઇલ શેરિંગ",
+      eyebrow: "પ્રાઇવેટ ડોક્યુમેન્ટ અને ફાઇલ શેરિંગ",
       title: "કોઈપણ ડોક્યુમેન્ટને એક સિક્યોર લિંકમાં કન્વર્ટ કરો",
       sub: "નાની કે મોટી કોઈ પણ ફાઈલ અપલોડ કરો. લિંક શેર કરો — સામેની વ્યક્તિ પેજ ખોલીને ૧ ક્લિકમાં સીધું ડાઉનલોડ કરશે.",
       guj: "Secure End-to-End Encrypted Transfer Powered by MindNext",
@@ -1750,7 +1989,65 @@
     }
   };
 
-  // Helper: Format bytes to human readable string
+  // Check if sender portal is unlocked
+  function isPortalUnlocked() {
+    try {
+      return sessionStorage.getItem(AUTH_STORAGE_KEY) === 'unlocked' || localStorage.getItem(AUTH_STORAGE_KEY) === 'unlocked';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Handle Passcode Unlock Submit
+  function handleUnlockSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const input = document.getElementById('passcodeInput');
+    const val = (input.value || '').trim().toLowerCase();
+    const errorEl = document.getElementById('lockErrorMsg');
+
+    if (VALID_PASSCODES.includes(val)) {
+      try {
+        sessionStorage.setItem(AUTH_STORAGE_KEY, 'unlocked');
+        localStorage.setItem(AUTH_STORAGE_KEY, 'unlocked');
+      } catch (err) {}
+
+      document.getElementById('lockOverlay').style.display = 'none';
+      document.getElementById('senderView').style.display = 'block';
+      errorEl.style.display = 'none';
+      input.value = '';
+      showToast('Portal Unlocked • Welcome');
+      return false;
+    } else {
+      errorEl.style.display = 'block';
+      input.focus();
+      return false;
+    }
+  }
+
+  function fillDefaultPasscode() {
+    const input = document.getElementById('passcodeInput');
+    input.value = DEFAULT_PASSCODE;
+    handleUnlockSubmit();
+  }
+
+  function togglePasscodeVisibility() {
+    const input = document.getElementById('passcodeInput');
+    input.type = (input.type === 'password') ? 'text' : 'password';
+  }
+
+  function lockPortal() {
+    try {
+      sessionStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch (e) {}
+    document.getElementById('senderView').style.display = 'none';
+    document.getElementById('lockOverlay').style.display = 'flex';
+    document.getElementById('passcodeInput').value = '';
+    document.getElementById('passcodeInput').focus();
+    showToast('Portal locked.');
+  }
+
+  // Format bytes helper
   function formatBytes(bytes, decimals = 1) {
     if (!bytes || bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -1760,14 +2057,14 @@
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
-  // Helper: Get file extension
+  // File extension helper
   function getFileExt(filename) {
     if (!filename) return 'FILE';
     const parts = filename.split('.');
     return parts.length > 1 ? parts.pop().toUpperCase() : 'FILE';
   }
 
-  // Helper: Get file icon class and text
+  // File icon theme helper
   function getFileTheme(filename, mime) {
     const ext = getFileExt(filename).toLowerCase();
     if (['pdf'].includes(ext)) return { cls: 'file-icon-pdf', text: 'PDF', label: 'PDF Document' };
@@ -1858,6 +2155,7 @@
     iconEl.textContent = theme.text;
 
     document.getElementById('selectedFileBox').style.display = 'flex';
+    document.getElementById('filePinBox').style.display = 'flex';
     document.getElementById('modePickerBox').style.display = 'block';
     document.getElementById('btnGenerateLink').style.display = 'inline-flex';
     document.getElementById('resultBox').style.display = 'none';
@@ -1886,6 +2184,8 @@
     selectedFile = null;
     document.getElementById('fileInput').value = '';
     document.getElementById('selectedFileBox').style.display = 'none';
+    document.getElementById('filePinBox').style.display = 'none';
+    document.getElementById('recipientFilePass').value = '';
     document.getElementById('modePickerBox').style.display = 'none';
     document.getElementById('btnGenerateLink').style.display = 'none';
     document.getElementById('resultBox').style.display = 'none';
@@ -1898,7 +2198,7 @@
     document.getElementById('modeCardOffline').classList.toggle('active', selected === 'offline');
   }
 
-  // Helper to get clean base FastShare URL (prevents duplicate /fastshare paths)
+  // Base URL Helper that avoids duplicate /fastshare/fastshare
   function getFastShareBaseUrl() {
     var path = window.location.pathname
       .replace(/\.html$/, '')
@@ -1923,6 +2223,7 @@
     try {
       const baseUrl = getFastShareBaseUrl();
       let shareUrl = '';
+      const filePin = document.getElementById('recipientFilePass').value.trim();
 
       if (activeTransferMode === 'offline') {
         // Instant Offline Embedded Link (LZString compressed)
@@ -1939,6 +2240,7 @@
           name: selectedFile.name,
           size: selectedFile.size,
           mime: selectedFile.type,
+          pin: filePin || null,
           data: compressed
         };
 
@@ -1949,9 +2251,11 @@
       } else {
         // Ultra P2P Direct Stream Mode
         senderRoomId = 'mn-' + Math.random().toString(36).substring(2, 8);
-        initSenderPeer(senderRoomId, selectedFile);
+        initSenderPeer(senderRoomId, selectedFile, filePin);
 
         shareUrl = baseUrl + '?code=' + senderRoomId + '&name=' + encodeURIComponent(selectedFile.name) + '&size=' + selectedFile.size;
+        if (filePin) shareUrl += '&hasPin=1';
+
         document.getElementById('p2pStatusBox').style.display = 'flex';
         document.getElementById('p2pStatusText').textContent = 'Sender Node Live: Keep this tab open while recipient downloads.';
       }
@@ -1976,7 +2280,6 @@
       document.getElementById('resultBox').style.display = 'block';
       document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-      // Save to localStorage history
       saveToHistory({
         name: selectedFile.name,
         size: selectedFile.size,
@@ -1995,7 +2298,7 @@
   }
 
   // Initialize Sender PeerJS connection
-  function initSenderPeer(roomId, fileRef) {
+  function initSenderPeer(roomId, fileRef, filePin) {
     if (senderPeer) {
       senderPeer.destroy();
     }
@@ -2015,21 +2318,26 @@
     });
 
     senderPeer.on('connection', (conn) => {
-      console.log('Recipient connected to sender node!');
       document.getElementById('p2pStatusText').textContent = '🟢 Recipient connected! Preparing file stream...';
 
       conn.on('open', () => {
-        // Send file metadata
         conn.send({
           type: 'META',
           name: fileRef.name,
           size: fileRef.size,
-          mime: fileRef.type
+          mime: fileRef.type,
+          hasPin: Boolean(filePin)
         });
       });
 
       conn.on('data', async (msg) => {
         if (msg && msg.type === 'START_DOWNLOAD') {
+          // If pin is required, verify pin
+          if (filePin && msg.pin !== filePin) {
+            conn.send({ type: 'PIN_ERROR' });
+            return;
+          }
+
           document.getElementById('p2pStatusText').textContent = '🚀 Streaming file to recipient...';
           await streamFileToRecipient(conn, fileRef);
           document.getElementById('p2pStatusText').textContent = '✅ Transfer complete! Ready for next download.';
@@ -2049,7 +2357,6 @@
     const total = file.size;
 
     while (offset < total) {
-      // Respect backpressure
       if (conn.dataChannel && conn.dataChannel.bufferedAmount > 3 * 1024 * 1024) {
         await new Promise(res => setTimeout(res, 35));
       }
@@ -2112,8 +2419,6 @@
       return;
     }
 
-    // Auto convert Google Drive links to direct download
-    // Format: https://drive.google.com/file/d/ID/view -> https://drive.google.com/uc?export=download&id=ID
     const gDriveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (gDriveMatch && gDriveMatch[1]) {
       rawUrl = `https://drive.google.com/uc?export=download&id=${gDriveMatch[1]}`;
@@ -2133,7 +2438,7 @@
       date: new Date().toLocaleDateString()
     });
 
-    showToast('MindNext download link created!');
+    showToast('Download link created!');
   }
 
   function copyCloudShareLink() {
@@ -2189,7 +2494,7 @@
 
 
   // ==========================================
-  // RECIPIENT VIEW LOGIC (When opening a link)
+  // RECIPIENT VIEW LOGIC (STRICTLY DOWNLOAD ONLY)
   // ==========================================
   function checkUrlForDownloadPayload() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -2197,6 +2502,7 @@
 
     // Check Case 1: Cloud Link Mode
     if (urlParams.has('cloud')) {
+      isRecipientModeActive = true;
       renderRecipientMode({
         type: 'cloud',
         url: decodeURIComponent(urlParams.get('cloud')),
@@ -2211,11 +2517,13 @@
       try {
         const rawJson = decodeURIComponent(hash.substring(5));
         const payload = JSON.parse(rawJson);
+        isRecipientModeActive = true;
         renderRecipientMode({
           type: 'offline',
           name: payload.name,
           size: payload.size,
           mime: payload.mime,
+          pin: payload.pin || null,
           data: payload.data
         });
         return;
@@ -2229,25 +2537,46 @@
       const code = urlParams.get('code');
       const name = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : 'Shared Document';
       const size = urlParams.get('size') ? parseInt(urlParams.get('size')) : null;
+      const hasPin = urlParams.get('hasPin') === '1';
 
+      isRecipientModeActive = true;
       renderRecipientMode({
         type: 'p2p',
         code: code,
         name: name,
-        size: size
+        size: size,
+        hasPin: hasPin
       });
       return;
     }
 
-    // Default: Show Sender View
-    document.getElementById('senderView').style.display = 'block';
+    // Default: This is SENDER PORTAL (Not Recipient)
+    isRecipientModeActive = false;
     document.getElementById('recipientView').style.display = 'none';
+
+    // Check if passcode is unlocked
+    if (isPortalUnlocked()) {
+      document.getElementById('lockOverlay').style.display = 'none';
+      document.getElementById('senderView').style.display = 'block';
+    } else {
+      document.getElementById('senderView').style.display = 'none';
+      document.getElementById('lockOverlay').style.display = 'flex';
+      setTimeout(() => {
+        const pin = document.getElementById('passcodeInput');
+        if (pin) pin.focus();
+      }, 150);
+    }
   }
 
-  // Render recipient download view
+  // Render recipient download view (ONLY DOWNLOAD, ZERO UPLOAD CONTROLS)
   function renderRecipientMode(info) {
+    // Hide Lock screen and Sender view entirely
+    document.getElementById('lockOverlay').style.display = 'none';
     document.getElementById('senderView').style.display = 'none';
     document.getElementById('recipientView').style.display = 'block';
+
+    // In Recipient view, hide header lock button and upload controls
+    document.getElementById('btnHeaderLock').style.display = 'none';
 
     const theme = getFileTheme(info.name, info.mime);
 
@@ -2302,7 +2631,6 @@
     let startTime = null;
 
     recipientConn.on('open', () => {
-      console.log('Connected to sender node successfully!');
       document.getElementById('recipSubNote').textContent = 'Sender is online 🟢 Ready to download!';
     });
 
@@ -2311,12 +2639,13 @@
         p2pMetaReceived = data;
         document.getElementById('recipFileName').textContent = data.name;
         document.getElementById('recipFileSize').textContent = formatBytes(data.size);
+      } else if (data.type === 'PIN_ERROR') {
+        document.getElementById('filePassError').style.display = 'block';
       } else if (data.type === 'CHUNK') {
         if (!startTime) startTime = Date.now();
         receivedChunks.push(data.chunk);
         receivedBytes += data.chunk.byteLength;
 
-        // Update progress bar
         const total = p2pMetaReceived ? p2pMetaReceived.size : data.total;
         const percent = Math.min(100, Math.round((receivedBytes / total) * 100));
 
@@ -2324,7 +2653,6 @@
         document.getElementById('downloadPercentText').textContent = percent + '%';
         document.getElementById('downloadBytesText').textContent = `${formatBytes(receivedBytes)} / ${formatBytes(total)}`;
 
-        // Calculate download speed
         const elapsedSec = (Date.now() - startTime) / 1000;
         if (elapsedSec > 0.2) {
           const speedBps = receivedBytes / elapsedSec;
@@ -2343,7 +2671,6 @@
       console.log('Connection to sender closed.');
     });
 
-    // Timeout check: If after 8 seconds no response, show friendly message
     setTimeout(() => {
       if (!recipientConn || !recipientConn.open) {
         showSenderOfflineWarning();
@@ -2365,6 +2692,40 @@
 
   // Handle click on big "Download File" button
   function handleRecipientDownloadClick() {
+    // Check if file is password protected
+    if (p2pMetaReceived && p2pMetaReceived.pin) {
+      document.getElementById('filePassModal').style.display = 'flex';
+      document.getElementById('recipientEnteredPass').focus();
+      return;
+    }
+    if (p2pMetaReceived && p2pMetaReceived.hasPin) {
+      document.getElementById('filePassModal').style.display = 'flex';
+      document.getElementById('recipientEnteredPass').focus();
+      return;
+    }
+
+    startActualDownload('');
+  }
+
+  function closeFilePassModal() {
+    document.getElementById('filePassModal').style.display = 'none';
+    document.getElementById('filePassError').style.display = 'none';
+    document.getElementById('recipientEnteredPass').value = '';
+  }
+
+  function verifyFilePassAndDownload() {
+    const entered = document.getElementById('recipientEnteredPass').value.trim();
+    if (p2pMetaReceived && p2pMetaReceived.pin) {
+      if (entered !== p2pMetaReceived.pin) {
+        document.getElementById('filePassError').style.display = 'block';
+        return;
+      }
+    }
+    closeFilePassModal();
+    startActualDownload(entered);
+  }
+
+  function startActualDownload(pin) {
     const btn = document.getElementById('btnDownloadNow');
 
     // Case 1: Cloud Link
@@ -2400,9 +2761,9 @@
       btn.disabled = true;
       btn.innerHTML = '<span>⏳ Downloading Stream...</span>';
       document.getElementById('downloadProgressSection').style.display = 'block';
-      document.getElementById('downloadStatusText').textContent = 'Streaming file in chunks...';
+      document.getElementById('downloadStatusText').textContent = 'Streaming file securely...';
 
-      recipientConn.send({ type: 'START_DOWNLOAD' });
+      recipientConn.send({ type: 'START_DOWNLOAD', pin: pin });
     } else {
       showSenderOfflineWarning();
     }
@@ -2412,7 +2773,6 @@
     document.getElementById('downloadCompletedBox').style.display = 'block';
     document.getElementById('downloadProgressSection').style.display = 'none';
 
-    // Celebration confetti!
     if (typeof confetti === 'function') {
       confetti({
         particleCount: 120,
