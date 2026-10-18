@@ -36,10 +36,17 @@
 <!-- Clean URL normalizer -->
 <script>
   (function() {
-    if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('.html')) {
-      var clean = window.location.pathname.replace(/\.html$/, '');
-      if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
-      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    if (window.location.protocol !== 'file:') {
+      if (window.location.pathname.includes('/fastshare/fastshare')) {
+        var cleanPath = window.location.pathname.replace(/\/fastshare\/fastshare+/g, '/fastshare');
+        window.location.replace(window.location.origin + cleanPath + window.location.search + window.location.hash);
+        return;
+      }
+      if (window.location.pathname.endsWith('.html')) {
+        var clean = window.location.pathname.replace(/\.html$/, '');
+        if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
+        window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+      }
     }
   })();
 </script>
@@ -1891,6 +1898,18 @@
     document.getElementById('modeCardOffline').classList.toggle('active', selected === 'offline');
   }
 
+  // Helper to get clean base FastShare URL (prevents duplicate /fastshare paths)
+  function getFastShareBaseUrl() {
+    var path = window.location.pathname
+      .replace(/\.html$/, '')
+      .replace(/\/index$/, '')
+      .replace(/\/$/, '');
+    if (!path.endsWith('/fastshare')) {
+      path = path + '/fastshare';
+    }
+    return window.location.origin + path;
+  }
+
   // ==========================================
   // GENERATE SHARE LINK (Sender Side)
   // ==========================================
@@ -1902,7 +1921,7 @@
     btn.innerHTML = '<span>⏳ Preparing Secure Link...</span>';
 
     try {
-      const baseUrl = window.location.origin + window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') + '/fastshare';
+      const baseUrl = getFastShareBaseUrl();
       let shareUrl = '';
 
       if (activeTransferMode === 'offline') {
@@ -2100,7 +2119,7 @@
       rawUrl = `https://drive.google.com/uc?export=download&id=${gDriveMatch[1]}`;
     }
 
-    const baseUrl = window.location.origin + window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') + '/fastshare';
+    const baseUrl = getFastShareBaseUrl();
     const finalUrl = `${baseUrl}?cloud=${encodeURIComponent(rawUrl)}&name=${encodeURIComponent(docName)}&size=${encodeURIComponent(docSize)}`;
 
     document.getElementById('cloudShareLinkInput').value = finalUrl;
