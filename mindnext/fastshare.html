@@ -1767,7 +1767,7 @@
               Recipient Password (Optional):
             </label>
             <input type="text" class="file-pin-input" id="recipientFilePass" placeholder="Leave blank for no password"
-              maxlength="20">
+              maxlength="20" onchange="generateFastShareLink()" onkeydown="if(event.key==='Enter'){event.preventDefault(); generateFastShareLink();}">
           </div>
 
           <!-- Generate Button -->
@@ -1789,10 +1789,14 @@
               <span id="resHeading">Your FastShare Link is Ready!</span>
             </div>
 
+            <p style="font-size: 13px; color: var(--text-muted); margin: -4px 0 14px 0;">
+              Click <strong>Copy Link</strong> below to copy this link and send it to your recipient.
+            </p>
+
             <div class="link-input-group">
-              <input type="text" class="share-link-input" id="shareLinkInput" readonly>
+              <input type="text" class="share-link-input" id="shareLinkInput" readonly onclick="this.select()">
               <button class="btn-copy" id="btnCopyLink" onclick="copyShareLink()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
@@ -2172,6 +2176,7 @@
     }
 
     function processSelectedFile(file) {
+      if (!file) return;
       selectedFile = file;
       const theme = getFileTheme(file.name, file.type);
 
@@ -2180,33 +2185,21 @@
       document.getElementById('selFileType').textContent = theme.label;
 
       const iconEl = document.getElementById('selFileIcon');
-      iconEl.className = 'file-type-icon ' + theme.cls;
-      iconEl.textContent = theme.text;
+      if (iconEl) {
+        iconEl.className = 'file-type-icon ' + theme.cls;
+        iconEl.textContent = theme.text;
+      }
 
       document.getElementById('selectedFileBox').style.display = 'flex';
       document.getElementById('filePinBox').style.display = 'flex';
-      document.getElementById('modePickerBox').style.display = 'block';
-      document.getElementById('btnGenerateLink').style.display = 'inline-flex';
-      document.getElementById('resultBox').style.display = 'none';
 
-      // Auto-select mode
-      const isSmall = file.size <= 3.5 * 1024 * 1024; // 3.5 MB
-      const p2pCard = document.getElementById('modeCardP2P');
-      const offCard = document.getElementById('modeCardOffline');
-
-      if (isSmall) {
-        document.querySelector('input[name="transferMode"][value="offline"]').checked = true;
-        activeTransferMode = 'offline';
-        offCard.classList.add('active');
-        p2pCard.classList.remove('active');
-        document.getElementById('modeHeaderHint').textContent = 'Direct Link Available (<3.5MB)';
-      } else {
-        document.querySelector('input[name="transferMode"][value="p2p"]').checked = true;
-        activeTransferMode = 'p2p';
-        p2pCard.classList.add('active');
-        offCard.classList.remove('active');
-        document.getElementById('modeHeaderHint').textContent = 'P2P Stream Active (Large File)';
+      const btnGen = document.getElementById('btnGenerateLink');
+      if (btnGen) {
+        btnGen.style.display = 'inline-flex';
       }
+
+      // Automatically generate the download link immediately on file selection!
+      generateFastShareLink();
     }
 
     function clearSelectedFile() {
@@ -2215,20 +2208,21 @@
       document.getElementById('selectedFileBox').style.display = 'none';
       document.getElementById('filePinBox').style.display = 'none';
       document.getElementById('recipientFilePass').value = '';
-      document.getElementById('modePickerBox').style.display = 'none';
-      document.getElementById('btnGenerateLink').style.display = 'none';
+      const btnGen = document.getElementById('btnGenerateLink');
+      if (btnGen) btnGen.style.display = 'none';
       document.getElementById('resultBox').style.display = 'none';
-    }
-
-    function handleModeChange() {
-      const selected = document.querySelector('input[name="transferMode"]:checked').value;
-      activeTransferMode = selected;
-      document.getElementById('modeCardP2P').classList.toggle('active', selected === 'p2p');
-      document.getElementById('modeCardOffline').classList.toggle('active', selected === 'offline');
+      if (senderPeer) {
+        senderPeer.destroy();
+        senderPeer = null;
+      }
     }
 
     // Base URL Helper that avoids duplicate /fastshare/fastshare
     function getFastShareBaseUrl() {
+      if (window.location.protocol === 'file:') {
+        return window.location.href.split('?')[0].split('#')[0];
+      }
+      var origin = window.location.origin;
       var path = window.location.pathname
         .replace(/\.html$/, '')
         .replace(/\/index$/, '')
@@ -2236,7 +2230,7 @@
       if (!path.endsWith('/fastshare')) {
         path = path + '/fastshare';
       }
-      return window.location.origin + path;
+      return origin + path;
     }
 
     // ==========================================
@@ -2246,68 +2240,56 @@
       if (!selectedFile) return;
 
       const btn = document.getElementById('btnGenerateLink');
-      btn.disabled = true;
-      btn.innerHTML = '<span>⏳ Preparing Secure Link...</span>';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳ Preparing Secure Link...</span>';
+      }
 
       try {
         const baseUrl = getFastShareBaseUrl();
-        let shareUrl = '';
         const filePin = document.getElementById('recipientFilePass').value.trim();
 
-        if (activeTransferMode === 'offline') {
-          // Instant Offline Embedded Link (LZString compressed)
-          const reader = new FileReader();
-          const base64Promise = new Promise((resolve, reject) => {
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-          });
-          reader.readAsDataURL(selectedFile);
-          const dataUrl = await base64Promise;
-          const compressed = LZString.compressToEncodedURIComponent(dataUrl);
+        // Direct Stream Mode - Supports any file size (1 KB to 50 GB+)
+        senderRoomId = 'mn-' + Math.random().toString(36).substring(2, 8);
+        initSenderPeer(senderRoomId, selectedFile, filePin);
 
-          const hashPayload = {
-            name: selectedFile.name,
-            size: selectedFile.size,
-            mime: selectedFile.type,
-            pin: filePin || null,
-            data: compressed
-          };
+        let shareUrl = baseUrl + '?code=' + senderRoomId + '&name=' + encodeURIComponent(selectedFile.name) + '&size=' + selectedFile.size;
+        if (filePin) shareUrl += '&hasPin=1';
 
-          const encodedJson = encodeURIComponent(JSON.stringify(hashPayload));
-          shareUrl = baseUrl + '#doc=' + encodedJson;
-
-          document.getElementById('p2pStatusBox').style.display = 'none';
-        } else {
-          // Ultra P2P Direct Stream Mode
-          senderRoomId = 'mn-' + Math.random().toString(36).substring(2, 8);
-          initSenderPeer(senderRoomId, selectedFile, filePin);
-
-          shareUrl = baseUrl + '?code=' + senderRoomId + '&name=' + encodeURIComponent(selectedFile.name) + '&size=' + selectedFile.size;
-          if (filePin) shareUrl += '&hasPin=1';
-
-          document.getElementById('p2pStatusBox').style.display = 'flex';
-          document.getElementById('p2pStatusText').textContent = 'Sender Node Live: Keep this tab open while recipient downloads.';
-        }
+        const p2pBox = document.getElementById('p2pStatusBox');
+        if (p2pBox) p2pBox.style.display = 'flex';
+        const p2pText = document.getElementById('p2pStatusText');
+        if (p2pText) p2pText.textContent = 'Sender Node Live: Keep this tab open while recipient downloads.';
 
         // Display results
-        document.getElementById('shareLinkInput').value = shareUrl;
-        const waText = encodeURIComponent(`Here is the file "${selectedFile.name}" shared with you via MindNext FastShare:\n${shareUrl}`);
-        document.getElementById('btnShareWhatsApp').href = `https://api.whatsapp.com/send?text=${waText}`;
+        const linkInput = document.getElementById('shareLinkInput');
+        if (linkInput) linkInput.value = shareUrl;
+
+        const waBtn = document.getElementById('btnShareWhatsApp');
+        if (waBtn) {
+          const waText = encodeURIComponent(`Here is the file "${selectedFile.name}" (${formatBytes(selectedFile.size)}) shared with you via MindNext FastShare:\n${shareUrl}`);
+          waBtn.href = `https://api.whatsapp.com/send?text=${waText}`;
+        }
 
         // Generate QR Code
         const qrEl = document.getElementById('qrcode');
-        qrEl.innerHTML = '';
-        qrCodeInstance = new QRCode(qrEl, {
-          text: shareUrl,
-          width: 170,
-          height: 170,
-          colorDark: "#090b11",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.M
-        });
+        if (qrEl) {
+          qrEl.innerHTML = '';
+          qrCodeInstance = new QRCode(qrEl, {
+            text: shareUrl,
+            width: 170,
+            height: 170,
+            colorDark: "#090b11",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
 
-        document.getElementById('resultBox').style.display = 'block';
-        document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const resBox = document.getElementById('resultBox');
+        if (resBox) {
+          resBox.style.display = 'block';
+          resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
 
         saveToHistory({
           name: selectedFile.name,
@@ -2321,8 +2303,10 @@
         console.error(err);
         alert('Error generating link: ' + err.message);
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span id="btnGenText">⚡ Generate FastShare Link</span>`;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span id="btnGenText">⚡ Generate FastShare Link</span>`;
+        }
       }
     }
 
@@ -2409,13 +2393,42 @@
     // Copy share link
     function copyShareLink() {
       const input = document.getElementById('shareLinkInput');
+      const copyBtn = document.getElementById('btnCopyLink');
+      const copyText = document.getElementById('btnCopyText');
+      if (!input || !input.value) return;
+
       input.select();
-      navigator.clipboard.writeText(input.value).then(() => {
-        showToast('Share link copied to clipboard!');
-      }).catch(() => {
-        document.execCommand('copy');
-        showToast('Share link copied to clipboard!');
-      });
+      input.setSelectionRange(0, 99999);
+
+      const markCopied = () => {
+        showToast('Link copied to clipboard!');
+        if (copyText) copyText.textContent = 'Copied!';
+        if (copyBtn) copyBtn.style.background = 'var(--accent-emerald)';
+        setTimeout(() => {
+          if (copyText) copyText.textContent = 'Copy Link';
+          if (copyBtn) copyBtn.style.background = '';
+        }, 2200);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(input.value)
+          .then(markCopied)
+          .catch(() => {
+            try {
+              document.execCommand('copy');
+              markCopied();
+            } catch (e) {
+              prompt('Copy link:', input.value);
+            }
+          });
+      } else {
+        try {
+          document.execCommand('copy');
+          markCopied();
+        } catch (e) {
+          prompt('Copy link:', input.value);
+        }
+      }
     }
 
     function toggleQRCode() {
