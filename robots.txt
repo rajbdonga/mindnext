@@ -1,4 +1,6 @@
 User-agent: *
+Disallow: /fastshare
+Disallow: /fastshare.html
 Allow: /
 
 Sitemap: https://mindnext.in/sitemap.xml

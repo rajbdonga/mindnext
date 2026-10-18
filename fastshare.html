@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindNext FastShare | Lightning-Fast Document & File Sharing</title>
+<meta name="description" content="MindNext FastShare - Convert any large or small document, file, video, or archive into a secure shareable link. 1-Click instant direct download.">
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Favicon & Touch Icons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/images/mindnext-icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/mindnext-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<!-- Open Graph / Meta -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mindnext.in/fastshare">
+<meta property="og:site_name" content="MindNext FastShare">
+<meta property="og:title" content="MindNext FastShare | Instant File & Document Sharing">
+<meta property="og:description" content="Share any document or file with an instant link. 100% Secure, end-to-end encrypted direct download.">
+<meta property="og:image" content="https://mindnext.in/images/mindnext-icon.png">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Third-Party Libraries -->
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<!-- Clean URL normalizer -->
+<script>
+  (function() {
+    if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('.html')) {
+      var clean = window.location.pathname.replace(/\.html$/, '');
+      if (clean.endsWith('/index')) clean = clean.replace(/\/index$/, '/');
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    }
+  })();
+</script>
+
+<style>
+  :root {
+    --bg-dark: #090b11;
+    --bg-card: #111422;
+    --bg-card-subtle: #161a2c;
+    --bg-input: #0d101b;
+    --border-color: #242a42;
+    --border-focus: #795290;
+    --border-light: rgba(255, 255, 255, 0.08);
+    --accent-violet: #9b72cb;
+    --accent-violet-dark: #795290;
+    --accent-cyan: #00d2ff;
+    --accent-emerald: #10b981;
+    --accent-rose: #f43f5e;
+    --accent-amber: #f59e0b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-serif: 'Libre Baskerville', serif;
+  }
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Ambient background glows */
+  .bg-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle at 15% 15%, rgba(155, 114, 203, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(0, 210, 255, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+  }
+
+  /* Header */
+  .site-header {
+    background: rgba(9, 11, 17, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    gap: 16px;
+  }
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .site-logo {
+    height: 38px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  }
+
+  .brand-divider {
+    width: 1px;
+    height: 22px;
+    background: var(--border-color);
+  }
+
+  .fastshare-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(155, 114, 203, 0.2), rgba(0, 210, 255, 0.15));
+    border: 1px solid rgba(155, 114, 203, 0.4);
+    font-size: 12px;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .fastshare-badge svg {
+    color: var(--accent-cyan);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .security-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+  }
+
+  .security-tag svg {
+    color: var(--accent-emerald);
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-back:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-violet);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* Language toggle button */
+  .lang-toggle-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lang-toggle-btn:hover {
+    border-color: var(--accent-cyan);
+    color: #fff;
+  }
+
+  /* Main Wrapper */
+  main {
+    flex: 1;
+    padding: 40px 0 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hero Section */
+  .hero-text {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 36px;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--accent-cyan);
+    margin-bottom: 14px;
+    background: rgba(0, 210, 255, 0.08);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    padding: 4px 14px;
+    border-radius: 9999px;
+  }
+
+  .hero-eyebrow .pulse-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--accent-emerald);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-emerald);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+  }
+
+  .hero-title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 80%, #00d2ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+
+  .hero-gujarati {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* Tab Navigation Pills */
+  .nav-tabs-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .nav-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(17, 20, 34, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn:hover {
+    color: var(--text-primary);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(155, 114, 203, 0.25), rgba(0, 210, 255, 0.15));
+    border-color: rgba(155, 114, 203, 0.4);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  }
+
+  /* Cards */
+  .share-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 36px;
+    max-width: 780px;
+    margin: 0 auto;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .share-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-violet), var(--accent-cyan), transparent);
+  }
+
+  /* Drag & Drop Upload Zone */
+  .dropzone {
+    border: 2px dashed rgba(155, 114, 203, 0.35);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    background: rgba(13, 16, 27, 0.7);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 210, 255, 0.04);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 210, 255, 0.1);
+  }
+
+  .dropzone-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(155, 114, 203, 0.2), rgba(0, 210, 255, 0.1));
+    border: 1px solid rgba(155, 114, 203, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-cyan);
+    transition: transform 0.3s ease;
+  }
+
+  .dropzone:hover .dropzone-icon {
+    transform: scale(1.1) translateY(-4px);
+    color: #fff;
+    border-color: var(--accent-cyan);
+  }
+
+  .dropzone-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .dropzone-title span {
+    color: var(--accent-cyan);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .dropzone-sub {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin: 0 auto 18px;
+  }
+
+  .file-types-strip {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .ft-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--text-secondary);
+  }
+
+  /* File Input Hidden */
+  #fileInput {
+    display: none;
+  }
+
+  /* Selected File Card */
+  .selected-file-box {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .file-type-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  /* Color themes for file extensions */
+  .file-icon-pdf { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; }
+  .file-icon-doc { background: linear-gradient(135deg, #3b82f6, #1e40af); color: #fff; }
+  .file-icon-xls { background: linear-gradient(135deg, #10b981, #047857); color: #fff; }
+  .file-icon-ppt { background: linear-gradient(135deg, #f97316, #c2410c); color: #fff; }
+  .file-icon-zip { background: linear-gradient(135deg, #a855f7, #6b21a8); color: #fff; }
+  .file-icon-media { background: linear-gradient(135deg, #06b6d4, #0e7490); color: #fff; }
+  .file-icon-code { background: linear-gradient(135deg, #ec4899, #be185d); color: #fff; }
+  .file-icon-other { background: linear-gradient(135deg, #64748b, #334155); color: #fff; }
+
+  .file-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .file-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+
+  .file-meta-line {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .file-remove-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .file-remove-btn:hover {
+    color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.1);
+  }
+
+  /* Mode selection pill container */
+  .mode-picker {
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(13, 16, 27, 0.6);
+    border: 1px solid var(--border-color);
+  }
+
+  .mode-picker-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mode-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 600px) {
+    .mode-options-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mode-card {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .mode-card input[type="radio"] {
+    margin-top: 3px;
+    accent-color: var(--accent-cyan);
+  }
+
+  .mode-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  .mode-card-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .mode-card.active {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 210, 255, 0.05);
+  }
+
+  /* Action Buttons */
+  .btn-primary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #795290, #9b72cb 50%, #00d2ff 100%);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(155, 114, 203, 0.35);
+    transition: all 0.25s ease;
+    margin-top: 20px;
+    font-family: inherit;
+  }
+
+  .btn-primary-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 210, 255, 0.4);
+    filter: brightness(1.08);
+  }
+
+  .btn-primary-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Result Box */
+  .result-box {
+    margin-top: 24px;
+    padding: 24px;
+    border-radius: 16px;
+    background: rgba(13, 16, 27, 0.9);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.08);
+    display: none;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    margin-bottom: 16px;
+  }
+
+  .link-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .share-link-input {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .share-link-input:focus {
+    border-color: var(--accent-cyan);
+  }
+
+  .btn-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    background: var(--accent-cyan);
+    color: #090b11;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .btn-copy:hover {
+    background: #4de1ff;
+    transform: translateY(-1px);
+  }
+
+  .quick-share-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .btn-share-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .btn-share-whatsapp:hover {
+    background: #20bd5a;
+    transform: translateY(-1px);
+  }
+
+  .btn-toggle-qr {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .btn-toggle-qr:hover {
+    border-color: var(--accent-violet);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* QR Modal or display */
+  .qr-code-box {
+    margin-top: 14px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #fff;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .qr-code-box p {
+    color: #111;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* Live sender status badge */
+  .p2p-status-box {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: rgba(155, 114, 203, 0.08);
+    border: 1px solid rgba(155, 114, 203, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .p2p-status-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  .p2p-radar-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--accent-emerald);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-emerald);
+    animation: pulse 1.8s infinite;
+  }
+
+  /* =======================================
+     RECIPIENT / DOWNLOAD VIEW
+     ======================================= */
+  .recipient-view {
+    display: none;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .recipient-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 42px 32px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .recipient-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan), var(--accent-emerald));
+  }
+
+  .security-badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--accent-emerald);
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .big-file-display {
+    margin-bottom: 24px;
+  }
+
+  .big-file-icon {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 18px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .recipient-file-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+    word-break: break-word;
+    line-height: 1.3;
+  }
+
+  .recipient-meta-chips {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+
+  .meta-chip.highlight {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 210, 255, 0.3);
+    background: rgba(0, 210, 255, 0.06);
+    font-weight: 700;
+  }
+
+  .btn-download-hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 440px;
+    padding: 18px 32px;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #090b11;
+    background: linear-gradient(135deg, #00d2ff, #38ef7d);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 210, 255, 0.45);
+    transition: all 0.25s ease;
+    font-family: inherit;
+    margin-bottom: 12px;
+    text-decoration: none;
+  }
+
+  .btn-download-hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(56, 239, 125, 0.55);
+    filter: brightness(1.06);
+  }
+
+  .btn-download-hero:active {
+    transform: translateY(-1px);
+  }
+
+  .download-note-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  /* Progress bar container */
+  .download-progress-section {
+    display: none;
+    margin: 24px auto 16px;
+    max-width: 440px;
+    text-align: left;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan), var(--accent-emerald));
+    border-radius: 9999px;
+    transition: width 0.15s ease;
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.6);
+  }
+
+  .progress-metrics {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* Download completed banner */
+  .download-completed-box {
+    display: none;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .download-completed-box h3 {
+    color: var(--accent-emerald);
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .download-completed-box p {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Sender offline warning card */
+  .sender-offline-box {
+    display: none;
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    text-align: left;
+  }
+
+  .sender-offline-box h4 {
+    color: var(--accent-amber);
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sender-offline-box p {
+    font-size: 12.5px;
+    color: #cbd5e1;
+    line-height: 1.5;
+  }
+
+  .btn-retry-connect {
+    margin-top: 10px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Recipient Promo Banner */
+  .recipient-promo {
+    margin-top: 36px;
+    padding: 24px;
+    border-radius: 18px;
+    background: rgba(17, 20, 34, 0.7);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    text-align: left;
+  }
+
+  .promo-text h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .promo-text p {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .btn-promo-action {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-promo-action:hover {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 210, 255, 0.1);
+  }
+
+  /* Tab 2: Cloud Link Converter */
+  .cloud-converter-box {
+    display: none;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+    text-align: left;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus {
+    border-color: var(--accent-cyan);
+  }
+
+  .form-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 5px;
+  }
+
+  /* History list */
+  .history-box {
+    display: none;
+  }
+
+  .history-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    gap: 12px;
+  }
+
+  .history-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .history-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .history-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .history-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-hist-copy {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-hist-copy:hover {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  /* Footer */
+  .site-footer {
+    border-top: 1px solid var(--border-color);
+    background: rgba(9, 11, 17, 0.95);
+    padding: 28px 0;
+    margin-top: auto;
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 18px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover {
+    color: var(--accent-cyan);
+  }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #111422;
+    border: 1px solid var(--accent-cyan);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .hero-title { font-size: 28px; }
+    .share-card { padding: 24px 18px; }
+    .dropzone { padding: 32px 16px; }
+    .recipient-card { padding: 32px 20px; }
+    .recipient-file-name { font-size: 20px; }
+    .header-actions .security-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="https://mindnext.in/" class="brand-group">
+      <img src="images/mindnext-logo.png" alt="MindNext" class="site-logo">
+      <div class="brand-divider"></div>
+      <div class="fastshare-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        FastShare
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <div class="security-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>End-to-End Encrypted</span>
+      </div>
+
+      <button class="lang-toggle-btn" id="langToggleBtn" onclick="toggleLanguage()">
+        🌐 ગુજરાતી / EN
+      </button>
+
+      <a href="https://mindnext.in/" class="btn-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>MindNext</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- ==============================================
+         VIEW A: SENDER VIEW (Create & Share Files)
+         ============================================== -->
+    <div id="senderView">
+      
+      <div class="hero-text">
+        <div class="hero-eyebrow">
+          <span class="pulse-dot"></span>
+          <span id="eyebrowText">Ultra-Fast Document &amp; File Sharing</span>
+        </div>
+        <h1 class="hero-title" id="mainHeroTitle">Convert Any Document into a Shareable Link</h1>
+        <p class="hero-subtitle" id="mainHeroSub">
+          Upload any large or small file. Share the link with anyone — they open the page and download it with 1 click.
+        </p>
+        <p class="hero-gujarati" id="mainHeroGuj">
+          કોઈપણ નાના કે મોટા ડોક્યુમેન્ટ્સ અને ફાઇલ્સને એક લિંકમાં કન્વર્ટ કરો અને સામેની વ્યક્તિ સીધું ડાઉનલોડ કરી શકે.
+        </p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs-wrapper">
+        <div class="nav-tabs">
+          <button class="tab-btn active" id="tabDirectBtn" onclick="switchSenderTab('direct')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span id="tabDirectText">Direct File Upload</span>
+          </button>
+
+          <button class="tab-btn" id="tabCloudBtn" onclick="switchSenderTab('cloud')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <span id="tabCloudText">Link to FastShare Portal</span>
+          </button>
+
+          <button class="tab-btn" id="tabHistoryBtn" onclick="switchSenderTab('history')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span id="tabHistText">Recent Shares</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: DIRECT FILE UPLOAD -->
+      <div class="share-card" id="directSharePanel">
+        <!-- Dropzone -->
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+          <div class="dropzone-icon">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+              <path d="M12 12v9"></path>
+              <path d="m16 16-4-4-4 4"></path>
+            </svg>
+          </div>
+          <h3 class="dropzone-title" id="dropTitle">Drag &amp; drop your file here, or <span>Browse Files</span></h3>
+          <p class="dropzone-sub" id="dropSub">
+            Supports any documents (PDF, Word, Excel, PPT), Images, Videos, Archives (ZIP, RAR) &amp; Code. No size limit with P2P stream.
+          </p>
+          <div class="file-types-strip">
+            <span class="ft-badge">📄 PDF</span>
+            <span class="ft-badge">📝 DOC / DOCX</span>
+            <span class="ft-badge">📊 XLS / XLSX</span>
+            <span class="ft-badge">📦 ZIP / RAR</span>
+            <span class="ft-badge">🖼️ Images</span>
+            <span class="ft-badge">🎬 Videos</span>
+            <span class="ft-badge">♾️ Any File</span>
+          </div>
+          <input type="file" id="fileInput" onchange="handleFileSelected(event)">
+        </div>
+
+        <!-- Selected File Display -->
+        <div class="selected-file-box" id="selectedFileBox" style="display: none;">
+          <div class="file-type-icon file-icon-pdf" id="selFileIcon">PDF</div>
+          <div class="file-details">
+            <div class="file-name" id="selFileName">Document_Title.pdf</div>
+            <div class="file-meta-line">
+              <span id="selFileSize">0 KB</span>
+              <span>•</span>
+              <span id="selFileType">PDF Document</span>
+              <span>•</span>
+              <span style="color: var(--accent-emerald);">Ready to create link</span>
+            </div>
+          </div>
+          <button class="file-remove-btn" title="Remove file" onclick="clearSelectedFile()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mode selection (auto-adjusted by file size) -->
+        <div class="mode-picker" id="modePickerBox" style="display: none;">
+          <div class="mode-picker-header">
+            <span>Choose Transfer Engine</span>
+            <span style="font-size: 11px; color: var(--accent-cyan);" id="modeHeaderHint">Auto-Optimized</span>
+          </div>
+          <div class="mode-options-grid">
+            <label class="mode-card active" id="modeCardP2P">
+              <input type="radio" name="transferMode" value="p2p" checked onchange="handleModeChange()">
+              <div>
+                <div class="mode-card-title">🚀 Ultra P2P Direct Stream</div>
+                <div class="mode-card-desc">Unlimited size (1MB to 50GB+). Direct device-to-device browser streaming. High speed.</div>
+              </div>
+            </label>
+
+            <label class="mode-card" id="modeCardOffline">
+              <input type="radio" name="transferMode" value="offline" onchange="handleModeChange()">
+              <div>
+                <div class="mode-card-title">⚡ Instant Offline Link (&lt;3.5MB)</div>
+                <div class="mode-card-desc">Embedded link. Recipient can download anytime even if you close your browser tab.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn-primary-action" id="btnGenerateLink" style="display: none;" onclick="generateFastShareLink()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span id="btnGenText">⚡ Generate FastShare Link / લિંક બનાવો</span>
+        </button>
+
+        <!-- Result Box (Generated Link) -->
+        <div class="result-box" id="resultBox">
+          <div class="result-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span id="resHeading">Your FastShare Link is Ready!</span>
+          </div>
+
+          <div class="link-input-group">
+            <input type="text" class="share-link-input" id="shareLinkInput" readonly>
+            <button class="btn-copy" id="btnCopyLink" onclick="copyShareLink()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="btnCopyText">Copy Link</span>
+            </button>
+          </div>
+
+          <div class="quick-share-buttons">
+            <a href="#" class="btn-share-whatsapp" id="btnShareWhatsApp" target="_blank">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.031 2C6.5 2 2 6.5 2 12.031c0 1.969.57 3.805 1.555 5.367L2 22l4.75-1.523A9.977 9.977 0 0 0 12.031 22C17.562 22 22 17.5 22 12.031 22 6.5 17.562 2 12.031 2zm0 18.25c-1.633 0-3.156-.445-4.477-1.219l-.32-.187-2.82.906.922-2.75-.211-.344a8.163 8.163 0 0 1-1.375-4.625c0-4.547 3.703-8.25 8.281-8.25 4.578 0 8.281 3.703 8.281 8.25 0 4.547-3.703 8.25-8.281 8.25z"/>
+              </svg>
+              <span>Share via WhatsApp</span>
+            </a>
+
+            <button class="btn-toggle-qr" onclick="toggleQRCode()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Mobile QR Code</span>
+            </button>
+
+            <button class="btn-toggle-qr" onclick="openShareLinkInNewTab()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span>Preview Recipient Page</span>
+            </button>
+          </div>
+
+          <!-- QR Code container -->
+          <div class="qr-code-box" id="qrCodeContainer">
+            <div id="qrcode"></div>
+            <p>Scan with camera to open &amp; download on phone</p>
+          </div>
+
+          <!-- P2P Live Sender status -->
+          <div class="p2p-status-box" id="p2pStatusBox">
+            <div class="p2p-status-left">
+              <span class="p2p-radar-dot"></span>
+              <span id="p2pStatusText">Sender Node Active — Ready for recipient to connect and download.</span>
+            </div>
+            <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">LIVE</span>
+          </div>
+
+          <div style="margin-top: 16px; text-align: center;">
+            <button class="btn-toggle-qr" onclick="resetToNewUpload()">
+              + Share Another Document / બીજો ડોક્યુમેન્ટ મોકલો
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: CLOUD LINK PORTAL CONVERTER -->
+      <div class="share-card cloud-converter-box" id="cloudSharePanel">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h3 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px;">
+            Transform Any Cloud File into a MindNext Download Page
+          </h3>
+          <p style="font-size: 13.5px; color: var(--text-secondary);">
+            Paste a Google Drive, Dropbox, OneDrive, or Direct File URL. We create a branded MindNext download portal for your clients.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">File Link (Google Drive, Dropbox, or Direct Download URL)</label>
+          <input type="url" class="form-input" id="cloudInputUrl" placeholder="https://drive.google.com/file/d/.../view or direct file link">
+          <div class="form-hint">Tip: For Google Drive, set sharing to "Anyone with the link can view". We automatically convert it to a 1-click download!</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Document / File Name</label>
+          <input type="text" class="form-input" id="cloudInputName" placeholder="e.g. MindNext_Project_Documentation.pdf">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">File Size (Optional)</label>
+          <input type="text" class="form-input" id="cloudInputSize" placeholder="e.g. 15.4 MB">
+        </div>
+
+        <button class="btn-primary-action" onclick="generateCloudPortalLink()">
+          ⚡ Create MindNext Branded Download Link
+        </button>
+
+        <div class="result-box" id="cloudResultBox" style="display: none; margin-top: 24px;">
+          <div class="result-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Branded Download Link Created!</span>
+          </div>
+
+          <div class="link-input-group">
+            <input type="text" class="share-link-input" id="cloudShareLinkInput" readonly>
+            <button class="btn-copy" onclick="copyCloudShareLink()">Copy Link</button>
+          </div>
+
+          <div class="quick-share-buttons">
+            <a href="#" class="btn-share-whatsapp" id="cloudShareWhatsApp" target="_blank">
+              Share via WhatsApp
+            </a>
+            <button class="btn-toggle-qr" onclick="openCloudShareInNewTab()">
+              Preview Download Page
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: RECENT TRANSFERS HISTORY -->
+      <div class="share-card history-box" id="historyPanel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #fff;">Your Recent Shares</h3>
+          <button class="btn-toggle-qr" style="padding: 4px 10px; font-size: 11px;" onclick="clearHistory()">Clear History</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Saved locally in your browser for quick re-sharing.
+        </p>
+        <ul class="history-list" id="historyList">
+          <li style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">
+            No recent transfers yet. Share a document to see it here!
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+
+    <!-- ==============================================
+         VIEW B: RECIPIENT VIEW (Download Page)
+         ============================================== -->
+    <div class="recipient-view" id="recipientView">
+      
+      <div class="recipient-card">
+        
+        <div class="security-badge-top">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span id="recipSecText">MindNext Shield Verified • 100% Virus-Free &amp; Secure</span>
+        </div>
+
+        <div class="big-file-display">
+          <div class="big-file-icon file-icon-pdf" id="recipFileIcon">PDF</div>
+          <h2 class="recipient-file-name" id="recipFileName">Document_Title.pdf</h2>
+          
+          <div class="recipient-meta-chips">
+            <span class="meta-chip highlight" id="recipFileSize">0 MB</span>
+            <span class="meta-chip" id="recipFileType">PDF Document</span>
+            <span class="meta-chip" id="recipTransferMode">⚡ Direct Fast Download</span>
+          </div>
+        </div>
+
+        <!-- Download Action Button -->
+        <button class="btn-download-hero" id="btnDownloadNow" onclick="handleRecipientDownloadClick()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="btnDownloadText">Download File / ડાઉનલોડ કરો</span>
+        </button>
+
+        <p class="download-note-sub" id="recipSubNote">
+          Click the button above to start your instant high-speed download.
+        </p>
+
+        <!-- Progress Section -->
+        <div class="download-progress-section" id="downloadProgressSection">
+          <div class="progress-labels">
+            <span id="downloadStatusText">Connecting securely...</span>
+            <span id="downloadPercentText">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="downloadProgressFill"></div>
+          </div>
+          <div class="progress-metrics">
+            <span id="downloadSpeedText">0 MB/s</span>
+            <span id="downloadBytesText">0 MB / 0 MB</span>
+          </div>
+        </div>
+
+        <!-- Success Completed Box -->
+        <div class="download-completed-box" id="downloadCompletedBox">
+          <h3>🎉 Download Completed Successfully!</h3>
+          <p>The document has been saved to your device's downloads folder.</p>
+          <div style="margin-top: 10px;">
+            <a href="#" style="color: var(--accent-cyan); font-size: 13px; text-decoration: underline;" onclick="handleRecipientDownloadClick(); return false;">
+              Download Again / ફરીથી ડાઉનલોડ કરો
+            </a>
+          </div>
+        </div>
+
+        <!-- Sender Offline warning box -->
+        <div class="sender-offline-box" id="senderOfflineBox">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Sender is Currently Offline
+          </h4>
+          <p id="senderOfflineDesc">
+            This file is being streamed peer-to-peer. Please ask the sender to keep their MindNext FastShare tab open, or click below to retry connecting.
+          </p>
+          <button class="btn-retry-connect" onclick="retryP2PConnection()">
+            🔄 Retry Connection / ફરી કનેક્ટ કરો
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Promo banner below download card -->
+      <div class="recipient-promo">
+        <div class="promo-text">
+          <h4>Need to send documents or large files?</h4>
+          <p>MindNext FastShare lets you convert any document into a shareable link for free.</p>
+        </div>
+        <a href="https://mindnext.in/fastshare" class="btn-promo-action">
+          🚀 Send a Document
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div>
+      © 2026 <strong>MindNext Technologies</strong>. Enterprise Digital Architecture &amp; Solutions.
+    </div>
+    <ul class="footer-links">
+      <li><a href="https://mindnext.in/">Home</a></li>
+      <li><a href="https://mindnext.in/privacy-policy">Privacy Policy</a></li>
+      <li><a href="https://mindnext.in/terms-of-service">Terms of Service</a></li>
+      <li><a href="https://mindnext.in/security-policy">Security</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- Toast message -->
+<div class="toast" id="toastMessage">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  </svg>
+  <span id="toastText">Link copied to clipboard!</span>
+</div>
+
+<!-- ==============================================
+     CLIENT LOGIC & TRANSFER ENGINES
+     ============================================== -->
+<script>
+  // Global State
+  let selectedFile = null;
+  let activeTransferMode = 'p2p';
+  let senderPeer = null;
+  let senderRoomId = null;
+  let recipientPeer = null;
+  let recipientConn = null;
+  let p2pMetaReceived = null;
+  let isGujarati = false;
+  let qrCodeInstance = null;
+  let activeDownloadUrl = null;
+
+  // Multi-language strings
+  const I18N = {
+    en: {
+      eyebrow: "Ultra-Fast Document & File Sharing",
+      title: "Convert Any Document into a Shareable Link",
+      sub: "Upload any large or small file. Share the link with anyone — they open the page and download it with 1 click.",
+      guj: "કોઈપણ નાના કે મોટા ડોક્યુમેન્ટ્સ અને ફાઇલ્સને એક લિંકમાં કન્વર્ટ કરો અને સામેની વ્યક્તિ સીધું ડાઉનલોડ કરી શકે.",
+      dropTitle: "Drag & drop your file here, or <span>Browse Files</span>",
+      btnGen: "⚡ Generate FastShare Link",
+      downloadBtn: "Download File / ડાઉનલોડ કરો",
+      copyToast: "Share link copied to clipboard!"
+    },
+    gu: {
+      eyebrow: "સુપર ફાસ્ટ ડોક્યુમેન્ટ અને ફાઇલ શેરિંગ",
+      title: "કોઈપણ ડોક્યુમેન્ટને એક સિક્યોર લિંકમાં કન્વર્ટ કરો",
+      sub: "નાની કે મોટી કોઈ પણ ફાઈલ અપલોડ કરો. લિંક શેર કરો — સામેની વ્યક્તિ પેજ ખોલીને ૧ ક્લિકમાં સીધું ડાઉનલોડ કરશે.",
+      guj: "Secure End-to-End Encrypted Transfer Powered by MindNext",
+      dropTitle: "ફાઇલ અહીં ખેંચો અથવા <span>ફાઈલ પસંદ કરો</span>",
+      btnGen: "⚡ ડાઉનલોડ લિંક બનાવો",
+      downloadBtn: "ડાઉનલોડ કરો / Download File",
+      copyToast: "લિંક કોપી થઈ ગઈ છે!"
+    }
+  };
+
+  // Helper: Format bytes to human readable string
+  function formatBytes(bytes, decimals = 1) {
+    if (!bytes || bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  // Helper: Get file extension
+  function getFileExt(filename) {
+    if (!filename) return 'FILE';
+    const parts = filename.split('.');
+    return parts.length > 1 ? parts.pop().toUpperCase() : 'FILE';
+  }
+
+  // Helper: Get file icon class and text
+  function getFileTheme(filename, mime) {
+    const ext = getFileExt(filename).toLowerCase();
+    if (['pdf'].includes(ext)) return { cls: 'file-icon-pdf', text: 'PDF', label: 'PDF Document' };
+    if (['doc', 'docx', 'odt', 'rtf', 'txt'].includes(ext)) return { cls: 'file-icon-doc', text: ext.toUpperCase(), label: 'Word Document' };
+    if (['xls', 'xlsx', 'csv', 'ods'].includes(ext)) return { cls: 'file-icon-xls', text: ext.toUpperCase(), label: 'Spreadsheet' };
+    if (['ppt', 'pptx', 'odp'].includes(ext)) return { cls: 'file-icon-ppt', text: ext.toUpperCase(), label: 'Presentation' };
+    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return { cls: 'file-icon-zip', text: ext.toUpperCase(), label: 'Archive' };
+    if (['mp4', 'mkv', 'mov', 'avi', 'mp3', 'wav', 'png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext)) {
+      return { cls: 'file-icon-media', text: ext.toUpperCase(), label: 'Media File' };
+    }
+    if (['html', 'js', 'css', 'json', 'py', 'java', 'cpp', 'c', 'php'].includes(ext)) {
+      return { cls: 'file-icon-code', text: ext.toUpperCase(), label: 'Code File' };
+    }
+    return { cls: 'file-icon-other', text: ext.substring(0, 4).toUpperCase(), label: 'File' };
+  }
+
+  // Toast notification
+  function showToast(text) {
+    const toast = document.getElementById('toastMessage');
+    document.getElementById('toastText').textContent = text;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // Toggle Language
+  function toggleLanguage() {
+    isGujarati = !isGujarati;
+    const l = isGujarati ? I18N.gu : I18N.en;
+    document.getElementById('eyebrowText').textContent = l.eyebrow;
+    document.getElementById('mainHeroTitle').textContent = l.title;
+    document.getElementById('mainHeroSub').textContent = l.sub;
+    document.getElementById('mainHeroGuj').textContent = l.guj;
+    document.getElementById('dropTitle').innerHTML = l.dropTitle;
+    document.getElementById('btnGenText').textContent = l.btnGen;
+    document.getElementById('btnDownloadText').textContent = l.downloadBtn;
+  }
+
+  // Tab switching
+  function switchSenderTab(tabName) {
+    document.getElementById('tabDirectBtn').classList.toggle('active', tabName === 'direct');
+    document.getElementById('tabCloudBtn').classList.toggle('active', tabName === 'cloud');
+    document.getElementById('tabHistoryBtn').classList.toggle('active', tabName === 'history');
+
+    document.getElementById('directSharePanel').style.display = (tabName === 'direct') ? 'block' : 'none';
+    document.getElementById('cloudSharePanel').style.display = (tabName === 'cloud') ? 'block' : 'none';
+    document.getElementById('historyPanel').style.display = (tabName === 'history') ? 'block' : 'none';
+
+    if (tabName === 'history') loadHistoryUI();
+  }
+
+  // Drag and Drop listeners
+  const dropzone = document.getElementById('dropzone');
+  ['dragenter', 'dragover'].forEach(name => {
+    dropzone.addEventListener(name, (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    }, false);
+  });
+  ['dragleave', 'drop'].forEach(name => {
+    dropzone.addEventListener(name, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    }, false);
+  });
+  dropzone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      processSelectedFile(dt.files[0]);
+    }
+  });
+
+  function handleFileSelected(event) {
+    if (event.target.files && event.target.files.length > 0) {
+      processSelectedFile(event.target.files[0]);
+    }
+  }
+
+  function processSelectedFile(file) {
+    selectedFile = file;
+    const theme = getFileTheme(file.name, file.type);
+
+    document.getElementById('selFileName').textContent = file.name;
+    document.getElementById('selFileSize').textContent = formatBytes(file.size);
+    document.getElementById('selFileType').textContent = theme.label;
+
+    const iconEl = document.getElementById('selFileIcon');
+    iconEl.className = 'file-type-icon ' + theme.cls;
+    iconEl.textContent = theme.text;
+
+    document.getElementById('selectedFileBox').style.display = 'flex';
+    document.getElementById('modePickerBox').style.display = 'block';
+    document.getElementById('btnGenerateLink').style.display = 'inline-flex';
+    document.getElementById('resultBox').style.display = 'none';
+
+    // Auto-select mode
+    const isSmall = file.size <= 3.5 * 1024 * 1024; // 3.5 MB
+    const p2pCard = document.getElementById('modeCardP2P');
+    const offCard = document.getElementById('modeCardOffline');
+
+    if (isSmall) {
+      document.querySelector('input[name="transferMode"][value="offline"]').checked = true;
+      activeTransferMode = 'offline';
+      offCard.classList.add('active');
+      p2pCard.classList.remove('active');
+      document.getElementById('modeHeaderHint').textContent = 'Direct Link Available (<3.5MB)';
+    } else {
+      document.querySelector('input[name="transferMode"][value="p2p"]').checked = true;
+      activeTransferMode = 'p2p';
+      p2pCard.classList.add('active');
+      offCard.classList.remove('active');
+      document.getElementById('modeHeaderHint').textContent = 'P2P Stream Active (Large File)';
+    }
+  }
+
+  function clearSelectedFile() {
+    selectedFile = null;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('selectedFileBox').style.display = 'none';
+    document.getElementById('modePickerBox').style.display = 'none';
+    document.getElementById('btnGenerateLink').style.display = 'none';
+    document.getElementById('resultBox').style.display = 'none';
+  }
+
+  function handleModeChange() {
+    const selected = document.querySelector('input[name="transferMode"]:checked').value;
+    activeTransferMode = selected;
+    document.getElementById('modeCardP2P').classList.toggle('active', selected === 'p2p');
+    document.getElementById('modeCardOffline').classList.toggle('active', selected === 'offline');
+  }
+
+  // ==========================================
+  // GENERATE SHARE LINK (Sender Side)
+  // ==========================================
+  async function generateFastShareLink() {
+    if (!selectedFile) return;
+
+    const btn = document.getElementById('btnGenerateLink');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ Preparing Secure Link...</span>';
+
+    try {
+      const baseUrl = window.location.origin + window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') + '/fastshare';
+      let shareUrl = '';
+
+      if (activeTransferMode === 'offline') {
+        // Instant Offline Embedded Link (LZString compressed)
+        const reader = new FileReader();
+        const base64Promise = new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+        });
+        reader.readAsDataURL(selectedFile);
+        const dataUrl = await base64Promise;
+        const compressed = LZString.compressToEncodedURIComponent(dataUrl);
+
+        const hashPayload = {
+          name: selectedFile.name,
+          size: selectedFile.size,
+          mime: selectedFile.type,
+          data: compressed
+        };
+
+        const encodedJson = encodeURIComponent(JSON.stringify(hashPayload));
+        shareUrl = baseUrl + '#doc=' + encodedJson;
+
+        document.getElementById('p2pStatusBox').style.display = 'none';
+      } else {
+        // Ultra P2P Direct Stream Mode
+        senderRoomId = 'mn-' + Math.random().toString(36).substring(2, 8);
+        initSenderPeer(senderRoomId, selectedFile);
+
+        shareUrl = baseUrl + '?code=' + senderRoomId + '&name=' + encodeURIComponent(selectedFile.name) + '&size=' + selectedFile.size;
+        document.getElementById('p2pStatusBox').style.display = 'flex';
+        document.getElementById('p2pStatusText').textContent = 'Sender Node Live: Keep this tab open while recipient downloads.';
+      }
+
+      // Display results
+      document.getElementById('shareLinkInput').value = shareUrl;
+      const waText = encodeURIComponent(`Here is the file "${selectedFile.name}" shared with you via MindNext FastShare:\n${shareUrl}`);
+      document.getElementById('btnShareWhatsApp').href = `https://api.whatsapp.com/send?text=${waText}`;
+
+      // Generate QR Code
+      const qrEl = document.getElementById('qrcode');
+      qrEl.innerHTML = '';
+      qrCodeInstance = new QRCode(qrEl, {
+        text: shareUrl,
+        width: 170,
+        height: 170,
+        colorDark: "#090b11",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      document.getElementById('resultBox').style.display = 'block';
+      document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Save to localStorage history
+      saveToHistory({
+        name: selectedFile.name,
+        size: selectedFile.size,
+        url: shareUrl,
+        date: new Date().toLocaleDateString()
+      });
+
+      showToast('FastShare link generated successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Error generating link: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span id="btnGenText">${isGujarati ? '⚡ ડાઉનલોડ લિંક બનાવો' : '⚡ Generate FastShare Link / લિંક બનાવો'}</span>`;
+    }
+  }
+
+  // Initialize Sender PeerJS connection
+  function initSenderPeer(roomId, fileRef) {
+    if (senderPeer) {
+      senderPeer.destroy();
+    }
+
+    senderPeer = new Peer(roomId, {
+      debug: 1,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+      }
+    });
+
+    senderPeer.on('open', (id) => {
+      console.log('Sender peer opened with ID:', id);
+    });
+
+    senderPeer.on('connection', (conn) => {
+      console.log('Recipient connected to sender node!');
+      document.getElementById('p2pStatusText').textContent = '🟢 Recipient connected! Preparing file stream...';
+
+      conn.on('open', () => {
+        // Send file metadata
+        conn.send({
+          type: 'META',
+          name: fileRef.name,
+          size: fileRef.size,
+          mime: fileRef.type
+        });
+      });
+
+      conn.on('data', async (msg) => {
+        if (msg && msg.type === 'START_DOWNLOAD') {
+          document.getElementById('p2pStatusText').textContent = '🚀 Streaming file to recipient...';
+          await streamFileToRecipient(conn, fileRef);
+          document.getElementById('p2pStatusText').textContent = '✅ Transfer complete! Ready for next download.';
+        }
+      });
+    });
+
+    senderPeer.on('error', (err) => {
+      console.warn('Sender peer notice:', err);
+    });
+  }
+
+  // Stream file chunks to recipient over WebRTC
+  async function streamFileToRecipient(conn, file) {
+    const CHUNK_SIZE = 64 * 1024; // 64KB per packet
+    let offset = 0;
+    const total = file.size;
+
+    while (offset < total) {
+      // Respect backpressure
+      if (conn.dataChannel && conn.dataChannel.bufferedAmount > 3 * 1024 * 1024) {
+        await new Promise(res => setTimeout(res, 35));
+      }
+
+      const slice = file.slice(offset, offset + CHUNK_SIZE);
+      const buffer = await slice.arrayBuffer();
+
+      conn.send({
+        type: 'CHUNK',
+        chunk: buffer,
+        offset: offset,
+        total: total
+      });
+
+      offset += buffer.byteLength;
+    }
+
+    conn.send({ type: 'COMPLETE' });
+  }
+
+  // Copy share link
+  function copyShareLink() {
+    const input = document.getElementById('shareLinkInput');
+    input.select();
+    navigator.clipboard.writeText(input.value).then(() => {
+      showToast(isGujarati ? I18N.gu.copyToast : I18N.en.copyToast);
+    }).catch(() => {
+      document.execCommand('copy');
+      showToast(isGujarati ? I18N.gu.copyToast : I18N.en.copyToast);
+    });
+  }
+
+  function toggleQRCode() {
+    const box = document.getElementById('qrCodeContainer');
+    box.style.display = (box.style.display === 'flex') ? 'none' : 'flex';
+  }
+
+  function openShareLinkInNewTab() {
+    const url = document.getElementById('shareLinkInput').value;
+    if (url) window.open(url, '_blank');
+  }
+
+  function resetToNewUpload() {
+    clearSelectedFile();
+    document.getElementById('resultBox').style.display = 'none';
+    if (senderPeer) {
+      senderPeer.destroy();
+      senderPeer = null;
+    }
+  }
+
+  // Tab 2: Cloud link converter logic
+  function generateCloudPortalLink() {
+    let rawUrl = document.getElementById('cloudInputUrl').value.trim();
+    const docName = document.getElementById('cloudInputName').value.trim() || 'Download_Document';
+    const docSize = document.getElementById('cloudInputSize').value.trim() || '';
+
+    if (!rawUrl) {
+      alert('Please enter a file link.');
+      return;
+    }
+
+    // Auto convert Google Drive links to direct download
+    // Format: https://drive.google.com/file/d/ID/view -> https://drive.google.com/uc?export=download&id=ID
+    const gDriveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (gDriveMatch && gDriveMatch[1]) {
+      rawUrl = `https://drive.google.com/uc?export=download&id=${gDriveMatch[1]}`;
+    }
+
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') + '/fastshare';
+    const finalUrl = `${baseUrl}?cloud=${encodeURIComponent(rawUrl)}&name=${encodeURIComponent(docName)}&size=${encodeURIComponent(docSize)}`;
+
+    document.getElementById('cloudShareLinkInput').value = finalUrl;
+    document.getElementById('cloudShareWhatsApp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Here is the file "${docName}" shared via MindNext FastShare:\n${finalUrl}`)}`;
+    document.getElementById('cloudResultBox').style.display = 'block';
+
+    saveToHistory({
+      name: docName,
+      size: docSize || 'Cloud File',
+      url: finalUrl,
+      date: new Date().toLocaleDateString()
+    });
+
+    showToast('MindNext download link created!');
+  }
+
+  function copyCloudShareLink() {
+    const input = document.getElementById('cloudShareLinkInput');
+    input.select();
+    navigator.clipboard.writeText(input.value);
+    showToast('Link copied!');
+  }
+
+  function openCloudShareInNewTab() {
+    const url = document.getElementById('cloudShareLinkInput').value;
+    if (url) window.open(url, '_blank');
+  }
+
+  // Tab 3: History
+  function saveToHistory(item) {
+    try {
+      let hist = JSON.parse(localStorage.getItem('mindnext_fastshare_history') || '[]');
+      hist.unshift(item);
+      if (hist.length > 10) hist = hist.slice(0, 10);
+      localStorage.setItem('mindnext_fastshare_history', JSON.stringify(hist));
+    } catch (e) {}
+  }
+
+  function loadHistoryUI() {
+    try {
+      const hist = JSON.parse(localStorage.getItem('mindnext_fastshare_history') || '[]');
+      const listEl = document.getElementById('historyList');
+      if (hist.length === 0) {
+        listEl.innerHTML = '<li style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">No recent transfers yet. Share a document to see it here!</li>';
+        return;
+      }
+      listEl.innerHTML = hist.map(h => `
+        <li class="history-item">
+          <div class="history-info">
+            <div class="history-title">${h.name}</div>
+            <div class="history-sub">${typeof h.size === 'number' ? formatBytes(h.size) : h.size} • ${h.date}</div>
+          </div>
+          <div class="history-actions">
+            <button class="btn-hist-copy" onclick="navigator.clipboard.writeText('${h.url}'); showToast('Link copied!');">Copy Link</button>
+            <a href="${h.url}" target="_blank" class="btn-hist-copy" style="text-decoration:none;">Open</a>
+          </div>
+        </li>
+      `).join('');
+    } catch (e) {}
+  }
+
+  function clearHistory() {
+    localStorage.removeItem('mindnext_fastshare_history');
+    loadHistoryUI();
+    showToast('History cleared.');
+  }
+
+
+  // ==========================================
+  // RECIPIENT VIEW LOGIC (When opening a link)
+  // ==========================================
+  function checkUrlForDownloadPayload() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+
+    // Check Case 1: Cloud Link Mode
+    if (urlParams.has('cloud')) {
+      renderRecipientMode({
+        type: 'cloud',
+        url: decodeURIComponent(urlParams.get('cloud')),
+        name: decodeURIComponent(urlParams.get('name') || 'Download_Document'),
+        size: decodeURIComponent(urlParams.get('size') || '')
+      });
+      return;
+    }
+
+    // Check Case 2: Direct URL hash payload (#doc=...)
+    if (hash && hash.startsWith('#doc=')) {
+      try {
+        const rawJson = decodeURIComponent(hash.substring(5));
+        const payload = JSON.parse(rawJson);
+        renderRecipientMode({
+          type: 'offline',
+          name: payload.name,
+          size: payload.size,
+          mime: payload.mime,
+          data: payload.data
+        });
+        return;
+      } catch (err) {
+        console.error('Error parsing hash payload:', err);
+      }
+    }
+
+    // Check Case 3: P2P Room ID (?code=...)
+    if (urlParams.has('code')) {
+      const code = urlParams.get('code');
+      const name = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : 'Shared Document';
+      const size = urlParams.get('size') ? parseInt(urlParams.get('size')) : null;
+
+      renderRecipientMode({
+        type: 'p2p',
+        code: code,
+        name: name,
+        size: size
+      });
+      return;
+    }
+
+    // Default: Show Sender View
+    document.getElementById('senderView').style.display = 'block';
+    document.getElementById('recipientView').style.display = 'none';
+  }
+
+  // Render recipient download view
+  function renderRecipientMode(info) {
+    document.getElementById('senderView').style.display = 'none';
+    document.getElementById('recipientView').style.display = 'block';
+
+    const theme = getFileTheme(info.name, info.mime);
+
+    document.getElementById('recipFileName').textContent = info.name;
+    document.getElementById('recipFileType').textContent = theme.label;
+    document.getElementById('recipFileSize').textContent = info.size ? (typeof info.size === 'number' ? formatBytes(info.size) : info.size) : 'Ready';
+
+    const iconEl = document.getElementById('recipFileIcon');
+    iconEl.className = 'big-file-icon ' + theme.cls;
+    iconEl.textContent = theme.text;
+
+    if (info.type === 'cloud') {
+      document.getElementById('recipTransferMode').textContent = '⚡ Cloud Direct Download';
+      activeDownloadUrl = info.url;
+    } else if (info.type === 'offline') {
+      document.getElementById('recipTransferMode').textContent = '⚡ Instant Offline Ready';
+      p2pMetaReceived = info;
+    } else if (info.type === 'p2p') {
+      document.getElementById('recipTransferMode').textContent = '🚀 Ultra P2P Direct Stream';
+      initRecipientPeer(info.code);
+    }
+  }
+
+  // Initialize Recipient PeerJS connection
+  function initRecipientPeer(code) {
+    recipientPeer = new Peer(null, {
+      debug: 1,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+      }
+    });
+
+    recipientPeer.on('open', () => {
+      connectToSender(code);
+    });
+
+    recipientPeer.on('error', (err) => {
+      console.warn('Recipient peer warning:', err);
+      showSenderOfflineWarning();
+    });
+  }
+
+  function connectToSender(code) {
+    document.getElementById('senderOfflineBox').style.display = 'none';
+    recipientConn = recipientPeer.connect(code, { reliable: true });
+
+    let receivedChunks = [];
+    let receivedBytes = 0;
+    let startTime = null;
+
+    recipientConn.on('open', () => {
+      console.log('Connected to sender node successfully!');
+      document.getElementById('recipSubNote').textContent = 'Sender is online 🟢 Ready to download!';
+    });
+
+    recipientConn.on('data', (data) => {
+      if (data.type === 'META') {
+        p2pMetaReceived = data;
+        document.getElementById('recipFileName').textContent = data.name;
+        document.getElementById('recipFileSize').textContent = formatBytes(data.size);
+      } else if (data.type === 'CHUNK') {
+        if (!startTime) startTime = Date.now();
+        receivedChunks.push(data.chunk);
+        receivedBytes += data.chunk.byteLength;
+
+        // Update progress bar
+        const total = p2pMetaReceived ? p2pMetaReceived.size : data.total;
+        const percent = Math.min(100, Math.round((receivedBytes / total) * 100));
+
+        document.getElementById('downloadProgressFill').style.width = percent + '%';
+        document.getElementById('downloadPercentText').textContent = percent + '%';
+        document.getElementById('downloadBytesText').textContent = `${formatBytes(receivedBytes)} / ${formatBytes(total)}`;
+
+        // Calculate download speed
+        const elapsedSec = (Date.now() - startTime) / 1000;
+        if (elapsedSec > 0.2) {
+          const speedBps = receivedBytes / elapsedSec;
+          document.getElementById('downloadSpeedText').textContent = formatBytes(speedBps) + '/s';
+        }
+      } else if (data.type === 'COMPLETE') {
+        const mime = (p2pMetaReceived && p2pMetaReceived.mime) ? p2pMetaReceived.mime : 'application/octet-stream';
+        const blob = new Blob(receivedChunks, { type: mime });
+        triggerFileSave(blob, p2pMetaReceived ? p2pMetaReceived.name : 'Downloaded_Document');
+
+        completeDownloadUI();
+      }
+    });
+
+    recipientConn.on('close', () => {
+      console.log('Connection to sender closed.');
+    });
+
+    // Timeout check: If after 8 seconds no response, show friendly message
+    setTimeout(() => {
+      if (!recipientConn || !recipientConn.open) {
+        showSenderOfflineWarning();
+      }
+    }, 8000);
+  }
+
+  function showSenderOfflineWarning() {
+    document.getElementById('senderOfflineBox').style.display = 'block';
+  }
+
+  function retryP2PConnection() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code && recipientPeer) {
+      connectToSender(code);
+    }
+  }
+
+  // Handle click on big "Download File" button
+  function handleRecipientDownloadClick() {
+    const btn = document.getElementById('btnDownloadNow');
+
+    // Case 1: Cloud Link
+    if (activeDownloadUrl) {
+      triggerDirectUrlDownload(activeDownloadUrl);
+      completeDownloadUI();
+      return;
+    }
+
+    // Case 2: Offline Hash link
+    if (p2pMetaReceived && p2pMetaReceived.data) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡ Unpacking Document...</span>';
+
+      setTimeout(() => {
+        try {
+          const dataUrl = LZString.decompressFromEncodedURIComponent(p2pMetaReceived.data);
+          const blob = dataUrlToBlob(dataUrl);
+          triggerFileSave(blob, p2pMetaReceived.name);
+          completeDownloadUI();
+        } catch (e) {
+          alert('Error downloading file: ' + e.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span>${isGujarati ? 'ડાઉનલોડ કરો / Download File' : 'Download File / ડાઉનલોડ કરો'}</span>`;
+        }
+      }, 100);
+      return;
+    }
+
+    // Case 3: P2P streaming
+    if (recipientConn && recipientConn.open) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Downloading Stream...</span>';
+      document.getElementById('downloadProgressSection').style.display = 'block';
+      document.getElementById('downloadStatusText').textContent = 'Streaming file in chunks...';
+
+      recipientConn.send({ type: 'START_DOWNLOAD' });
+    } else {
+      showSenderOfflineWarning();
+    }
+  }
+
+  function completeDownloadUI() {
+    document.getElementById('downloadCompletedBox').style.display = 'block';
+    document.getElementById('downloadProgressSection').style.display = 'none';
+
+    // Celebration confetti!
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  }
+
+  // Trigger file save from Blob
+  function triggerFileSave(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1500);
+  }
+
+  // Trigger download from URL
+  function triggerDirectUrlDownload(url) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 1000);
+  }
+
+  // DataURL to Blob helper
+  function dataUrlToBlob(dataUrl) {
+    const arr = dataUrl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  }
+
+  // Initialize on load
+  window.addEventListener('DOMContentLoaded', () => {
+    checkUrlForDownloadPayload();
+  });
+</script>
+
+</body>
+</html>
