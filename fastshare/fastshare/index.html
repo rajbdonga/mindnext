@@ -1469,10 +1469,6 @@
         Unlock Portal / અનલૉક કરો
       </button>
     </form>
-
-    <div class="lock-hint-link" onclick="fillDefaultPasscode()">
-      Quick Fill: mindnext2026
-    </div>
   </div>
 </div>
 
@@ -1624,31 +1620,6 @@
             Recipient Password (Optional):
           </label>
           <input type="text" class="file-pin-input" id="recipientFilePass" placeholder="Leave blank for no password" maxlength="20">
-        </div>
-
-        <!-- Mode selection (auto-adjusted by file size) -->
-        <div class="mode-picker" id="modePickerBox" style="display: none;">
-          <div class="mode-picker-header">
-            <span>Choose Transfer Engine</span>
-            <span style="font-size: 11px; color: var(--accent-cyan);" id="modeHeaderHint">Auto-Optimized</span>
-          </div>
-          <div class="mode-options-grid">
-            <label class="mode-card active" id="modeCardP2P">
-              <input type="radio" name="transferMode" value="p2p" checked onchange="handleModeChange()">
-              <div>
-                <div class="mode-card-title">🚀 Ultra P2P Direct Stream</div>
-                <div class="mode-card-desc">Unlimited size (1MB to 50GB+). Direct device-to-device streaming. Keep this tab open.</div>
-              </div>
-            </label>
-
-            <label class="mode-card" id="modeCardOffline">
-              <input type="radio" name="transferMode" value="offline" onchange="handleModeChange()">
-              <div>
-                <div class="mode-card-title">⚡ Instant Direct Link (&lt;3.5MB)</div>
-                <div class="mode-card-desc">Embedded link. Works 24/7 even if you close your browser tab.</div>
-              </div>
-            </label>
-          </div>
         </div>
 
         <!-- Generate Button -->
@@ -2024,12 +1995,6 @@
     }
   }
 
-  function fillDefaultPasscode() {
-    const input = document.getElementById('passcodeInput');
-    input.value = DEFAULT_PASSCODE;
-    handleUnlockSubmit();
-  }
-
   function togglePasscodeVisibility() {
     const input = document.getElementById('passcodeInput');
     input.type = (input.type === 'password') ? 'text' : 'password';
@@ -2156,28 +2121,8 @@
 
     document.getElementById('selectedFileBox').style.display = 'flex';
     document.getElementById('filePinBox').style.display = 'flex';
-    document.getElementById('modePickerBox').style.display = 'block';
     document.getElementById('btnGenerateLink').style.display = 'inline-flex';
     document.getElementById('resultBox').style.display = 'none';
-
-    // Auto-select mode
-    const isSmall = file.size <= 3.5 * 1024 * 1024; // 3.5 MB
-    const p2pCard = document.getElementById('modeCardP2P');
-    const offCard = document.getElementById('modeCardOffline');
-
-    if (isSmall) {
-      document.querySelector('input[name="transferMode"][value="offline"]').checked = true;
-      activeTransferMode = 'offline';
-      offCard.classList.add('active');
-      p2pCard.classList.remove('active');
-      document.getElementById('modeHeaderHint').textContent = 'Direct Link Available (<3.5MB)';
-    } else {
-      document.querySelector('input[name="transferMode"][value="p2p"]').checked = true;
-      activeTransferMode = 'p2p';
-      p2pCard.classList.add('active');
-      offCard.classList.remove('active');
-      document.getElementById('modeHeaderHint').textContent = 'P2P Stream Active (Large File)';
-    }
   }
 
   function clearSelectedFile() {
@@ -2186,16 +2131,8 @@
     document.getElementById('selectedFileBox').style.display = 'none';
     document.getElementById('filePinBox').style.display = 'none';
     document.getElementById('recipientFilePass').value = '';
-    document.getElementById('modePickerBox').style.display = 'none';
     document.getElementById('btnGenerateLink').style.display = 'none';
     document.getElementById('resultBox').style.display = 'none';
-  }
-
-  function handleModeChange() {
-    const selected = document.querySelector('input[name="transferMode"]:checked').value;
-    activeTransferMode = selected;
-    document.getElementById('modeCardP2P').classList.toggle('active', selected === 'p2p');
-    document.getElementById('modeCardOffline').classList.toggle('active', selected === 'offline');
   }
 
   // Base URL Helper that avoids duplicate /fastshare/fastshare
@@ -2222,47 +2159,21 @@
 
     try {
       const baseUrl = getFastShareBaseUrl();
-      let shareUrl = '';
       const filePin = document.getElementById('recipientFilePass').value.trim();
 
-      if (activeTransferMode === 'offline') {
-        // Instant Offline Embedded Link (LZString compressed)
-        const reader = new FileReader();
-        const base64Promise = new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-        });
-        reader.readAsDataURL(selectedFile);
-        const dataUrl = await base64Promise;
-        const compressed = LZString.compressToEncodedURIComponent(dataUrl);
+      // Direct Stream Mode - Supports any file size (1 KB to 50 GB+)
+      senderRoomId = 'mn-' + Math.random().toString(36).substring(2, 8);
+      initSenderPeer(senderRoomId, selectedFile, filePin);
 
-        const hashPayload = {
-          name: selectedFile.name,
-          size: selectedFile.size,
-          mime: selectedFile.type,
-          pin: filePin || null,
-          data: compressed
-        };
+      let shareUrl = baseUrl + '?code=' + senderRoomId + '&name=' + encodeURIComponent(selectedFile.name) + '&size=' + selectedFile.size;
+      if (filePin) shareUrl += '&hasPin=1';
 
-        const encodedJson = encodeURIComponent(JSON.stringify(hashPayload));
-        shareUrl = baseUrl + '#doc=' + encodedJson;
-
-        document.getElementById('p2pStatusBox').style.display = 'none';
-      } else {
-        // Ultra P2P Direct Stream Mode
-        senderRoomId = 'mn-' + Math.random().toString(36).substring(2, 8);
-        initSenderPeer(senderRoomId, selectedFile, filePin);
-
-        shareUrl = baseUrl + '?code=' + senderRoomId + '&name=' + encodeURIComponent(selectedFile.name) + '&size=' + selectedFile.size;
-        if (filePin) shareUrl += '&hasPin=1';
-
-        document.getElementById('p2pStatusBox').style.display = 'flex';
-        document.getElementById('p2pStatusText').textContent = 'Sender Node Live: Keep this tab open while recipient downloads.';
-      }
+      document.getElementById('p2pStatusBox').style.display = 'flex';
+      document.getElementById('p2pStatusText').textContent = 'Sender Node Live: Keep this tab open while recipient downloads.';
 
       // Display results
       document.getElementById('shareLinkInput').value = shareUrl;
-      const waText = encodeURIComponent(`Here is the file "${selectedFile.name}" shared with you via MindNext FastShare:\n${shareUrl}`);
+      const waText = encodeURIComponent(`Here is the file "${selectedFile.name}" (${formatBytes(selectedFile.size)}) shared with you via MindNext FastShare:\n${shareUrl}`);
       document.getElementById('btnShareWhatsApp').href = `https://api.whatsapp.com/send?text=${waText}`;
 
       // Generate QR Code

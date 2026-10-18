@@ -1040,14 +1040,15 @@
     .lock-screen-overlay {
       position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
-      background: #07090e;
+      background: rgba(7, 9, 14, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
+      overflow-y: auto;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .lock-screen-overlay.unlocked {
@@ -1063,34 +1064,46 @@
       background: #0f1523;
       border: 1px solid var(--border-subtle);
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-      border-radius: var(--radius-lg);
-      padding: 34px 28px;
+      border-radius: 18px;
+      padding: 34px 26px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .lock-header {
-      margin-bottom: 22px;
+    .lock-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));
     }
 
     .lock-brand-img {
       height: 38px;
+      max-width: 160px;
       width: auto;
       margin: 0 auto 14px;
       display: block;
+      object-fit: contain;
     }
 
     .lock-title {
-      font-family: var(--font-display);
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 700;
       color: #ffffff;
       margin-bottom: 2px;
     }
 
     .lock-subtitle {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--accent-cyan);
-      font-family: monospace;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
     }
 
     .passcode-input-wrap {
@@ -1100,10 +1113,10 @@
 
     .passcode-input {
       width: 100%;
-      padding: 12px 42px 12px 16px;
+      padding: 12px 42px 12px 14px;
       background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 10px;
       color: #ffffff;
       font-size: 15px;
       outline: none;
@@ -1111,8 +1124,8 @@
       transition: all 0.2s ease;
     }
     .passcode-input:focus {
-      border-color: var(--accent-violet);
-      box-shadow: 0 0 0 3px var(--accent-violet-glow);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
     }
 
     .toggle-pass-eye {
@@ -1120,10 +1133,11 @@
       right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      background: transparent;
+      background: none;
       border: none;
       color: var(--text-dim);
       cursor: pointer;
+      padding: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1132,50 +1146,38 @@
       color: #ffffff;
     }
 
-    .lock-submit-btn {
+    .btn-unlock-portal {
       width: 100%;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 600;
+      padding: 13px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-violet-dark), var(--accent-cyan));
+      border: none;
+      color: #fff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn-unlock-portal:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
     }
 
     .lock-error-msg {
-      color: #f87171;
-      font-size: 12.5px;
-      margin-bottom: 12px;
       display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      animation: shake 0.35s ease;
+      color: var(--accent-rose);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+      animation: shake 0.3s ease;
     }
 
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-6px); }
-      40%, 80% { transform: translateX(6px); }
-    }
-
-    .lock-footer-simple {
-      font-size: 12px;
-      color: var(--text-dim);
-      margin-top: 18px;
-    }
-
-    .default-pass-chip {
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.08);
-      border: 1px solid rgba(0, 210, 255, 0.2);
-      padding: 2px 7px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: monospace;
-      font-size: 12px;
-      transition: all 0.15s ease;
-    }
-    .default-pass-chip:hover {
-      background: rgba(0, 210, 255, 0.18);
-      color: #ffffff;
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
 
     /* Toast Notifications */
@@ -1942,33 +1944,25 @@
   <!-- ========================================================= -->
   <div class="lock-screen-overlay" id="lockOverlay">
     <div class="lock-container">
-      <div class="lock-header">
-        <img src="images/mindnext-logo-white.png" alt="MindNext" class="lock-brand-img" onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo-white.png';}else{this.src='../images/mindnext-icon.png';}">
-        <h1 class="lock-title">Admin Login</h1>
-      </div>
+      <img src="images/mindnext-logo-white.png" alt="MindNext" class="lock-brand-img" onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo-white.png';}else{this.src='../images/mindnext-icon.png';}">
+      <h1 class="lock-title">Executive Admin Portal</h1>
+      <p class="lock-subtitle">🔒 Enter Passcode to Unlock</p>
 
       <form id="lockForm" onsubmit="handleUnlockSubmit(event); return false;" action="javascript:void(0);">
         <div class="passcode-input-wrap">
-          <input type="password" id="passcodeInput" class="passcode-input" placeholder="Enter password..." autocomplete="current-password" autofocus required>
+          <input type="password" id="passcodeInput" class="passcode-input" placeholder="Enter portal passcode..." autocomplete="current-password" autofocus required>
           <button type="button" class="toggle-pass-eye" onclick="togglePassVisibility()" title="Show/Hide Password">
-            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg id="eyeIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
           </button>
         </div>
 
-        <div id="lockErrorMsg" class="lock-error-msg">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <span id="lockErrorText">Incorrect password. Please try again.</span>
-        </div>
+        <div id="lockErrorMsg" class="lock-error-msg">Incorrect passcode. Please try again.</div>
 
-        <button type="submit" class="btn btn-primary lock-submit-btn" id="lockSubmitBtn" onclick="handleUnlockSubmit(event)">
-          Login to Admin &rarr;
+        <button type="submit" class="btn-unlock-portal" id="lockSubmitBtn">
+          Unlock Portal / અનલૉક કરો
         </button>
       </form>
     </div>
@@ -2749,14 +2743,10 @@
         return false;
       } else {
         const errorEl = document.getElementById('lockErrorMsg');
-        const errorText = document.getElementById('lockErrorText');
-        if (errorText) {
-          errorText.textContent = 'Incorrect password. Default: mindnext2026';
-        }
-        if (errorEl) errorEl.style.display = 'flex';
+        if (errorEl) errorEl.style.display = 'block';
         input.classList.add('shake');
         input.select();
-        showToast('Access Denied: Please use mindnext2026', 'error');
+        showToast('Access Denied: Incorrect passcode', 'error');
         setTimeout(() => input.classList.remove('shake'), 400);
         return false;
       }
