@@ -1697,6 +1697,13 @@
               <span id="tabDirectText">Direct File Upload</span>
             </button>
 
+            <button class="tab-btn" id="tabCloudBtn" onclick="switchSenderTab('cloud')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+              </svg>
+              <span id="tabCloudText">Cloud &amp; Drive Link (24/7 Offline)</span>
+            </button>
+
             <button class="tab-btn" id="tabHistoryBtn" onclick="switchSenderTab('history')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -1857,7 +1864,107 @@
 
         </div>
 
-        <!-- TAB 2: RECENT TRANSFERS HISTORY -->
+        <!-- TAB 2: CLOUD & GOOGLE DRIVE LINK (24/7 OFFLINE READY) -->
+        <div class="share-card" id="cloudSharePanel" style="display: none;">
+          <div style="background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+              </svg>
+              24/7 Guaranteed Offline Download
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5;">
+              Paste any Google Drive, Dropbox, or OneDrive share link (10 MB, 1 GB, 50 GB). MindNext transforms it into a branded download portal where recipients can download at any time, even if you are offline or your PC is turned off.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px;">
+              Google Drive / Cloud Share Link:
+            </label>
+            <input type="url" class="form-input" id="cloudInputUrl" placeholder="https://drive.google.com/file/d/... or any file link"
+              style="width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: #fff; font-size: 13.5px; outline: none;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 16px;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px;">
+                File Title (e.g. Project_Presentation.mp4):
+              </label>
+              <input type="text" class="form-input" id="cloudInputName" placeholder="Document_Title.pdf"
+                style="width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: #fff; font-size: 13.5px; outline: none;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px;">
+                File Size (Optional):
+              </label>
+              <input type="text" class="form-input" id="cloudInputSize" placeholder="e.g. 15 MB / 1.2 GB"
+                style="width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: #fff; font-size: 13.5px; outline: none;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px;">
+              Recipient Password (Optional):
+            </label>
+            <input type="text" class="form-input" id="cloudInputPass" placeholder="Leave blank for no password"
+              maxlength="20" style="width: 100%; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: #fff; font-size: 13.5px; outline: none;">
+          </div>
+
+          <button class="btn-primary-action" onclick="generateCloudSharePortalLink()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>⚡ Generate FastShare Link</span>
+          </button>
+
+          <!-- Cloud Result Box -->
+          <div class="result-box" id="cloudResultBox" style="display: none; margin-top: 20px;">
+            <div class="result-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Your FastShare Link is Ready!</span>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-muted); margin: -4px 0 14px 0;">
+              This link is 24/7 active and allows recipients to download even while you are offline.
+            </p>
+
+            <div class="link-input-group">
+              <input type="text" class="share-link-input" id="cloudShareLinkInput" readonly onclick="this.select()">
+              <button class="btn-copy" id="btnCloudCopyLink" onclick="copyCloudShareLink()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="btnCloudCopyText">Copy Link</span>
+              </button>
+            </div>
+
+            <div class="quick-share-buttons">
+              <a href="#" class="btn-share-whatsapp" id="cloudShareWhatsApp" target="_blank">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12.031 2C6.5 2 2 6.5 2 12.031c0 1.969.57 3.805 1.555 5.367L2 22l4.75-1.523A9.977 9.977 0 0 0 12.031 22C17.562 22 22 17.5 22 12.031 22 6.5 17.562 2 12.031 2zm0 18.25c-1.633 0-3.156-.445-4.477-1.219l-.32-.187-2.82.906.922-2.75-.211-.344a8.163 8.163 0 0 1-1.375-4.625c0-4.547 3.703-8.25 8.281-8.25 4.578 0 8.281 3.703 8.281 8.25 0 4.547-3.703 8.25-8.281 8.25z" />
+                </svg>
+                <span>Share via WhatsApp</span>
+              </a>
+
+              <button class="btn-toggle-qr" onclick="openCloudLinkInNewTab()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Preview Link</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: RECENT TRANSFERS HISTORY -->
         <div class="share-card history-box" id="historyPanel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
             <h3 style="font-size: 17px; font-weight: 700; color: #fff;">Your Recent Shares</h3>
@@ -2140,9 +2247,11 @@
     // Tab switching
     function switchSenderTab(tabName) {
       document.getElementById('tabDirectBtn').classList.toggle('active', tabName === 'direct');
+      document.getElementById('tabCloudBtn').classList.toggle('active', tabName === 'cloud');
       document.getElementById('tabHistoryBtn').classList.toggle('active', tabName === 'history');
 
       document.getElementById('directSharePanel').style.display = (tabName === 'direct') ? 'block' : 'none';
+      document.getElementById('cloudSharePanel').style.display = (tabName === 'cloud') ? 'block' : 'none';
       document.getElementById('historyPanel').style.display = (tabName === 'history') ? 'block' : 'none';
 
       if (tabName === 'history') loadHistoryUI();
@@ -2450,7 +2559,94 @@
       }
     }
 
-    // Tab 2: History
+    // ==========================================
+    // CLOUD & GOOGLE DRIVE LINK PORTAL GENERATOR (24/7 Offline Ready)
+    // ==========================================
+    function generateCloudSharePortalLink() {
+      let rawUrl = document.getElementById('cloudInputUrl').value.trim();
+      const docName = document.getElementById('cloudInputName').value.trim() || 'Shared_Document';
+      const docSize = document.getElementById('cloudInputSize').value.trim() || '';
+      const docPass = document.getElementById('cloudInputPass').value.trim() || '';
+
+      if (!rawUrl) {
+        alert('Please paste a Google Drive, Dropbox, or cloud file link.');
+        document.getElementById('cloudInputUrl').focus();
+        return;
+      }
+
+      // Automatically convert Google Drive sharing URL to direct download URL
+      const gDriveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (gDriveMatch && gDriveMatch[1]) {
+        rawUrl = `https://drive.google.com/uc?export=download&id=${gDriveMatch[1]}`;
+      }
+
+      const baseUrl = getFastShareBaseUrl();
+      let finalUrl = `${baseUrl}?cloud=${encodeURIComponent(rawUrl)}&name=${encodeURIComponent(docName)}&size=${encodeURIComponent(docSize)}`;
+      if (docPass) {
+        finalUrl += `&hasPin=1&pin=${encodeURIComponent(docPass)}`;
+      }
+
+      document.getElementById('cloudShareLinkInput').value = finalUrl;
+      const waText = encodeURIComponent(`Here is the file "${docName}" ${docSize ? '(' + docSize + ')' : ''} shared via MindNext FastShare:\n${finalUrl}`);
+      document.getElementById('cloudShareWhatsApp').href = `https://api.whatsapp.com/send?text=${waText}`;
+
+      document.getElementById('cloudResultBox').style.display = 'block';
+      document.getElementById('cloudResultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      saveToHistory({
+        name: docName,
+        size: docSize || 'Cloud File (Offline Ready)',
+        url: finalUrl,
+        date: new Date().toLocaleDateString()
+      });
+
+      showToast('FastShare link generated successfully!');
+    }
+
+    function copyCloudShareLink() {
+      const input = document.getElementById('cloudShareLinkInput');
+      const copyBtn = document.getElementById('btnCloudCopyLink');
+      const copyText = document.getElementById('btnCloudCopyText');
+      if (!input || !input.value) return;
+
+      input.select();
+      input.setSelectionRange(0, 99999);
+
+      const markCopied = () => {
+        showToast('Link copied to clipboard!');
+        if (copyText) copyText.textContent = 'Copied!';
+        if (copyBtn) copyBtn.style.background = 'var(--accent-emerald)';
+        setTimeout(() => {
+          if (copyText) copyText.textContent = 'Copy Link';
+          if (copyBtn) copyBtn.style.background = '';
+        }, 2200);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(input.value).then(markCopied).catch(() => {
+          try {
+            document.execCommand('copy');
+            markCopied();
+          } catch (e) {
+            prompt('Copy link:', input.value);
+          }
+        });
+      } else {
+        try {
+          document.execCommand('copy');
+          markCopied();
+        } catch (e) {
+          prompt('Copy link:', input.value);
+        }
+      }
+    }
+
+    function openCloudLinkInNewTab() {
+      const url = document.getElementById('cloudShareLinkInput').value;
+      if (url) window.open(url, '_blank');
+    }
+
+    // Tab 3: History
     function saveToHistory(item) {
       try {
         let hist = JSON.parse(localStorage.getItem('mindnext_fastshare_history') || '[]');
@@ -2504,7 +2700,9 @@
           type: 'cloud',
           url: decodeURIComponent(urlParams.get('cloud')),
           name: decodeURIComponent(urlParams.get('name') || 'Download_Document'),
-          size: decodeURIComponent(urlParams.get('size') || '')
+          size: decodeURIComponent(urlParams.get('size') || ''),
+          hasPin: urlParams.get('hasPin') === '1',
+          pin: urlParams.get('pin') ? decodeURIComponent(urlParams.get('pin')) : null
         });
         return;
       }
@@ -2586,8 +2784,9 @@
       iconEl.textContent = theme.text;
 
       if (info.type === 'cloud') {
-        document.getElementById('recipTransferMode').textContent = '⚡ Cloud Direct Download';
+        document.getElementById('recipTransferMode').textContent = '⚡ Cloud Direct Download (24/7 Offline Ready)';
         activeDownloadUrl = info.url;
+        p2pMetaReceived = info;
       } else if (info.type === 'offline') {
         document.getElementById('recipTransferMode').textContent = '⚡ Instant Offline Ready';
         p2pMetaReceived = info;
