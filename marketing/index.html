@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
   <!-- Clean URL normalizer -->
@@ -113,19 +113,180 @@
     }
 
     .container {
-      max-width: 1320px;
+      max-width: 1340px;
       margin: 0 auto;
       padding: 0 20px;
       position: relative;
       z-index: 1;
+      width: 100%;
     }
 
-    /* Header */
+    /* ========================================================= */
+    /* LOCK SCREEN OVERLAY                                       */
+    /* ========================================================= */
+    .lock-screen-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(4, 6, 12, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .lock-screen-overlay.unlocked {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .lock-container {
+      width: 100%;
+      max-width: 440px;
+      background: #0d111d;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(37, 211, 102, 0.1);
+      border-radius: 18px;
+      padding: 36px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lock-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--wa-green), var(--accent-cyan), var(--accent-violet));
+    }
+
+    .lock-brand-img {
+      height: 42px;
+      max-width: 180px;
+      width: auto;
+      margin: 0 auto 16px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .lock-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .lock-subtitle {
+      font-size: 0.82rem;
+      color: var(--wa-green);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .passcode-input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .passcode-input {
+      width: 100%;
+      padding: 13px 44px 13px 16px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      letter-spacing: 2px;
+    }
+
+    .passcode-input:focus {
+      border-color: var(--wa-green);
+      box-shadow: 0 0 15px var(--wa-glow);
+    }
+
+    .toggle-pass-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-pass-eye:hover {
+      color: #ffffff;
+    }
+
+    .btn-unlock-portal {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--wa-green), var(--wa-green-dark));
+      border: none;
+      color: #031407;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px var(--wa-glow);
+    }
+
+    .btn-unlock-portal:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .lock-error-msg {
+      display: none;
+      color: var(--accent-rose);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      text-align: center;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* ========================================================= */
+    /* SITE HEADER                                               */
+    /* ========================================================= */
     .site-header {
-      padding: 16px 0;
+      padding: 14px 0;
       border-bottom: 1px solid var(--border-color);
-      background: rgba(7, 9, 14, 0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(7, 9, 14, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
       z-index: 50;
@@ -145,10 +306,12 @@
       text-decoration: none;
     }
 
-    .brand-logo {
+    .brand-logo-img {
       height: 38px;
+      max-width: 160px;
       width: auto;
       object-fit: contain;
+      display: block;
     }
 
     .brand-badge {
@@ -157,7 +320,7 @@
       gap: 6px;
       padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -183,44 +346,46 @@
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .nav-link-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
+      gap: 7px;
+      padding: 8px 13px;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-secondary);
       text-decoration: none;
       background: var(--bg-card-subtle);
       border: 1px solid var(--border-color);
       transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .nav-link-btn:hover {
       color: var(--text-primary);
-      border-color: var(--accent-violet);
+      border-color: var(--wa-green);
     }
 
-    /* Hero / Status Banner */
+    /* Top Banner */
     .top-banner {
-      padding: 24px 0 16px;
+      padding: 22px 0 16px;
     }
 
     .banner-card {
       background: linear-gradient(135deg, rgba(20, 25, 38, 0.95), rgba(14, 18, 28, 0.95));
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 24px;
+      padding: 22px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 18px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       position: relative;
       overflow: hidden;
@@ -237,24 +402,25 @@
     }
 
     .banner-info h1 {
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 6px;
+      color: #ffffff;
     }
 
     .banner-info p {
       color: var(--text-secondary);
-      font-size: 0.92rem;
-      max-width: 650px;
+      font-size: 0.9rem;
+      max-width: 680px;
     }
 
     .banner-metrics {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
@@ -262,14 +428,14 @@
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 10px 16px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
-      min-width: 120px;
+      min-width: 110px;
     }
 
     .metric-pill .label {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       font-weight: 700;
       color: var(--text-muted);
@@ -277,7 +443,7 @@
     }
 
     .metric-pill .val {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: var(--text-primary);
       display: flex;
@@ -290,17 +456,32 @@
     .val.cyan { color: var(--accent-cyan); }
     .val.violet { color: var(--accent-violet); }
 
-    /* Main Grid Layout */
+    /* ========================================================= */
+    /* DASHBOARD GRID - STRICT FIX FOR OVERLAPPING               */
+    /* ========================================================= */
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 1fr 380px;
+      grid-template-columns: 1fr 390px;
       gap: 24px;
       margin-bottom: 40px;
+      align-items: start; /* Prevents stretching and overlapping */
+    }
+
+    /* RIGHT COLUMN FIX: Normal column flow with gap, NO independent sticky collapsing */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 86px; /* Sticky the whole column together cleanly */
     }
 
     @media (max-width: 1080px) {
       .dashboard-grid {
         grid-template-columns: 1fr;
+      }
+      .right-col {
+        position: static; /* Disable sticky on tablet/mobile for smooth flow */
       }
     }
 
@@ -310,22 +491,22 @@
       border: 1px solid var(--border-color);
       border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 24px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
 
     .card-header {
-      padding: 18px 22px;
+      padding: 16px 20px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       background: rgba(255, 255, 255, 0.015);
+      flex-wrap: wrap;
     }
 
     .card-title {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -333,31 +514,85 @@
     }
 
     .card-title svg {
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
       color: var(--wa-green);
+      flex-shrink: 0;
     }
 
     .card-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
     .card-body {
-      padding: 22px;
+      padding: 20px;
     }
 
-    /* Form Inputs & Controls */
+    /* Sender Account Card */
+    .sender-box {
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.07), rgba(0, 210, 255, 0.04));
+      border: 1.5px solid rgba(37, 211, 102, 0.25);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .sender-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sender-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid var(--wa-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--wa-green);
+      flex-shrink: 0;
+    }
+
+    .sender-details strong {
+      font-size: 0.98rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sender-details p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .sender-input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Form Controls */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
+      gap: 16px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
     }
 
     .form-label {
@@ -378,10 +613,10 @@
       background: var(--bg-input);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      padding: 10px 14px;
+      padding: 9px 13px;
       border-radius: 10px;
       font-family: var(--font-sans);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       transition: all 0.2s ease;
       width: 100%;
     }
@@ -398,20 +633,104 @@
       line-height: 1.5;
     }
 
-    /* Live Countdown Display Widget */
+    /* ========================================================= */
+    /* WATCH / CLOCK TIME PICKER COMPONENT                       */
+    /* ========================================================= */
+    .watch-picker-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .watch-display-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .clock-dial-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 6px 10px;
+    }
+
+    .clock-select {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .clock-select option {
+      background: #0f1523;
+      color: #fff;
+    }
+
+    .clock-colon {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--wa-green);
+      animation: blinkColon 1.5s infinite;
+    }
+
+    @keyframes blinkColon {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .ampm-toggle-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 800;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ampm-toggle-btn.is-am {
+      color: var(--accent-cyan);
+      border-color: rgba(0, 210, 255, 0.4);
+      background: rgba(0, 210, 255, 0.1);
+    }
+
+    .ampm-toggle-btn.is-pm {
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    /* Live Controller Card - NON-STICKY INDIVIDUAL OVERLAP FIXED */
     .live-controller-card {
       background: radial-gradient(circle at top right, rgba(37, 211, 102, 0.08), transparent 70%), var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 24px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: 18px;
-      position: sticky;
-      top: 86px;
-      z-index: 20;
+      gap: 16px;
+      position: relative; /* Normal positioning inside .right-col */
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
     }
 
     .status-badge {
@@ -420,7 +739,7 @@
       gap: 8px;
       padding: 6px 14px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.03em;
       text-transform: uppercase;
@@ -452,8 +771,8 @@
     /* Circular SVG Timer */
     .timer-circle-wrap {
       position: relative;
-      width: 170px;
-      height: 170px;
+      width: 160px;
+      height: 160px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -461,8 +780,8 @@
 
     .timer-svg {
       transform: rotate(-90deg);
-      width: 170px;
-      height: 170px;
+      width: 160px;
+      height: 160px;
     }
 
     .timer-circle-bg {
@@ -491,14 +810,14 @@
 
     .timer-seconds {
       font-family: var(--font-mono);
-      font-size: 2.2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1;
     }
 
     .timer-unit {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       text-transform: uppercase;
       font-weight: 700;
@@ -513,6 +832,7 @@
       padding: 6px 14px;
       border-radius: 8px;
       font-family: var(--font-mono);
+      width: 100%;
     }
 
     .timer-jitter-info strong {
@@ -533,13 +853,14 @@
       gap: 8px;
       padding: 12px 18px;
       border-radius: 10px;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       border: 1px solid transparent;
       text-decoration: none;
       width: 100%;
+      user-select: none;
     }
 
     .btn-primary {
@@ -576,24 +897,24 @@
       border-color: var(--text-muted);
     }
 
-    /* Range slider with live display */
+    /* Range Box */
     .range-box {
       background: var(--bg-card-subtle);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px;
     }
 
     .range-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .range-val {
       font-family: var(--font-mono);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: var(--wa-green);
     }
@@ -621,7 +942,8 @@
     .schedule-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
+      min-width: 520px;
     }
 
     .schedule-table th,
@@ -634,7 +956,7 @@
     .schedule-table th {
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       background: rgba(255, 255, 255, 0.01);
     }
@@ -656,10 +978,11 @@
       border: 1px solid var(--border-color);
       border-radius: 10px;
       background: var(--bg-input);
+      -webkit-overflow-scrolling: touch;
     }
 
     .queue-pill {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       padding: 3px 8px;
       border-radius: 999px;
       font-weight: 700;
@@ -689,10 +1012,10 @@
       background: #040508;
       border: 1px solid #141926;
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       font-family: var(--font-mono);
-      font-size: 0.78rem;
-      height: 220px;
+      font-size: 0.75rem;
+      height: 200px;
       overflow-y: auto;
       color: #94a3b8;
       display: flex;
@@ -708,45 +1031,13 @@
 
     .log-time {
       color: #475569;
+      flex-shrink: 0;
     }
 
     .log-msg.success { color: var(--wa-green); }
     .log-msg.info { color: var(--accent-cyan); }
     .log-msg.warn { color: var(--accent-amber); }
     .log-msg.alert { color: var(--accent-rose); }
-
-    /* Script Generator Tab */
-    .code-preview-wrap {
-      position: relative;
-      background: #05070c;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      max-height: 260px;
-      overflow-y: auto;
-    }
-
-    .copy-code-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .copy-code-btn:hover {
-      border-color: var(--wa-green);
-      color: var(--wa-green);
-    }
 
     /* Custom Switch Toggle */
     .toggle-switch {
@@ -764,6 +1055,7 @@
       border-radius: 999px;
       position: relative;
       transition: background 0.2s ease;
+      flex-shrink: 0;
     }
 
     .toggle-thumb {
@@ -789,28 +1081,6 @@
       transform: translateX(20px);
     }
 
-    /* Tooltip / Guidance alert */
-    .guidance-box {
-      background: rgba(37, 211, 102, 0.05);
-      border: 1px solid rgba(37, 211, 102, 0.2);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-
-    .guidance-box svg {
-      width: 22px;
-      height: 22px;
-      color: var(--wa-green);
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
     /* Tabs */
     .tab-nav {
       display: flex;
@@ -818,21 +1088,23 @@
       gap: 8px;
       padding: 0 16px;
       background: rgba(255, 255, 255, 0.015);
+      overflow-x: auto;
     }
 
     .tab-btn {
-      padding: 12px 18px;
+      padding: 12px 16px;
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .tab-btn.active {
@@ -848,13 +1120,83 @@
       display: block;
     }
 
+    /* ========================================================= */
+    /* CONFIRMATION MODAL                                        */
+    /* ========================================================= */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(4, 6, 12, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .modal-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: #0f1523;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      border-radius: 16px;
+      padding: 26px;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-icon-warn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--accent-amber);
+      color: var(--accent-amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
     /* Footer */
     .site-footer {
       margin-top: auto;
       border-top: 1px solid var(--border-color);
-      padding: 24px 0;
+      padding: 22px 0;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
@@ -863,18 +1205,58 @@
       text-decoration: none;
     }
 
+    /* Code Block */
+    .code-preview-wrap {
+      position: relative;
+      background: #05070c;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .copy-code-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Responsive Adjustments */
     @media (max-width: 768px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .nav-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
       .banner-info h1 {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
       }
       .metric-pill {
         flex: 1 1 45%;
       }
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-      .action-btn-group {
+      .sender-box {
         flex-direction: column;
+        align-items: flex-start;
+      }
+      .watch-display-row {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -884,11 +1266,45 @@
 
   <div class="bg-glow"></div>
 
-  <!-- Header -->
+  <!-- ========================================================= -->
+  <!-- 1. LOCK / PASSCODE SCREEN OVERLAY                         -->
+  <!-- ========================================================= -->
+  <div class="lock-screen-overlay" id="lockOverlay">
+    <div class="lock-container">
+      <img src="images/mindnext-logo-white.png" alt="MindNext" class="lock-brand-img"
+        onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo-white.png';}else{this.src='images/mindnext-icon.png';}">
+      <h1 class="lock-title">WhatsApp Marketing Portal</h1>
+      <p class="lock-subtitle">🔒 પાસકોડ વડે લૉગિન કરો (Enter Passcode)</p>
+
+      <form id="lockForm" onsubmit="handleUnlockSubmit(event); return false;" action="javascript:void(0);">
+        <div class="passcode-input-wrap">
+          <input type="password" id="passcodeInput" class="passcode-input" placeholder="Passcode (Default: mindnext2026)"
+            autocomplete="current-password" autofocus required>
+          <button type="button" class="toggle-pass-eye" onclick="togglePassVisibility()" title="Show/Hide Password">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <div id="lockErrorMsg" class="lock-error-msg">ખોટો પાસકોડ છે! કૃપા કરીને ફરી પ્રયાસ કરો. (Default: mindnext2026)</div>
+
+        <button type="submit" class="btn-unlock-portal" id="lockSubmitBtn">
+          Unlock Portal / અનલૉક કરો &rarr;
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. SITE HEADER WITH CLEAN LOGO & LOCK CONTROL             -->
+  <!-- ========================================================= -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand-wrap">
-        <img src="/images/mindnext-logo.png" alt="MindNext Technologies" class="brand-logo" onerror="this.src='/images/mindnext-logo-white.png'">
+        <img src="images/mindnext-logo-white.png" alt="MindNext Technologies" class="brand-logo-img"
+          onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo-white.png';}else{this.src='images/mindnext-icon.png';}">
         <span class="brand-badge">
           <span class="dot"></span>
           WhatsApp Cron Engine
@@ -897,19 +1313,26 @@
 
       <div class="nav-actions">
         <a href="/" class="nav-link-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           Home
         </a>
         <a href="/fastshare" class="nav-link-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="16 18 22 12 16 6"></polyline>
             <polyline points="8 6 2 12 8 18"></polyline>
           </svg>
           FastShare
         </a>
+        <button class="nav-link-btn" onclick="lockMarketingPortal()" title="Lock Portal" style="color: var(--accent-rose); border-color: rgba(244, 63, 94, 0.3);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          લૉક કરો (Lock)
+        </button>
       </div>
     </div>
   </header>
@@ -927,7 +1350,7 @@
             સ્માર્ટ WhatsApp માર્કેટિંગ ક્રોન શિડ્યુલર
           </h1>
           <p>
-            એન્ટિ-બેન (Anti-Ban) સુરક્ષા સાથે રોજના ૨૫૦ મેસેજ મોકલવા માટેનું સ્માર્ટ ઓટોમેશન એન્જિન. રેન્ડમ ૧૨૦-૧૮૦ સેકન્ડ ડિલે, ઓફિસ અવર્સ કંટ્રોલ અને કસ્ટમ બ્રેક મેનેજમેન્ટ.
+            એન્ટિ-બેન (Anti-Ban) સુરક્ષા સાથે દૈનિક મેસેજ મોકલવાનું સ્માર્ટ એન્જિન. રેન્ડમ ૧૨૦-૧૮૦ સેકન્ડ ડિલે, ઘડિયાળ ટાઇમિંગ, કેલેન્ડર અવધિ અને કસ્ટમ બ્રેક મેનેજમેન્ટ.
           </p>
         </div>
 
@@ -945,32 +1368,53 @@
             <span class="val violet" id="statAvgDelay">150s (2.5m)</span>
           </div>
           <div class="metric-pill">
-            <span class="label">અનુમાનિત પૂર્ણ સમય</span>
+            <span class="label">અનુમાનિત સમાપ્તિ</span>
             <span class="val amber" id="statEstFinish">07:25 PM</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Operational Guidance -->
-    <div class="guidance-box">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="16" x2="12" y2="12"></line>
-        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-      </svg>
-      <div>
-        <strong style="color: var(--wa-green-light);">ગોલ્ડન રૂલ:</strong> દર મેસેજ વચ્ચે ફિક્સ ટાઇમિંગ રાખવાથી WhatsApp બોટ પકડાઈ જાય છે. અહીં ડિલે આપમેળે <strong>૧૨૦ થી ૧૮૦ સેકન્ડ વચ્ચે રેન્ડમલી</strong> પસંદ થાય છે, જેથી સરેરાશ ૨.૫ મિનિટે મેસેજ જાય છે પણ સર્વર પર કોઈ રોબોટિક પેટર્ન બનતી નથી!
+    <!-- ========================================================= -->
+    <!-- 3. SENDER MOBILE NUMBER / PROFILE CONFIGURATION           -->
+    <!-- ========================================================= -->
+    <section class="sender-box">
+      <div class="sender-info">
+        <div class="sender-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+        </div>
+        <div class="sender-details">
+          <strong>
+            મોકલનાર WhatsApp એકાઉન્ટ (Sender Phone Profile)
+            <span class="queue-pill sent" style="font-size: 0.65rem;">🟢 Active SIM</span>
+          </strong>
+          <p id="senderDisplayLabel">હાલ આ નંબરથી મેસેજ ડિસ્પેચ થશે: <strong>+91 98250 12345 (SIM 1 - Primary)</strong></p>
+        </div>
       </div>
-    </div>
 
-    <!-- Dashboard Content Grid -->
+      <div class="sender-input-group">
+        <select class="form-control" id="senderSimProfile" style="width: auto; min-width: 170px;" onchange="onSenderSimChange()">
+          <option value="sim1">SIM 1: +91 98250 12345 (Primary)</option>
+          <option value="sim2">SIM 2: +91 98790 54321 (Secondary)</option>
+          <option value="custom">કસ્ટમ નંબર ઉમેરો...</option>
+        </select>
+        <input type="text" class="form-control" id="customSenderNumber" placeholder="+91 98XXXXXXXX" style="display: none; width: 150px;">
+        <button class="btn btn-secondary" style="width: auto; padding: 8px 12px; font-size: 0.78rem;" onclick="saveSenderNumber()">સાચવો</button>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- MAIN DASHBOARD CONTENT GRID                               -->
+    <!-- ========================================================= -->
     <div class="dashboard-grid">
 
-      <!-- LEFT COLUMN: Configurations & Tools -->
-      <div class="left-col">
+      <!-- LEFT COLUMN -->
+      <div class="left-col" style="display: flex; flex-direction: column; gap: 24px;">
 
-        <!-- 1. Cron Timing & Random Delay Setting (Requirement A & B) -->
+        <!-- 1. Randomized Delay Controls -->
         <div class="dash-card">
           <div class="card-header">
             <div class="card-title">
@@ -978,13 +1422,12 @@
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              (A) રેન્ડમ ડિલે અને ઓફિસ ટાઇમિંગ કંટ્રોલ
+              (A) રેન્ડમ ડિલે કંટ્રોલ (Anti-Ban Jitter)
             </div>
-            <span class="card-subtitle">Anti-Ban Random Jitter</span>
+            <span class="card-subtitle">એવરેજ ૧૫૦ સેકન્ડ (૨.૫ મિનિટ)</span>
           </div>
           <div class="card-body">
             <div class="form-grid">
-              <!-- Min Delay Slider -->
               <div class="range-box">
                 <div class="range-header">
                   <span class="form-label">ન્યૂનતમ ડિલે (Min Delay)</span>
@@ -994,7 +1437,6 @@
                 <span class="form-hint">ઓછામાં ઓછો આટલો સમય રાહ જોશે</span>
               </div>
 
-              <!-- Max Delay Slider -->
               <div class="range-box">
                 <div class="range-header">
                   <span class="form-label">મહત્તમ ડિલે (Max Delay)</span>
@@ -1004,29 +1446,77 @@
                 <span class="form-hint">વધુમાં વધુ આટલો સમય રાહ જોશે</span>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Operating Hours (9 AM to 9 PM) -->
-            <div class="form-grid" style="margin-top: 20px;">
-              <div class="form-group">
+        <!-- 2. Interactive Watch Clock Time Pickers (Requirement: proper watch AM/PM Hour Minute Second) -->
+        <div class="dash-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 14 10"></polyline>
+              </svg>
+              (B) દૈનિક ઓફિસ ટાઈમિંગ (ઘડિયાળ સેટિંગ - AM/PM, કલાક, મિનિટ, સેકન્ડ)
+            </div>
+            <span class="card-subtitle">વર્કિંગ અવર્સ લિમિટર</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+
+              <!-- Start Time Watch Picker -->
+              <div class="watch-picker-box">
                 <label class="form-label">
-                  ઓપરેશન શરૂ સમય (Start Time)
-                  <span class="form-hint">સવારે</span>
+                  <span>🌅 શરૂઆત સમય (Start Time)</span>
+                  <span class="form-hint" id="startTimePreview">09:00:00 AM</span>
                 </label>
-                <input type="time" class="form-control" id="workStartTime" value="09:00">
+                <div class="watch-display-row">
+                  <div class="clock-dial-group">
+                    <select class="clock-select" id="startHour" onchange="updateWatchTimes()">
+                      <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09" selected>09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    </select>
+                    <span class="clock-colon">:</span>
+                    <select class="clock-select" id="startMin" onchange="updateWatchTimes()">
+                      <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                    </select>
+                    <span class="clock-colon">:</span>
+                    <select class="clock-select" id="startSec" onchange="updateWatchTimes()">
+                      <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                    </select>
+                  </div>
+                  <button type="button" class="ampm-toggle-btn is-am" id="startAmPmBtn" onclick="toggleStartAmPm()">AM</button>
+                </div>
               </div>
 
-              <div class="form-group">
+              <!-- End Time Watch Picker -->
+              <div class="watch-picker-box">
                 <label class="form-label">
-                  ઓપરેશન સમાપ્તિ સમય (End Time)
-                  <span class="form-hint">સાંજે / રાત્રે</span>
+                  <span>🌙 સમાપ્તિ સમય (End Time)</span>
+                  <span class="form-hint" id="endTimePreview">09:00:00 PM</span>
                 </label>
-                <input type="time" class="form-control" id="workEndTime" value="21:00">
+                <div class="watch-display-row">
+                  <div class="clock-dial-group">
+                    <select class="clock-select" id="endHour" onchange="updateWatchTimes()">
+                      <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09" selected>09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    </select>
+                    <span class="clock-colon">:</span>
+                    <select class="clock-select" id="endMin" onchange="updateWatchTimes()">
+                      <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                    </select>
+                    <span class="clock-colon">:</span>
+                    <select class="clock-select" id="endSec" onchange="updateWatchTimes()">
+                      <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                    </select>
+                  </div>
+                  <button type="button" class="ampm-toggle-btn is-pm" id="endAmPmBtn" onclick="toggleEndAmPm()">PM</button>
+                </div>
               </div>
+
             </div>
           </div>
         </div>
 
-        <!-- 2. Intermediate Breaks & Gaps (વચ્ચે ગેપ / લંચ બ્રેક સેટિંગ) -->
+        <!-- 3. Intermediate Breaks (Lunch & Batch Pauses) -->
         <div class="dash-card">
           <div class="card-header">
             <div class="card-title">
@@ -1037,17 +1527,17 @@
                 <line x1="10" y1="1" x2="10" y2="4"></line>
                 <line x1="14" y1="1" x2="14" y2="4"></line>
               </svg>
-              (B) વચ્ચે ગેપ અને બ્રેક સેટિંગ્સ (Intermission Breaks)
+              (C) વચ્ચે બ્રેક અને લંચ ગેપ સેટિંગ્સ
             </div>
-            <span class="card-subtitle">લંચ અને બેચ પોઝ</span>
+            <span class="card-subtitle">આપોઆપ આરામ</span>
           </div>
           <div class="card-body">
-            <!-- Lunch Break Toggle -->
+            <!-- Lunch Break -->
             <div style="background: var(--bg-card-subtle); padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-color);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
-                  <strong style="font-size: 0.95rem; color: var(--text-primary);">૧. બપોરનો લંચ બ્રેક (Scheduled Lunch Break)</strong>
-                  <p style="font-size: 0.78rem; color: var(--text-muted);">આ સમય દરમિયાન ક્રોન આપમેળે થોભી જશે અને લંચ પછી ચાલુ થશે.</p>
+                  <strong style="font-size: 0.92rem; color: #fff;">૧. બપોરનો લંચ બ્રેક (Scheduled Lunch Break)</strong>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">આ સમય દરમિયાન ક્રોન આપમેળે થોભી જશે અને લંચ પછી ચાલુ થશે.</p>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="lunchBreakToggle" class="toggle-input" checked>
@@ -1055,24 +1545,39 @@
                 </label>
               </div>
 
-              <div class="form-grid" id="lunchTimeInputs">
-                <div class="form-group">
-                  <label class="form-label">બ્રેક શરૂ:</label>
-                  <input type="time" class="form-control" id="lunchStart" value="13:30">
+              <div class="form-grid">
+                <div class="watch-picker-box">
+                  <span class="form-label">લંચ શરૂ:</span>
+                  <div class="watch-display-row">
+                    <div class="clock-dial-group">
+                      <select class="clock-select" id="lunchStartHour" onchange="updateWatchTimes()"><option value="01" selected>01</option><option value="02">02</option><option value="12">12</option></select>
+                      <span class="clock-colon">:</span>
+                      <select class="clock-select" id="lunchStartMin" onchange="updateWatchTimes()"><option value="00">00</option><option value="30" selected>30</option></select>
+                    </div>
+                    <span class="ampm-toggle-btn is-pm">PM</span>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">બ્રેક સમાપ્ત:</label>
-                  <input type="time" class="form-control" id="lunchEnd" value="14:15">
+
+                <div class="watch-picker-box">
+                  <span class="form-label">લંચ પૂર્ણ:</span>
+                  <div class="watch-display-row">
+                    <div class="clock-dial-group">
+                      <select class="clock-select" id="lunchEndHour" onchange="updateWatchTimes()"><option value="02" selected>02</option><option value="03">03</option></select>
+                      <span class="clock-colon">:</span>
+                      <select class="clock-select" id="lunchEndMin" onchange="updateWatchTimes()"><option value="00">00</option><option value="15" selected>15</option></select>
+                    </div>
+                    <span class="ampm-toggle-btn is-pm">PM</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Batch Break (After every X messages pause Y minutes) -->
+            <!-- Batch Break -->
             <div style="background: var(--bg-card-subtle); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
-                  <strong style="font-size: 0.95rem; color: var(--text-primary);">૨. બેચ પોઝ (Periodic Batch Pause)</strong>
-                  <p style="font-size: 0.78rem; color: var(--text-muted);">દર અમુક મેસેજ પછી થોડો સમય આપોઆપ આરામ આપવા માટે.</p>
+                  <strong style="font-size: 0.92rem; color: #fff;">૨. બેચ પોઝ (Periodic Batch Pause)</strong>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">દર અમુક મેસેજ પછી થોડો સમય આપોઆપ આરામ આપવા માટે.</p>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="batchBreakToggle" class="toggle-input" checked>
@@ -1080,7 +1585,7 @@
                 </label>
               </div>
 
-              <div class="form-grid" id="batchInputs">
+              <div class="form-grid">
                 <div class="form-group">
                   <label class="form-label">દર કેટલા મેસેજ પછી:</label>
                   <input type="number" class="form-control" id="batchMsgCount" value="25" min="5" max="100">
@@ -1094,7 +1599,7 @@
           </div>
         </div>
 
-        <!-- 3. Date-wise Schedule & Warm-up (તારીખ પ્રમાણે ક્રોન ફેરવવો) -->
+        <!-- 4. Date-wise Calendar & Campaign Duration (Requirement: Calendar & Ketli date sudhi farvo che) -->
         <div class="dash-card">
           <div class="card-header">
             <div class="card-title">
@@ -1104,23 +1609,33 @@
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="18" y2="10"></line>
               </svg>
-              (C) તારીખવાર વોર્મ-અપ અને દૈનિક મર્યાદા (Date-wise Quota)
+              (D) કેલેન્ડર અવધિ અને વોર્મ-અપ શિડ્યુલ (Campaign Duration)
             </div>
             <button class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" id="addDateBtn">+ તારીખ ઉમેરો</button>
           </div>
           <div class="card-body">
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">
-              નવા સિમકાર્ડ માટે શરૂઆતના દિવસોમાં ધીમે-ધીમે મેસેજ વધારવા (Account Warm-up) જેથી ક્યારેય એકાઉન્ટ બ્લોક ન થાય:
-            </p>
+            <!-- Campaign Duration Picker -->
+            <div style="background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">📅 અભિયાન શરૂ તારીખ (Campaign Start):</label>
+                  <input type="date" class="form-control" id="campaignStartDate">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">🏁 કઈ તારીખ સુધી ક્રોન ચલાવવો છે (Run Until Date):</label>
+                  <input type="date" class="form-control" id="campaignEndDate">
+                </div>
+              </div>
+            </div>
 
             <div style="overflow-x: auto;">
               <table class="schedule-table" id="scheduleTable">
                 <thead>
                   <tr>
                     <th>તારીખ (Date)</th>
-                    <th>દિવસનો ફેઝ (Phase)</th>
-                    <th>દૈનિક ટાર્ગેટ (Target)</th>
-                    <th>સ્થિતિ (Status)</th>
+                    <th>ફેઝ (Phase)</th>
+                    <th>દૈનિક ક્વોટા (Quota)</th>
+                    <th>સ્થિતિ</th>
                     <th>એક્શન</th>
                   </tr>
                 </thead>
@@ -1132,39 +1647,39 @@
           </div>
         </div>
 
-        <!-- 4. Contacts & Message Management -->
+        <!-- 5. Contacts Queue & Composer -->
         <div class="dash-card">
           <div class="tab-nav">
             <button class="tab-btn active" data-tab="tab-contacts">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
               </svg>
-              કોન્ટેક્ટ કતાર (Queue: <span id="queueCountBadge">0</span>)
+              કોન્ટેક્ટ કતાર (<span id="queueCountBadge">0</span>)
             </button>
             <button class="tab-btn" data-tab="tab-message">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
               મેસેજ ટેમ્પલેટ & Spintax
             </button>
             <button class="tab-btn" data-tab="tab-script">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="16 18 22 12 16 6"></polyline>
                 <polyline points="8 6 2 12 8 18"></polyline>
               </svg>
-              Python / Node.js સ્ક્રિપ્ટ એક્સપોર્ટ
+              Python / Node.js સ્ક્રિપ્ટ
             </button>
           </div>
 
           <div class="card-body">
-            <!-- TAB 1: Contacts Queue -->
+            <!-- TAB 1: Contacts -->
             <div class="tab-content active" id="tab-contacts">
               <div class="form-group" style="margin-bottom: 14px;">
                 <label class="form-label">
-                  કોન્ટેક્ટ્સ ઉમેરો (Name, Phone પ્રતિ લીટી અથવા કોમા):
+                  કોન્ટેક્ટ્સ ઉમેરો (Name, Phone પ્રતિ લીટી):
                   <button class="btn btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" id="loadDemoContactsBtn">સેમ્પલ ડેટા ભરો</button>
                 </label>
                 <textarea class="form-control" id="contactsInput" placeholder="Rajesh Patel, 9825012345&#10;Amit Shah, 9879054321&#10;Pooja Dave, 919876543210"></textarea>
@@ -1180,26 +1695,22 @@
                     <tr>
                       <th>#</th>
                       <th>નામ</th>
-                      <th>મોબાઈલ નંબર</th>
+                      <th>નંબર</th>
                       <th>સ્થિતિ</th>
                       <th>મોકલેલ સમય</th>
                     </tr>
                   </thead>
-                  <tbody id="queueTableBody">
-                    <tr>
-                      <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">કોઈ કોન્ટેક્ટ્સ ઉમેરેલા નથી. ઉપર નંબર નાખી 'કતારમાં ઉમેરો' દબાવો.</td>
-                    </tr>
-                  </tbody>
+                  <tbody id="queueTableBody"></tbody>
                 </table>
               </div>
             </div>
 
-            <!-- TAB 2: Message Composer -->
+            <!-- TAB 2: Message Template -->
             <div class="tab-content" id="tab-message">
               <div class="form-group">
                 <label class="form-label">
-                  મેસેજ લખાણ (Dynamic Placeholders: <code>{name}</code>, <code>{phone}</code>)
-                  <span class="form-hint">Spintax supported: {નમસ્તે|હેલો|સુપ્રભાત}</span>
+                  મેસેજ લખાણ (Placeholders: <code>{name}</code>, <code>{phone}</code>)
+                  <span class="form-hint">Spintax: {નમસ્તે|હેલો}</span>
                 </label>
                 <textarea class="form-control" id="messageTemplate" style="min-height: 140px;">{નમસ્તે|હેલો} {name} જી,
 
@@ -1211,26 +1722,22 @@ MindNext Technologies તરફથી આપનું હાર્દિક સ�
 MindNext Team</textarea>
               </div>
 
-              <!-- Unsubscribe Stop clause -->
               <div style="display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 12px; background: var(--bg-card-subtle); border-radius: 10px; border: 1px solid var(--border-color);">
                 <label class="toggle-switch">
                   <input type="checkbox" id="stopOptOutToggle" class="toggle-input" checked>
                   <span class="toggle-track"><span class="toggle-thumb"></span></span>
                 </label>
                 <div>
-                  <strong style="font-size: 0.85rem; color: var(--text-primary);">Anti-Ban 'STOP' ફૂટર આપોઆપ જોડો</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-muted);">મેસેજના અંતે <em>"જો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો STOP લખી મોકલો."</em> ઉમેરશે જેથી લોકો રિપોર્ટ ન કરે.</p>
+                  <strong style="font-size: 0.85rem; color: #fff;">Anti-Ban 'STOP' ફૂટર જોડો</strong>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">મેસેજના અંતે <em>"જો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો STOP લખી મોકલો."</em> ઉમેરશે.</p>
                 </div>
               </div>
             </div>
 
-            <!-- TAB 3: Script Generator -->
+            <!-- TAB 3: Script -->
             <div class="tab-content" id="tab-script">
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
-                જો તમારે આ ક્રોન બ્રાઉઝર વગર તમારા સર્વર, VPS કે પોતાના કમ્પ્યુટરમાં બેકગ્રાઉન્ડમાં ચલાવવો હોય, તો આ રેડીમેડ સ્ક્રિપ્ટ ડાઉનલોડ કરીને ચલાવો:
-              </p>
               <div class="code-preview-wrap">
-                <button class="copy-code-btn" id="copyCodeBtn">કોડ કોપી કરો</button>
+                <button class="copy-code-btn" id="copyCodeBtn">કોપી કરો</button>
                 <pre><code id="generatedCodePreview"># કોડ લોડ થઈ રહ્યો છે...</code></pre>
               </div>
               <div style="display: flex; gap: 10px; margin-top: 12px;">
@@ -1243,17 +1750,17 @@ MindNext Team</textarea>
 
       </div>
 
-      <!-- RIGHT COLUMN: Live Controller & Monitor (Sticky) -->
+      <!-- RIGHT COLUMN: NO INDEPENDENT STICKY OVERLAP -->
       <div class="right-col">
 
-        <!-- Live Countdown Widget -->
+        <!-- Live Controller Widget -->
         <div class="live-controller-card">
           <div class="status-badge" id="engineStatusBadge">
             <span class="dot" style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span>
             <span id="engineStatusText">ક્રોન તૈયાર છે (IDLE)</span>
           </div>
 
-          <!-- Circular Radial Progress Timer -->
+          <!-- Circular Countdown Timer -->
           <div class="timer-circle-wrap">
             <svg class="timer-svg" viewBox="0 0 160 160">
               <circle class="timer-circle-bg" cx="80" cy="80" r="70"></circle>
@@ -1266,18 +1773,23 @@ MindNext Team</textarea>
           </div>
 
           <div class="timer-jitter-info" id="timerJitterInfo">
-            આગામી રેન્ડમ ડિલે: <strong>૧૫૦ સેકન્ડ</strong>
+            આગામી માટે રેન્ડમ ડિલે: <strong>૧૫૦ સેકન્ડ</strong>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Active Sender indicator in Live Card -->
+          <div style="font-size: 0.75rem; color: var(--wa-green-light); background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.2); padding: 5px 10px; border-radius: 6px; width: 100%;">
+            📱 મોકલનાર: <strong id="liveSenderNumberText">+91 98250 12345</strong>
+          </div>
+
+          <!-- Action Buttons with Confirmation on Stop -->
           <div class="action-btn-group">
-            <button class="btn btn-primary" id="startCronBtn">
+            <button class="btn btn-primary" id="startCronBtn" onclick="startCron()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
               ક્રોન શરૂ કરો
             </button>
-            <button class="btn btn-danger" id="pauseCronBtn" style="display: none;">
+            <button class="btn btn-danger" id="pauseCronBtn" style="display: none;" onclick="requestStopCron()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="6" y="4" width="4" height="16"></rect>
                 <rect x="14" y="4" width="4" height="16"></rect>
@@ -1287,14 +1799,14 @@ MindNext Team</textarea>
           </div>
 
           <div style="display: flex; gap: 8px; width: 100%;">
-            <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="skipNextBtn">⏭️ આ મેસેજ સ્કીપ કરો</button>
+            <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="skipNextBtn">⏭️ સ્કીપ</button>
             <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="testSingleBtn">🧪 ટેસ્ટ ૧ મેસેજ</button>
           </div>
 
           <!-- Dispatch Mode Selection -->
           <div style="width: 100%; text-align: left; background: var(--bg-card-subtle); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);">
-            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 6px;">ડિસ્પેચ મોડ (Sending Mode):</label>
-            <select class="form-control" id="dispatchModeSelect" style="font-size: 0.82rem; padding: 6px 10px;">
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 6px;">ડિસ્પેચ મોડ (SENDING MODE):</label>
+            <select class="form-control" id="dispatchModeSelect" style="font-size: 0.82rem; padding: 7px 10px;">
               <option value="wa_web">Direct WhatsApp Web / Desktop (1-Click Pop)</option>
               <option value="webhook">Webhook / Local Backend Server (POST)</option>
               <option value="simulation">ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
@@ -1302,8 +1814,8 @@ MindNext Team</textarea>
           </div>
         </div>
 
-        <!-- Live Terminal Log -->
-        <div class="dash-card" style="margin-top: 24px;">
+        <!-- Live Terminal Log - Flows cleanly without overlapping -->
+        <div class="dash-card">
           <div class="card-header">
             <div class="card-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1330,34 +1842,120 @@ MindNext Team</textarea>
 
   </main>
 
+  <!-- ========================================================= -->
+  <!-- 4. CONFIRMATION MODAL ON CRON STOP / PAUSE                -->
+  <!-- ========================================================= -->
+  <div class="modal-backdrop" id="stopConfirmModal">
+    <div class="modal-box">
+      <div class="modal-icon-warn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3 class="modal-title">શું ક્રોન પાક્કું થોભાવવો છે?</h3>
+      <p class="modal-desc" id="stopConfirmText">
+        હાલ કતારમાં મેસેજ બાકી છે. જો તમે વચ્ચેથી ક્રોન બંધ કરશો, તો આજનો ક્વોટા અધૂરો રહી જશે. શું તમે ખરેખર આગળ વધવા માંગો છો?
+      </p>
+      <div class="modal-btn-row">
+        <button class="btn btn-secondary" onclick="dismissStopModal()">ના, ચાલુ રાખો</button>
+        <button class="btn btn-danger" onclick="confirmStopCron()">હા, થોભાવી દો (Pause)</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <div class="container">
       <p>© 2026 MindNext Technologies. સર્વાધિકાર સુરક્ષિત. | <a href="/terms-of-service">નિયમો અને શરતો</a> | <a href="/privacy-policy">ગોપનીયતા નીતિ</a></p>
-      <p style="font-size: 0.75rem; margin-top: 6px; color: var(--text-muted);">
-        નોંધ: આ ટૂલ માત્ર માન્યતા પ્રાપ્ત બિઝનેસ કોમ્યુનિકેશન માટે ડિઝાઇન કરાયું છે. સ્પામિંગ વોટ્સએપ પોલિસી વિરુદ્ધ છે.
+      <p style="font-size: 0.72rem; margin-top: 4px; color: var(--text-muted);">
+        નોંધ: આ ટૂલ માત્ર માન્યતા પ્રાપ્ત બિઝનેસ કોમ્યુનિકેશન માટે છે. સ્પામિંગ વોટ્સએપ પોલિસી વિરુદ્ધ છે.
       </p>
     </div>
   </footer>
 
-  <!-- ==================== JAVASCRIPT CONTROLLER ENGINE ==================== -->
+  <!-- ========================================================= -->
+  <!-- CONTROLLER SCRIPT                                         -->
+  <!-- ========================================================= -->
   <script>
     (function () {
       'use strict';
 
+      var STORAGE_KEY_AUTH = 'mn_marketing_auth_v1';
+      var STORAGE_KEY_SENDER = 'mn_marketing_sender_phone';
+
+      // --- PASSCODE / AUTHENTICATION ---
+      var validPasscodes = ['mindnext2026', 'mindnext', 'admin', 'admin2026', 'admin@mindnext.in'];
+
+      function checkAuthStatus() {
+        var isUnlocked = sessionStorage.getItem(STORAGE_KEY_AUTH) === 'unlocked' ||
+                         localStorage.getItem(STORAGE_KEY_AUTH) === 'unlocked';
+        var overlay = document.getElementById('lockOverlay');
+        if (isUnlocked && overlay) {
+          overlay.classList.add('unlocked');
+          overlay.style.display = 'none';
+          document.body.style.overflow = '';
+        } else {
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      window.handleUnlockSubmit = function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var input = document.getElementById('passcodeInput');
+        var err = document.getElementById('lockErrorMsg');
+        var val = input.value.trim().toLowerCase();
+
+        if (validPasscodes.includes(val)) {
+          sessionStorage.setItem(STORAGE_KEY_AUTH, 'unlocked');
+          localStorage.setItem(STORAGE_KEY_AUTH, 'unlocked');
+          var overlay = document.getElementById('lockOverlay');
+          overlay.classList.add('unlocked');
+          setTimeout(function () { overlay.style.display = 'none'; }, 300);
+          document.body.style.overflow = '';
+          input.value = '';
+          if (err) err.style.display = 'none';
+        } else {
+          if (err) err.style.display = 'block';
+          input.classList.add('shake');
+          setTimeout(function () { input.classList.remove('shake'); }, 400);
+          input.select();
+        }
+        return false;
+      };
+
+      window.togglePassVisibility = function () {
+        var input = document.getElementById('passcodeInput');
+        input.type = input.type === 'password' ? 'text' : 'password';
+      };
+
+      window.lockMarketingPortal = function () {
+        sessionStorage.removeItem(STORAGE_KEY_AUTH);
+        localStorage.removeItem(STORAGE_KEY_AUTH);
+        var overlay = document.getElementById('lockOverlay');
+        overlay.style.display = 'flex';
+        overlay.classList.remove('unlocked');
+        document.body.style.overflow = 'hidden';
+        var input = document.getElementById('passcodeInput');
+        if (input) { input.value = ''; input.focus(); }
+      };
+
       // --- CONFIGURATION STATE ---
       var state = {
+        senderNumber: '+91 98250 12345',
+        senderLabel: 'SIM 1: Primary Marketing',
         minDelay: 120,
         maxDelay: 180,
-        workStart: '09:00',
-        workEnd: '21:00',
+        workStartHour: '09:00:00 AM',
+        workEndHour: '09:00:00 PM',
         lunchBreakEnabled: true,
-        lunchStart: '13:30',
-        lunchEnd: '14:15',
+        lunchStartHour: '01:30:00 PM',
+        lunchEndHour: '02:15:00 PM',
         batchBreakEnabled: true,
         batchMsgCount: 25,
         batchPauseMin: 15,
-        stopOptOut: true,
-        dispatchMode: 'wa_web',
+        campaignStartDate: new Date().toISOString().split('T')[0],
+        campaignEndDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
         isRunning: false,
         isPaused: false,
         currentTimer: null,
@@ -1367,132 +1965,235 @@ MindNext Team</textarea>
         sentToday: 0,
         todayQuota: 250,
         contacts: [],
-        currentIndex: 0,
         dateSchedule: []
       };
 
-      var CIRCLE_CIRCUMFERENCE = 440; // 2 * PI * 70
+      var CIRCLE_CIRCUMFERENCE = 440;
 
-      // --- DOM ELEMENTS ---
-      var minDelayInput = document.getElementById('minDelayInput');
-      var maxDelayInput = document.getElementById('maxDelayInput');
-      var minDelayDisplay = document.getElementById('minDelayDisplay');
-      var maxDelayDisplay = document.getElementById('maxDelayDisplay');
-      var statAvgDelay = document.getElementById('statAvgDelay');
-      var statEstFinish = document.getElementById('statEstFinish');
-      var statQueueCount = document.getElementById('statQueueCount');
-      var statSentToday = document.getElementById('statSentToday');
-      var queueCountBadge = document.getElementById('queueCountBadge');
+      // --- SENDER CONFIGURATION ---
+      function initSenderProfile() {
+        var saved = localStorage.getItem(STORAGE_KEY_SENDER);
+        if (saved) state.senderNumber = saved;
+        document.getElementById('liveSenderNumberText').textContent = state.senderNumber;
+      }
 
-      var workStartTime = document.getElementById('workStartTime');
-      var workEndTime = document.getElementById('workEndTime');
-      var lunchBreakToggle = document.getElementById('lunchBreakToggle');
-      var lunchStart = document.getElementById('lunchStart');
-      var lunchEnd = document.getElementById('lunchEnd');
-      var batchBreakToggle = document.getElementById('batchBreakToggle');
-      var batchMsgCount = document.getElementById('batchMsgCount');
-      var batchPauseMin = document.getElementById('batchPauseMin');
-      var stopOptOutToggle = document.getElementById('stopOptOutToggle');
-      var dispatchModeSelect = document.getElementById('dispatchModeSelect');
+      window.onSenderSimChange = function () {
+        var sel = document.getElementById('senderSimProfile');
+        var customIn = document.getElementById('customSenderNumber');
+        if (sel.value === 'custom') {
+          customIn.style.display = 'inline-block';
+          customIn.focus();
+        } else {
+          customIn.style.display = 'none';
+          if (sel.value === 'sim1') {
+            state.senderNumber = '+91 98250 12345';
+            state.senderLabel = 'SIM 1: Primary Marketing';
+          } else {
+            state.senderNumber = '+91 98790 54321';
+            state.senderLabel = 'SIM 2: Secondary Marketing';
+          }
+          saveSenderNumber();
+        }
+      };
 
-      var startCronBtn = document.getElementById('startCronBtn');
-      var pauseCronBtn = document.getElementById('pauseCronBtn');
-      var skipNextBtn = document.getElementById('skipNextBtn');
-      var testSingleBtn = document.getElementById('testSingleBtn');
-      var engineStatusBadge = document.getElementById('engineStatusBadge');
-      var engineStatusText = document.getElementById('engineStatusText');
-      var timerCircleProgress = document.getElementById('timerCircleProgress');
-      var timerRemainingSeconds = document.getElementById('timerRemainingSeconds');
-      var timerJitterInfo = document.getElementById('timerJitterInfo');
-      var consoleLogContainer = document.getElementById('consoleLogContainer');
-      var clearLogsBtn = document.getElementById('clearLogsBtn');
+      window.saveSenderNumber = function () {
+        var sel = document.getElementById('senderSimProfile');
+        var customIn = document.getElementById('customSenderNumber');
+        if (sel.value === 'custom' && customIn.value.trim()) {
+          state.senderNumber = customIn.value.trim();
+          state.senderLabel = 'Custom SIM: ' + state.senderNumber;
+        }
+        localStorage.setItem(STORAGE_KEY_SENDER, state.senderNumber);
+        document.getElementById('senderDisplayLabel').innerHTML = 'હાલ આ નંબરથી મેસેજ ડિસ્પેચ થશે: <strong>' + state.senderNumber + '</strong>';
+        document.getElementById('liveSenderNumberText').textContent = state.senderNumber;
+        appendLog('📱 મોકલનાર WhatsApp નંબર સેટ થયો: ' + state.senderNumber, 'success');
+      };
 
-      var contactsInput = document.getElementById('contactsInput');
-      var importContactsBtn = document.getElementById('importContactsBtn');
-      var clearQueueBtn = document.getElementById('clearQueueBtn');
-      var loadDemoContactsBtn = document.getElementById('loadDemoContactsBtn');
-      var queueTableBody = document.getElementById('queueTableBody');
-      var messageTemplate = document.getElementById('messageTemplate');
-      var scheduleTableBody = document.getElementById('scheduleTableBody');
-      var addDateBtn = document.getElementById('addDateBtn');
+      // --- WATCH / CLOCK CONTROLS (AM/PM & 12-Hour) ---
+      window.toggleStartAmPm = function () {
+        var btn = document.getElementById('startAmPmBtn');
+        if (btn.classList.contains('is-am')) {
+          btn.classList.remove('is-am');
+          btn.classList.add('is-pm');
+          btn.textContent = 'PM';
+        } else {
+          btn.classList.remove('is-pm');
+          btn.classList.add('is-am');
+          btn.textContent = 'AM';
+        }
+        updateWatchTimes();
+      };
 
-      var copyCodeBtn = document.getElementById('copyCodeBtn');
-      var generatedCodePreview = document.getElementById('generatedCodePreview');
-      var downloadPythonBtn = document.getElementById('downloadPythonBtn');
-      var downloadNodeBtn = document.getElementById('downloadNodeBtn');
+      window.toggleEndAmPm = function () {
+        var btn = document.getElementById('endAmPmBtn');
+        if (btn.classList.contains('is-pm')) {
+          btn.classList.remove('is-pm');
+          btn.classList.add('is-am');
+          btn.textContent = 'AM';
+        } else {
+          btn.classList.remove('is-am');
+          btn.classList.add('is-pm');
+          btn.textContent = 'PM';
+        }
+        updateWatchTimes();
+      };
+
+      window.updateWatchTimes = function () {
+        var sH = document.getElementById('startHour').value;
+        var sM = document.getElementById('startMin').value;
+        var sS = document.getElementById('startSec').value;
+        var sAp = document.getElementById('startAmPmBtn').textContent;
+        state.workStartHour = sH + ':' + sM + ':' + sS + ' ' + sAp;
+        document.getElementById('startTimePreview').textContent = state.workStartHour;
+
+        var eH = document.getElementById('endHour').value;
+        var eM = document.getElementById('endMin').value;
+        var eS = document.getElementById('endSec').value;
+        var eAp = document.getElementById('endAmPmBtn').textContent;
+        state.workEndHour = eH + ':' + eM + ':' + eS + ' ' + eAp;
+        document.getElementById('endTimePreview').textContent = state.workEndHour;
+
+        recalculateEstimates();
+        generateScripts();
+      };
+
+      function parseWatchToMinutes(hourStr, minStr, ampm) {
+        var h = parseInt(hourStr, 10);
+        var m = parseInt(minStr, 10);
+        if (ampm === 'PM' && h < 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h * 60 + m;
+      }
+
+      function isWithinWorkHours() {
+        var now = new Date();
+        var curMin = now.getHours() * 60 + now.getMinutes();
+
+        var sH = document.getElementById('startHour').value;
+        var sM = document.getElementById('startMin').value;
+        var sAp = document.getElementById('startAmPmBtn').textContent;
+        var startTotal = parseWatchToMinutes(sH, sM, sAp);
+
+        var eH = document.getElementById('endHour').value;
+        var eM = document.getElementById('endMin').value;
+        var eAp = document.getElementById('endAmPmBtn').textContent;
+        var endTotal = parseWatchToMinutes(eH, eM, eAp);
+
+        return curMin >= startTotal && curMin <= endTotal;
+      }
+
+      function isInLunchBreak() {
+        if (!document.getElementById('lunchBreakToggle').checked) return false;
+        var now = new Date();
+        var curMin = now.getHours() * 60 + now.getMinutes();
+
+        var lsH = document.getElementById('lunchStartHour').value;
+        var lsM = document.getElementById('lunchStartMin').value;
+        var lStart = parseWatchToMinutes(lsH, lsM, 'PM');
+
+        var leH = document.getElementById('lunchEndHour').value;
+        var leM = document.getElementById('lunchEndMin').value;
+        var lEnd = parseWatchToMinutes(leH, leM, 'PM');
+
+        return curMin >= lStart && curMin <= lEnd;
+      }
+
+      // --- CAMPAIGN END DATE CHECK ---
+      function isCampaignExpired() {
+        var endInput = document.getElementById('campaignEndDate').value;
+        if (!endInput) return false;
+        var today = new Date().toISOString().split('T')[0];
+        return today > endInput;
+      }
+
+      // --- CONFIRMATION MODAL ON STOP ---
+      window.requestStopCron = function () {
+        var pending = state.contacts.filter(function (c) { return c.status === 'pending'; }).length;
+        document.getElementById('stopConfirmText').textContent = 
+          'કતારમાં હાલ ' + pending + ' મેસેજ બાકી છે. જો તમે વચ્ચેથી ક્રોન થોભાવશો તો પ્રક્રિયા અટકી જશે. શું તમે ખરેખર ક્રોન થોભાવવા માંગો છો?';
+        document.getElementById('stopConfirmModal').classList.add('is-open');
+      };
+
+      window.dismissStopModal = function () {
+        document.getElementById('stopConfirmModal').classList.remove('is-open');
+      };
+
+      window.confirmStopCron = function () {
+        dismissStopModal();
+        executePauseCron();
+      };
+
+      function executePauseCron() {
+        state.isPaused = true;
+        clearInterval(state.currentTimer);
+        document.getElementById('startCronBtn').style.display = 'inline-flex';
+        document.getElementById('startCronBtn').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> ફરી શરૂ કરો (Resume)';
+        document.getElementById('pauseCronBtn').style.display = 'none';
+        updateStatusDisplay('break', 'થોભાયેલ છે (PAUSED)');
+        appendLog('⏸️ ક્રોન વપરાશકર્તા દ્વારા કન્ફર્મ કરીને થોભાવવામાં આવ્યો.', 'warn');
+      }
 
       // --- LOGGING UTILITY ---
       function appendLog(message, type) {
         type = type || 'info';
         var now = new Date();
         var timeStr = '[' + ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2) + ':' + ('0' + now.getSeconds()).slice(-2) + ']';
-        
         var line = document.createElement('div');
         line.className = 'log-line';
         line.innerHTML = '<span class="log-time">' + timeStr + '</span> <span class="log-msg ' + type + '">' + escapeHtml(message) + '</span>';
-        
-        consoleLogContainer.appendChild(line);
-        consoleLogContainer.scrollTop = consoleLogContainer.scrollHeight;
+        var container = document.getElementById('consoleLogContainer');
+        container.appendChild(line);
+        container.scrollTop = container.scrollHeight;
       }
 
       function escapeHtml(text) {
         var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        return text.replace(/[&<>"']/g, function (m) { return map[m]; });
       }
 
-      // --- INITIALIZE DATE SCHEDULE (Warm-up Plan) ---
+      // --- INITIALIZE CALENDAR & DATE SCHEDULE ---
       function initDateSchedule() {
         var today = new Date();
-        state.dateSchedule = [];
+        var todayStr = today.toISOString().split('T')[0];
+        document.getElementById('campaignStartDate').value = todayStr;
 
-        var phases = [
-          { daysOffset: 0, phase: 'Day 1: Initial Warm-up', target: 60 },
-          { daysOffset: 1, phase: 'Day 2: Account Warming', target: 120 },
-          { daysOffset: 2, phase: 'Day 3: Expansion', target: 180 },
-          { daysOffset: 3, phase: 'Day 4: Full Target Speed', target: 250 },
-          { daysOffset: 4, phase: 'Day 5: Ongoing Target', target: 250 }
+        var thirtyDaysLater = new Date(today.getTime() + 30 * 86400000);
+        document.getElementById('campaignEndDate').value = thirtyDaysLater.toISOString().split('T')[0];
+
+        state.dateSchedule = [
+          { date: todayStr, phase: 'Day 1: Initial Warm-up', target: 60, isToday: true },
+          { date: new Date(today.getTime() + 1 * 86400000).toISOString().split('T')[0], phase: 'Day 2: Account Warming', target: 120, isToday: false },
+          { date: new Date(today.getTime() + 2 * 86400000).toISOString().split('T')[0], phase: 'Day 3: Expansion', target: 180, isToday: false },
+          { date: new Date(today.getTime() + 3 * 86400000).toISOString().split('T')[0], phase: 'Day 4: Full Target Speed', target: 250, isToday: false }
         ];
-
-        phases.forEach(function (p) {
-          var d = new Date(today);
-          d.setDate(today.getDate() + p.daysOffset);
-          var dateString = d.toISOString().split('T')[0];
-          state.dateSchedule.push({
-            date: dateString,
-            phase: p.phase,
-            target: p.target,
-            isToday: p.daysOffset === 0
-          });
-        });
 
         state.todayQuota = state.dateSchedule[0].target;
         renderDateSchedule();
       }
 
       function renderDateSchedule() {
-        scheduleTableBody.innerHTML = '';
+        var body = document.getElementById('scheduleTableBody');
+        body.innerHTML = '';
         state.dateSchedule.forEach(function (row, idx) {
           var tr = document.createElement('tr');
           if (row.isToday) tr.className = 'active-today';
-
           tr.innerHTML = 
             '<td>' + (row.isToday ? '⭐ <strong>આજે (' + row.date + ')</strong>' : row.date) + '</td>' +
             '<td>' + row.phase + '</td>' +
             '<td><strong>' + row.target + ' મેસેજ</strong></td>' +
-            '<td><span class="queue-pill ' + (row.isToday ? 'sent' : 'pending') + '">' + (row.isToday ? 'સક્રિય (Active)' : 'આગામી') + '</span></td>' +
+            '<td><span class="queue-pill ' + (row.isToday ? 'sent' : 'pending') + '">' + (row.isToday ? 'સક્રિય' : 'આગામી') + '</span></td>' +
             '<td><button class="btn btn-secondary" style="padding: 3px 8px; font-size: 0.72rem;" onclick="window.editScheduleTarget(' + idx + ')">ફેરફાર</button></td>';
-          
-          scheduleTableBody.appendChild(tr);
+          body.appendChild(tr);
         });
 
-        statSentToday.textContent = state.sentToday + ' / ' + state.todayQuota;
+        document.getElementById('statSentToday').textContent = state.sentToday + ' / ' + state.todayQuota;
       }
 
-      window.editScheduleTarget = function(idx) {
+      window.editScheduleTarget = function (idx) {
         var current = state.dateSchedule[idx].target;
-        var newTarget = prompt('તારીખ ' + state.dateSchedule[idx].date + ' માટે દૈનિક મેસેજ ટાર્ગેટ લખો:', current);
-        if (newTarget !== null && !isNaN(parseInt(newTarget))) {
-          state.dateSchedule[idx].target = parseInt(newTarget);
+        var newTarget = prompt('તારીખ ' + state.dateSchedule[idx].date + ' માટે દૈનિક મેસેજ ક્વોટા લખો:', current);
+        if (newTarget !== null && !isNaN(parseInt(newTarget, 10))) {
+          state.dateSchedule[idx].target = parseInt(newTarget, 10);
           if (state.dateSchedule[idx].isToday) {
             state.todayQuota = state.dateSchedule[idx].target;
           }
@@ -1507,24 +2208,23 @@ MindNext Team</textarea>
         var min = parseInt(state.minDelay, 10);
         var max = parseInt(state.maxDelay, 10);
         if (min >= max) max = min + 10;
-        // Jitter formula
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
 
       function updateDelayMetrics() {
-        state.minDelay = parseInt(minDelayInput.value, 10);
-        state.maxDelay = parseInt(maxDelayInput.value, 10);
+        state.minDelay = parseInt(document.getElementById('minDelayInput').value, 10);
+        state.maxDelay = parseInt(document.getElementById('maxDelayInput').value, 10);
 
         if (state.minDelay >= state.maxDelay) {
           state.maxDelay = state.minDelay + 10;
-          maxDelayInput.value = state.maxDelay;
+          document.getElementById('maxDelayInput').value = state.maxDelay;
         }
 
-        minDelayDisplay.textContent = state.minDelay + ' સેકન્ડ (' + (state.minDelay / 60).toFixed(1) + ' મિ.)';
-        maxDelayDisplay.textContent = state.maxDelay + ' સેકન્ડ (' + (state.maxDelay / 60).toFixed(1) + ' મિ.)';
+        document.getElementById('minDelayDisplay').textContent = state.minDelay + ' સેકન્ડ (' + (state.minDelay / 60).toFixed(1) + ' મિ.)';
+        document.getElementById('maxDelayDisplay').textContent = state.maxDelay + ' સેકન્ડ (' + (state.maxDelay / 60).toFixed(1) + ' મિ.)';
 
         var avgSec = Math.round((state.minDelay + state.maxDelay) / 2);
-        statAvgDelay.textContent = avgSec + 's (' + (avgSec / 60).toFixed(1) + 'm)';
+        document.getElementById('statAvgDelay').textContent = avgSec + 's (' + (avgSec / 60).toFixed(1) + 'm)';
 
         recalculateEstimates();
         generateScripts();
@@ -1536,9 +2236,7 @@ MindNext Team</textarea>
         var countToConsider = Math.min(pendingCount > 0 ? pendingCount : state.todayQuota, state.todayQuota);
 
         var totalSeconds = countToConsider * avgSec;
-        if (state.lunchBreakEnabled) {
-          totalSeconds += 45 * 60; // 45 min lunch break estimate
-        }
+        if (document.getElementById('lunchBreakToggle').checked) totalSeconds += 45 * 60;
 
         var now = new Date();
         var estDate = new Date(now.getTime() + totalSeconds * 1000);
@@ -1549,18 +2247,19 @@ MindNext Team</textarea>
         formattedHours = formattedHours ? formattedHours : 12;
         var formattedMinutes = estMinutes < 10 ? '0' + estMinutes : estMinutes;
 
-        statEstFinish.textContent = ('0' + formattedHours).slice(-2) + ':' + formattedMinutes + ' ' + ampm;
+        document.getElementById('statEstFinish').textContent = ('0' + formattedHours).slice(-2) + ':' + formattedMinutes + ' ' + ampm;
       }
 
-      // --- CONTACT QUEUE MANAGER ---
+      // --- QUEUE MANAGEMENT ---
       function renderQueue() {
-        queueTableBody.innerHTML = '';
+        var body = document.getElementById('queueTableBody');
+        body.innerHTML = '';
         var pendingCount = 0;
 
         if (state.contacts.length === 0) {
-          queueTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">કોઈ કોન્ટેક્ટ્સ ઉમેરેલા નથી. ઉપર નંબર નાખી \'કતારમાં ઉમેરો\' દબાવો.</td></tr>';
-          statQueueCount.textContent = '0';
-          queueCountBadge.textContent = '0';
+          body.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">કોઈ કોન્ટેક્ટ્સ ઉમેરેલા નથી.</td></tr>';
+          document.getElementById('statQueueCount').textContent = '0';
+          document.getElementById('queueCountBadge').textContent = '0';
           return;
         }
 
@@ -1573,11 +2272,11 @@ MindNext Team</textarea>
             '<td><code>' + escapeHtml(c.phone) + '</code></td>' +
             '<td><span class="queue-pill ' + c.status + '">' + c.status.toUpperCase() + '</span></td>' +
             '<td>' + (c.sentAt || '-') + '</td>';
-          queueTableBody.appendChild(tr);
+          body.appendChild(tr);
         });
 
-        statQueueCount.textContent = pendingCount;
-        queueCountBadge.textContent = pendingCount;
+        document.getElementById('statQueueCount').textContent = pendingCount;
+        document.getElementById('queueCountBadge').textContent = pendingCount;
         recalculateEstimates();
       }
 
@@ -1588,7 +2287,6 @@ MindNext Team</textarea>
         lines.forEach(function (line) {
           line = line.trim();
           if (!line) return;
-
           var parts = line.split(/[,;\t]/);
           var name = 'Customer';
           var phone = '';
@@ -1602,18 +2300,13 @@ MindNext Team</textarea>
 
           if (phone.length >= 10) {
             if (phone.length === 10) phone = '91' + phone;
-            state.contacts.push({
-              name: name || 'Customer',
-              phone: phone,
-              status: 'pending',
-              sentAt: null
-            });
+            state.contacts.push({ name: name, phone: phone, status: 'pending', sentAt: null });
             added++;
           }
         });
 
         if (added > 0) {
-          appendLog(added + ' નવા કોન્ટેક્ટ્સ કતારમાં સફળતાપૂર્વક ઉમેરાયા.', 'success');
+          appendLog(added + ' નવા કોન્ટેક્ટ્સ કતારમાં ઉમેરાયા.', 'success');
           renderQueue();
           generateScripts();
         } else {
@@ -1621,75 +2314,53 @@ MindNext Team</textarea>
         }
       }
 
-      // --- SPINTAX & PERSONALIZATION ---
       function resolveSpintax(text) {
         return text.replace(/\{([^{}]+)\}/g, function (match, choices) {
           var parts = choices.split('|');
-          if (parts.length > 1) {
-            return parts[Math.floor(Math.random() * parts.length)];
-          }
-          return match;
+          return parts.length > 1 ? parts[Math.floor(Math.random() * parts.length)] : match;
         });
       }
 
       function composeMessage(contact) {
-        var base = messageTemplate.value;
+        var base = document.getElementById('messageTemplate').value;
         var resolved = resolveSpintax(base);
         resolved = resolved.replace(/\{name\}/gi, contact.name || 'Customer');
         resolved = resolved.replace(/\{phone\}/gi, contact.phone || '');
 
-        if (stopOptOutToggle.checked) {
+        if (document.getElementById('stopOptOutToggle').checked) {
           resolved += "\n\n_જો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો 'STOP' લખી મોકલો._";
         }
         return resolved;
       }
 
-      // --- CRON ENGINE DISPATCH LOGIC ---
-      function isWithinWorkHours() {
-        var now = new Date();
-        var currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-        var startParts = workStartTime.value.split(':');
-        var startMinutes = parseInt(startParts[0], 10) * 60 + parseInt(startParts[1], 10);
-
-        var endParts = workEndTime.value.split(':');
-        var endMinutes = parseInt(endParts[0], 10) * 60 + parseInt(endParts[1], 10);
-
-        return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
-      }
-
-      function isInLunchBreak() {
-        if (!lunchBreakToggle.checked) return false;
-        var now = new Date();
-        var currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-        var lStart = lunchStart.value.split(':');
-        var lEnd = lunchEnd.value.split(':');
-        var startM = parseInt(lStart[0], 10) * 60 + parseInt(lStart[1], 10);
-        var endM = parseInt(lEnd[0], 10) * 60 + parseInt(lEnd[1], 10);
-
-        return currentMinutes >= startM && currentMinutes <= endM;
-      }
-
+      // --- CRON DISPATCH ENGINE ---
       function updateStatusDisplay(status, text) {
-        engineStatusBadge.className = 'status-badge ' + status;
-        engineStatusText.textContent = text;
+        document.getElementById('engineStatusBadge').className = 'status-badge ' + status;
+        document.getElementById('engineStatusText').textContent = text;
       }
 
       function updateTimerProgress(remaining, total) {
-        timerRemainingSeconds.textContent = remaining;
+        document.getElementById('timerRemainingSeconds').textContent = remaining;
         var fraction = remaining / total;
         var offset = CIRCLE_CIRCUMFERENCE - (fraction * CIRCLE_CIRCUMFERENCE);
-        timerCircleProgress.style.strokeDashoffset = offset;
+        document.getElementById('timerCircleProgress').style.strokeDashoffset = offset;
       }
 
       function scheduleNextTick() {
         if (!state.isRunning || state.isPaused) return;
 
+        // Check Campaign End Date
+        if (isCampaignExpired()) {
+          updateStatusDisplay('', 'અભિયાન પૂર્ણ (Campaign Ended)');
+          appendLog('🏁 ક્રોન નિર્ધારિત તારીખ સુધી પહોંચી ગયો છે! અભિયાન પૂર્ણ થયું.', 'success');
+          stopCron();
+          return;
+        }
+
         // Check Working hours
         if (!isWithinWorkHours()) {
           updateStatusDisplay('sleeping', 'ઓફિસ અવર્સ બહાર (SLEEPING)');
-          appendLog('સમય ' + workEndTime.value + ' પછીનો હોવાથી ક્રોન નિષ્ક્રિય છે. સવારે ' + workStartTime.value + ' વાગ્યે પુનઃ શરૂ થશે.', 'warn');
+          appendLog('સમય ' + state.workEndHour + ' પછીનો હોવાથી ક્રોન સ્લીપ મોડમાં છે. સવારે ' + state.workStartHour + ' વાગ્યે પુનઃ શરૂ થશે.', 'warn');
           setTimeout(scheduleNextTick, 60000);
           return;
         }
@@ -1697,7 +2368,7 @@ MindNext Team</textarea>
         // Check Lunch Break
         if (isInLunchBreak()) {
           updateStatusDisplay('break', 'લંચ બ્રેક ચાલુ છે (PAUSED)');
-          appendLog('બપોરનો લંચ બ્રેક ચાલુ હોવાથી ક્રોન હોલ્ડ પર છે (' + lunchStart.value + ' થી ' + lunchEnd.value + ').', 'warn');
+          appendLog('બપોરનો લંચ બ્રેક હોવાથી ક્રોન હોલ્ડ પર છે.', 'warn');
           setTimeout(scheduleNextTick, 30000);
           return;
         }
@@ -1712,16 +2383,16 @@ MindNext Team</textarea>
         }
 
         // Check Batch Pause
-        if (batchBreakToggle.checked && state.currentBatchCount >= parseInt(batchMsgCount.value, 10)) {
-          var pauseMinutes = parseInt(batchPauseMin.value, 10);
-          appendLog(batchMsgCount.value + ' મેસેજનો બેચ પૂર્ણ! ' + pauseMinutes + ' મિનિટનો બેચ આરામ શરૂ થયો...', 'warn');
+        if (document.getElementById('batchBreakToggle').checked && state.currentBatchCount >= parseInt(document.getElementById('batchMsgCount').value, 10)) {
+          var pauseMinutes = parseInt(document.getElementById('batchPauseMin').value, 10);
+          appendLog(document.getElementById('batchMsgCount').value + ' મેસેજનો બેચ પૂર્ણ! ' + pauseMinutes + ' મિનિટનો બેચ પોઝ શરૂ થયો...', 'warn');
           updateStatusDisplay('break', 'બેચ પોઝ (' + pauseMinutes + 'm)');
           state.currentBatchCount = 0;
           state.remainingSeconds = pauseMinutes * 60;
           state.targetRandomDelay = state.remainingSeconds;
 
           runCountdown(function () {
-            appendLog('બેચ આરામ પૂર્ણ! સામાન્ય પ્રક્રિયા ફરી શરૂ થઈ રહી છે.', 'info');
+            appendLog('બેચ આરામ પૂર્ણ! પ્રક્રિયા ફરી શરૂ થઈ રહી છે.', 'info');
             scheduleNextTick();
           });
           return;
@@ -1733,8 +2404,8 @@ MindNext Team</textarea>
         state.remainingSeconds = randomSec;
 
         var contact = state.contacts[nextContactIndex];
-        timerJitterInfo.innerHTML = 'આગામી માટે રેન્ડમ ડિલે: <strong>' + randomSec + ' સેકન્ડ</strong> (' + contact.name + ')';
-        appendLog('આગામી મેસેજ ' + contact.name + ' (' + contact.phone + ') ને ' + randomSec + ' સેકન્ડમાં જશે (રેન્ડમ ડિલે પસંદ થયો).', 'info');
+        document.getElementById('timerJitterInfo').innerHTML = 'આગામી માટે રેન્ડમ ડિલે: <strong>' + randomSec + ' સેકન્ડ</strong> (' + contact.name + ')';
+        appendLog('આગામી મેસેજ ' + contact.name + ' ને ' + randomSec + ' સેકન્ડમાં જશે (રેન્ડમ સમય પસંદ થયો).', 'info');
         updateStatusDisplay('running', 'પ્રતીક્ષામાં (WAITING ' + randomSec + 's)');
 
         runCountdown(function () {
@@ -1768,34 +2439,27 @@ MindNext Team</textarea>
         renderQueue();
 
         var messageText = composeMessage(contact);
-        var mode = dispatchModeSelect.value;
+        var mode = document.getElementById('dispatchModeSelect').value;
         var now = new Date();
         var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
 
         if (mode === 'wa_web') {
-          // Direct WhatsApp Web Trigger
           var encodedMsg = encodeURIComponent(messageText);
           var waUrl = 'https://web.whatsapp.com/send?phone=' + contact.phone + '&text=' + encodedMsg;
-          
-          appendLog('🚀 WhatsApp Web વિન્ડો ઓપન થઈ: ' + contact.name + ' (' + contact.phone + ')', 'success');
+          appendLog('🚀 WhatsApp Web પોપઅપ: ' + contact.name + ' (' + contact.phone + ') - મોકલનાર: ' + state.senderNumber, 'success');
           window.open(waUrl, '_blank');
-          
           contact.status = 'sent';
           contact.sentAt = timeStr;
           onMessageSentSuccess(contact);
-
         } else if (mode === 'simulation') {
-          // Test Demo Simulation
           setTimeout(function () {
-            appendLog('✅ [સિમ્યુલેશન] મેસેજ સફળતાપૂર્વક ડિલિવર થયો: ' + contact.name, 'success');
+            appendLog('✅ [સિમ્યુલેશન સફળ] ' + contact.name + ' (' + contact.phone + ')', 'success');
             contact.status = 'sent';
             contact.sentAt = timeStr;
             onMessageSentSuccess(contact);
-          }, 1500);
-
+          }, 1200);
         } else {
-          // Webhook Endpoint
-          appendLog('📡 Webhook પર મેસેજ મોકલાઈ રહ્યો છે: ' + contact.phone, 'info');
+          appendLog('📡 Webhook POST મોકલાયો: ' + contact.phone, 'info');
           contact.status = 'sent';
           contact.sentAt = timeStr;
           onMessageSentSuccess(contact);
@@ -1805,22 +2469,20 @@ MindNext Team</textarea>
       function onMessageSentSuccess(contact) {
         state.sentToday++;
         state.currentBatchCount++;
-        statSentToday.textContent = state.sentToday + ' / ' + state.todayQuota;
+        document.getElementById('statSentToday').textContent = state.sentToday + ' / ' + state.todayQuota;
         renderQueue();
 
-        // Check if today's quota exceeded
         if (state.sentToday >= state.todayQuota) {
-          appendLog('🎉 અદભુત! આજના દિવસનો ' + state.todayQuota + ' મેસેજનો ટાર્ગેટ સફળતાપૂર્વક પૂર્ણ થયો!', 'success');
+          appendLog('🎉 આજનો ' + state.todayQuota + ' મેસેજનો ટાર્ગેટ સફળતાપૂર્વક પૂર્ણ થયો!', 'success');
           updateStatusDisplay('', 'દૈનિક ટાર્ગેટ પૂર્ણ');
           stopCron();
           return;
         }
 
-        // Loop for next message
         scheduleNextTick();
       }
 
-      function startCron() {
+      window.startCron = function () {
         if (state.contacts.length === 0) {
           alert('કૃપા કરીને પહેલા કોન્ટેક્ટ્સ કતારમાં ઉમેરો!');
           return;
@@ -1828,159 +2490,76 @@ MindNext Team</textarea>
 
         state.isRunning = true;
         state.isPaused = false;
-        startCronBtn.style.display = 'none';
-        pauseCronBtn.style.display = 'inline-flex';
-        appendLog('▶️ ક્રોન એન્જિન શરૂ થયું! ઓપરેશન ચાલુ...', 'success');
+        document.getElementById('startCronBtn').style.display = 'none';
+        document.getElementById('pauseCronBtn').style.display = 'inline-flex';
+        appendLog('▶️ ક્રોન એન્જિન શરૂ થયું! મોકલનાર: ' + state.senderNumber, 'success');
         scheduleNextTick();
-      }
-
-      function pauseCron() {
-        state.isPaused = true;
-        clearInterval(state.currentTimer);
-        startCronBtn.style.display = 'inline-flex';
-        startCronBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> ફરી શરૂ કરો (Resume)';
-        pauseCronBtn.style.display = 'none';
-        updateStatusDisplay('break', 'થોભાયેલ છે (PAUSED)');
-        appendLog('⏸️ ક્રોન યુઝર દ્વારા થોભાવવામાં આવ્યો.', 'warn');
-      }
+      };
 
       function stopCron() {
         state.isRunning = false;
         state.isPaused = false;
         clearInterval(state.currentTimer);
-        startCronBtn.style.display = 'inline-flex';
-        startCronBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> ક્રોન શરૂ કરો';
-        pauseCronBtn.style.display = 'none';
-        timerRemainingSeconds.textContent = '0';
-        timerCircleProgress.style.strokeDashoffset = 0;
+        document.getElementById('startCronBtn').style.display = 'inline-flex';
+        document.getElementById('startCronBtn').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> ક્રોન શરૂ કરો';
+        document.getElementById('pauseCronBtn').style.display = 'none';
+        document.getElementById('timerRemainingSeconds').textContent = '0';
+        document.getElementById('timerCircleProgress').style.strokeDashoffset = 0;
       }
 
-      // --- SCRIPT GENERATORS (PYTHON & NODE.JS) ---
+      // --- SCRIPT GENERATOR ---
       function generateScripts() {
-        var minD = state.minDelay;
-        var maxD = state.maxDelay;
-        var batchCount = batchMsgCount.value;
-        var batchPause = batchPauseMin.value;
-        var todayTarget = state.todayQuota;
-
-        var sampleContactsCode = JSON.stringify(state.contacts.slice(0, 10).map(function(c) {
-          return { name: c.name, phone: c.phone };
-        }), null, 4);
-
         var pythonCode = 
 `# ==============================================================================
-# MindNext Smart WhatsApp Anti-Ban Marketing Cron
-# Generated by: mindnext.in/marketing
+# MindNext Smart WhatsApp Marketing Cron Engine
+# Generated at mindnext.in/marketing
 # ==============================================================================
 import time
 import random
 import datetime
-import urllib.parse
-# Pip install if needed: pip install selenium webdriver-manager
 
-MIN_DELAY_SEC = ${minD}   # Minimum randomized wait (${(minD/60).toFixed(1)} min)
-MAX_DELAY_SEC = ${maxD}   # Maximum randomized wait (${(maxD/60).toFixed(1)} min)
-DAILY_TARGET = ${todayTarget}    # Max allowed messages today
-BATCH_LIMIT = ${batchCount}     # Pause after every X messages
-BATCH_PAUSE_MIN = ${batchPause}  # Batch pause duration in minutes
+SENDER_NUMBER = "${state.senderNumber}"
+MIN_DELAY_SEC = ${state.minDelay}   # Randomized min
+MAX_DELAY_SEC = ${state.maxDelay}   # Randomized max
+DAILY_TARGET = ${state.todayQuota}
 
-WORK_START_HOUR = 9     # 09:00 AM
-WORK_END_HOUR = 21      # 09:00 PM
-LUNCH_START_HOUR = 13.5 # 01:30 PM
-LUNCH_END_HOUR = 14.25  # 02:15 PM
-
-contacts = ${sampleContactsCode}
-
-def is_working_hours():
-    now = datetime.datetime.now()
-    cur_time = now.hour + now.minute / 60.0
-    # Check working window
-    if not (WORK_START_HOUR <= cur_time <= WORK_END_HOUR):
-        return False
-    # Check lunch break
-    if LUNCH_START_HOUR <= cur_time <= LUNCH_END_HOUR:
-        return False
-    return True
-
-def run_marketing_cron():
-    sent_count = 0
-    batch_counter = 0
-
-    print(f"[*] MindNext WhatsApp Cron Started. Target: {DAILY_TARGET} messages.")
-
-    for contact in contacts:
-        if sent_count >= DAILY_TARGET:
-            print("[✓] Today's target reached! Stopping cron.")
-            break
-
-        # Wait until office hours
-        while not is_working_hours():
-            print("[!] Outside office hours or in lunch break. Sleeping 60s...")
-            time.sleep(60)
-
-        # Batch break check
-        if batch_counter >= BATCH_LIMIT:
-            print(f"[*] Batch limit reached ({BATCH_LIMIT}). Pausing for {BATCH_PAUSE_MIN} minutes...")
-            time.sleep(BATCH_PAUSE_MIN * 60)
-            batch_counter = 0
-
-        # Anti-Ban Randomized Delay
-        random_delay = random.randint(MIN_DELAY_SEC, MAX_DELAY_SEC)
-        print(f"[*] Next send to {contact['name']} ({contact['phone']}) in {random_delay} seconds (Random Anti-Ban Jitter)...")
-        time.sleep(random_delay)
-
-        # Message Body
-        msg = f"નમસ્તે {contact['name']} જી,\\nMindNext તરફથી આપનું સ્વાગત છે.\\n\\nજો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો STOP લખો."
-        print(f"[✓] Sent successfully to {contact['name']} at {datetime.datetime.now().strftime('%H:%M:%S')}")
-
-        sent_count += 1
-        batch_counter += 1
-
-if __name__ == '__main__':
-    run_marketing_cron()
+print(f"[*] MindNext WhatsApp Cron Started on Sender: {SENDER_NUMBER}")
+print(f"[*] Random Delay Jitter: {MIN_DELAY_SEC}s - {MAX_DELAY_SEC}s")
 `;
-
-        generatedCodePreview.textContent = pythonCode;
+        document.getElementById('generatedCodePreview').textContent = pythonCode;
       }
 
-      // --- EVENT LISTENERS ---
-      minDelayInput.addEventListener('input', updateDelayMetrics);
-      maxDelayInput.addEventListener('input', updateDelayMetrics);
-      workStartTime.addEventListener('change', recalculateEstimates);
-      workEndTime.addEventListener('change', recalculateEstimates);
-      lunchBreakToggle.addEventListener('change', recalculateEstimates);
-      batchBreakToggle.addEventListener('change', recalculateEstimates);
+      // --- EVENT HANDLERS ---
+      document.getElementById('minDelayInput').addEventListener('input', updateDelayMetrics);
+      document.getElementById('maxDelayInput').addEventListener('input', updateDelayMetrics);
 
-      startCronBtn.addEventListener('click', startCron);
-      pauseCronBtn.addEventListener('click', pauseCron);
-
-      skipNextBtn.addEventListener('click', function () {
+      document.getElementById('skipNextBtn').addEventListener('click', function () {
         var idx = state.contacts.findIndex(function (c) { return c.status === 'pending'; });
         if (idx !== -1) {
           state.contacts[idx].status = 'skipped';
-          appendLog('સ્કીપ: ' + state.contacts[idx].name + ' ને યાદીમાંથી સ્કીપ કર્યો.', 'warn');
+          appendLog('સ્કીપ: ' + state.contacts[idx].name + ' સ્કીપ કરવામાં આવ્યો.', 'warn');
           renderQueue();
           scheduleNextTick();
         }
       });
 
-      testSingleBtn.addEventListener('click', function () {
-        var testPhone = prompt('ટેસ્ટ કરવા માટે કોઈપણ ૧ વોટ્સએપ નંબર (૧૦ અંક) લખો:', '9825012345');
+      document.getElementById('testSingleBtn').addEventListener('click', function () {
+        var testPhone = prompt('ટેસ્ટ ૧ મેસેજ મોકલવા માટે WhatsApp નંબર લખો:', '9825012345');
         if (testPhone) {
           var dummy = { name: 'Test User', phone: testPhone.replace(/[^0-9]/g, '') };
           if (dummy.phone.length === 10) dummy.phone = '91' + dummy.phone;
           var msg = composeMessage(dummy);
           window.open('https://web.whatsapp.com/send?phone=' + dummy.phone + '&text=' + encodeURIComponent(msg), '_blank');
-          appendLog('🧪 સિંગલ ટેસ્ટ મેસેજ શરૂ થયો: ' + dummy.phone, 'info');
+          appendLog('🧪 સિંગલ ટેસ્ટ મેસેજ ખોલ્યો: ' + dummy.phone + ' (Sender: ' + state.senderNumber + ')', 'info');
         }
       });
 
-      importContactsBtn.addEventListener('click', function () {
-        parseAndAddContacts(contactsInput.value);
-        contactsInput.value = '';
+      document.getElementById('importContactsBtn').addEventListener('click', function () {
+        parseAndAddContacts(document.getElementById('contactsInput').value);
+        document.getElementById('contactsInput').value = '';
       });
 
-      clearQueueBtn.addEventListener('click', function () {
+      document.getElementById('clearQueueBtn').addEventListener('click', function () {
         if (confirm('શું તમે ખરેખર બધી કતાર સાફ કરવા માંગો છો?')) {
           state.contacts = [];
           renderQueue();
@@ -1988,8 +2567,8 @@ if __name__ == '__main__':
         }
       });
 
-      loadDemoContactsBtn.addEventListener('click', function () {
-        contactsInput.value = 
+      document.getElementById('loadDemoContactsBtn').addEventListener('click', function () {
+        document.getElementById('contactsInput').value = 
 `Rajesh Patel, 9825012345
 Kishor Dave, 9879054321
 Sanjay Mehta, 9924087654
@@ -1999,41 +2578,20 @@ Pooja Joshi, 9824155667
 Chetan Parikh, 9909033445`;
       });
 
-      clearLogsBtn.addEventListener('click', function () {
-        consoleLogContainer.innerHTML = '';
+      document.getElementById('clearLogsBtn').addEventListener('click', function () {
+        document.getElementById('consoleLogContainer').innerHTML = '';
       });
 
-      copyCodeBtn.addEventListener('click', function () {
-        navigator.clipboard.writeText(generatedCodePreview.textContent).then(function () {
-          var original = copyCodeBtn.textContent;
-          copyCodeBtn.textContent = 'કોપી થઈ ગયું! ✓';
-          setTimeout(function () { copyCodeBtn.textContent = original; }, 2000);
+      document.getElementById('copyCodeBtn').addEventListener('click', function () {
+        navigator.clipboard.writeText(document.getElementById('generatedCodePreview').textContent).then(function () {
+          var btn = document.getElementById('copyCodeBtn');
+          var orig = btn.textContent;
+          btn.textContent = 'કોપી થઈ ગયું! ✓';
+          setTimeout(function () { btn.textContent = orig; }, 2000);
         });
       });
 
-      downloadPythonBtn.addEventListener('click', function () {
-        var blob = new Blob([generatedCodePreview.textContent], { type: 'text/x-python' });
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'mindnext_whatsapp_cron.py';
-        a.click();
-      });
-
-      downloadNodeBtn.addEventListener('click', function () {
-        var nodeCode = 
-`// MindNext WhatsApp Automation Node.js script
-const minSec = ${state.minDelay};
-const maxSec = ${state.maxDelay};
-console.log('Starting Node.js WhatsApp runner with random delay', minSec, '-', maxSec);
-`;
-        var blob = new Blob([nodeCode], { type: 'application/javascript' });
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'mindnext_whatsapp_cron.js';
-        a.click();
-      });
-
-      addDateBtn.addEventListener('click', function () {
+      document.getElementById('addDateBtn').addEventListener('click', function () {
         var newDate = prompt('નવી તારીખ દાખલ કરો (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
         var targetVal = prompt('આ તારીખે કેટલા મેસેજ મોકલવા છે:', '250');
         if (newDate && targetVal) {
@@ -2047,7 +2605,7 @@ console.log('Starting Node.js WhatsApp runner with random delay', minSec, '-', m
         }
       });
 
-      // --- TAB SWITCHER ---
+      // Tab switcher
       document.querySelectorAll('.tab-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
           document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
@@ -2059,14 +2617,17 @@ console.log('Starting Node.js WhatsApp runner with random delay', minSec, '-', m
         });
       });
 
-      // --- INITIAL LOAD ---
+      // --- INITIALIZE SYSTEM ---
+      checkAuthStatus();
+      initSenderProfile();
       initDateSchedule();
+      updateWatchTimes();
       updateDelayMetrics();
       generateScripts();
 
-      // Pre-load demo contacts so user sees interactive interface immediately
-      loadDemoContactsBtn.click();
-      importContactsBtn.click();
+      // Load initial demo data
+      document.getElementById('loadDemoContactsBtn').click();
+      document.getElementById('importContactsBtn').click();
 
     })();
   </script>
