@@ -6,6 +6,10 @@ whatsapp-gateway/node_modules/
 whatsapp-gateway/session_auth/
 session_auth/
 
+# Database
+whatsapp-gateway/cron_db.json
+cron_db.json
+
 # Logs & temp
 *.log
 .DS_Store

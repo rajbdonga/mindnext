@@ -1,8 +1,8 @@
 /**
- * MindNext WhatsApp Background Gateway Server
+ * MindNext WhatsApp Background Gateway Server & Persistent Cron Engine
  * Powered by Baileys Multi-Device Engine
  * Runs locally on http://localhost:3001
- * Zero browser tabs needed - sends 100% in background.
+ * Zero browser tabs needed - runs 100% in backend even when tab/browser is closed!
  */
 
 const http = require('http');
@@ -20,18 +20,99 @@ const {
 
 const PORT = 3001;
 const AUTH_DIR = path.join(__dirname, 'session_auth');
+const DB_FILE = path.join(__dirname, 'cron_db.json');
 
 // Ensure auth dir exists
 if (!fs.existsSync(AUTH_DIR)) {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 }
 
+// -------------------------------------------------------------
+// PERSISTENT DATABASE ENGINE (cron_db.json)
+// -------------------------------------------------------------
+function loadCronDb() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+      // sanitize defaults
+      return {
+        isRunning: false, // Default idle on fresh restart until user or auto starts
+        isPaused: false,
+        senderNumber: data.senderNumber || '+91 94290 66805',
+        minDelay: data.minDelay || 120,
+        maxDelay: data.maxDelay || 180,
+        workStartHour: data.workStartHour || '09:00:00 AM',
+        workEndHour: data.workEndHour || '09:00:00 PM',
+        lunchBreakEnabled: data.lunchBreakEnabled !== undefined ? data.lunchBreakEnabled : true,
+        lunchStartHour: data.lunchStartHour || '01:30:00 PM',
+        lunchEndHour: data.lunchEndHour || '02:15:00 PM',
+        batchBreakEnabled: data.batchBreakEnabled !== undefined ? data.batchBreakEnabled : true,
+        batchMsgCount: data.batchMsgCount || 25,
+        batchPauseMin: data.batchPauseMin || 15,
+        campaignStartDate: data.campaignStartDate || new Date().toISOString().split('T')[0],
+        campaignEndDate: data.campaignEndDate || new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+        sentToday: data.sentToday || 0,
+        todayQuota: data.todayQuota || 250,
+        currentBatchCount: data.currentBatchCount || 0,
+        messageTemplate: data.messageTemplate || '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
+        stopOptOut: data.stopOptOut !== undefined ? data.stopOptOut : true,
+        contacts: Array.isArray(data.contacts) ? data.contacts : [],
+        dateSchedule: Array.isArray(data.dateSchedule) ? data.dateSchedule : [],
+        nextTickTimestamp: null,
+        targetRandomDelay: 150
+      };
+    }
+  } catch (e) {
+    console.error('Error loading cron_db.json:', e);
+  }
+  return {
+    isRunning: false,
+    isPaused: false,
+    senderNumber: '+91 94290 66805',
+    minDelay: 120,
+    maxDelay: 180,
+    workStartHour: '09:00:00 AM',
+    workEndHour: '09:00:00 PM',
+    lunchBreakEnabled: true,
+    lunchStartHour: '01:30:00 PM',
+    lunchEndHour: '02:15:00 PM',
+    batchBreakEnabled: true,
+    batchMsgCount: 25,
+    batchPauseMin: 15,
+    campaignStartDate: new Date().toISOString().split('T')[0],
+    campaignEndDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+    sentToday: 0,
+    todayQuota: 250,
+    currentBatchCount: 0,
+    messageTemplate: '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
+    stopOptOut: true,
+    contacts: [],
+    dateSchedule: [],
+    nextTickTimestamp: null,
+    targetRandomDelay: 150
+  };
+}
+
+let cronDb = loadCronDb();
+
+function saveCronDb() {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(cronDb, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Error saving cron_db.json:', e);
+  }
+}
+
+// -------------------------------------------------------------
+// WHATSAPP BAILEYS CLIENT STATE
+// -------------------------------------------------------------
 let sock = null;
 let currentQr = null;
 let currentQrDataUrl = null;
 let connectionStatus = 'initializing'; // initializing, qr_ready, connecting, connected, disconnected
 let connectedPhone = null;
 let reconnectTimer = null;
+let backendCronTimer = null;
 
 // Activity logs in memory
 const activityLogs = [];
@@ -41,7 +122,7 @@ function log(msg, type = 'info') {
   const entry = { time, msg, type };
   console.log(`[${time}] [${type.toUpperCase()}] ${msg}`);
   activityLogs.push(entry);
-  if (activityLogs.length > 200) activityLogs.shift();
+  if (activityLogs.length > 250) activityLogs.shift();
 }
 
 /**
@@ -60,7 +141,7 @@ async function startWhatsAppSocket() {
       version,
       logger: pino({ level: 'silent' }),
       auth: state,
-      printQRInTerminal: false, // We'll handle custom terminal & web QR
+      printQRInTerminal: false,
       browser: ['MindNext Marketing', 'Chrome', '1.0.0'],
       syncFullHistory: false
     });
@@ -118,6 +199,12 @@ async function startWhatsAppSocket() {
         const rawUser = sock?.user?.id || '';
         connectedPhone = rawUser.split(':')[0].replace(/[^0-9]/g, '');
         log(`🎉 WhatsApp સાથે સફળતાપૂર્વક કનેક્ટ થયું! નંબર: +${connectedPhone}`, 'success');
+
+        // If cron was running before reconnect, continue it
+        if (cronDb.isRunning && !cronDb.isPaused && !backendCronTimer) {
+          log('બેકગ્રાઉન્ડ ક્રોન ચાલુ અવસ્થામાં છે - શેડ્યુલર સક્રિય કર્યું.', 'info');
+          scheduleNextBackendTick();
+        }
       }
     });
 
@@ -135,14 +222,188 @@ async function startWhatsAppSocket() {
 function formatPhoneToJid(phone) {
   let clean = (phone || '').toString().replace(/[^0-9]/g, '');
   if (clean.length === 10) {
-    clean = '91' + clean; // Default to India
+    clean = '91' + clean;
   }
   return clean + '@s.whatsapp.net';
 }
 
-/**
- * HTTP Server handling CORS, /api/status, /api/send, and Web UI
- */
+// -------------------------------------------------------------
+// BACKEND CRON ENGINE (RUNS HEADLESSLY EVEN IF TABS ARE CLOSED)
+// -------------------------------------------------------------
+function calculateRandomDelay(min, max) {
+  min = Math.max(5, parseInt(min, 10) || 120);
+  max = Math.max(min, parseInt(max, 10) || 180);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function parseTimeString(tStr) {
+  if (!tStr) return null;
+  const parts = tStr.trim().split(' ');
+  const timeParts = parts[0].split(':');
+  let h = parseInt(timeParts[0], 10);
+  const m = parseInt(timeParts[1], 10);
+  const isPm = (parts[1] || '').toUpperCase() === 'PM';
+  if (isPm && h < 12) h += 12;
+  if (!isPm && h === 12) h = 0;
+  return h * 60 + m;
+}
+
+function isWithinWorkHours() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const startM = parseTimeString(cronDb.workStartHour) ?? (9 * 60);
+  const endM = parseTimeString(cronDb.workEndHour) ?? (21 * 60);
+
+  if (currentMinutes < startM || currentMinutes >= endM) {
+    return { ok: false, reason: 'કામકાજના કલાકો (Work Hours: 9 AM - 9 PM) ની બહાર છે.' };
+  }
+
+  if (cronDb.lunchBreakEnabled) {
+    const lStart = parseTimeString(cronDb.lunchStartHour) ?? (13 * 60 + 30);
+    const lEnd = parseTimeString(cronDb.lunchEndHour) ?? (14 * 60 + 15);
+    if (currentMinutes >= lStart && currentMinutes < lEnd) {
+      return { ok: false, reason: 'બપોરનો લંચ બ્રેક ચાલુ છે.' };
+    }
+  }
+
+  return { ok: true };
+}
+
+function composeMessage(template, contact, addStopOptOut) {
+  let text = template || '';
+  text = text.replace(/\{name\}/gi, contact.name || 'ગ્રાહક');
+  text = text.replace(/\{phone\}/gi, contact.phone || '');
+
+  // Spintax {A|B|C}
+  text = text.replace(/\{([^{}]+)\}/g, (match, choices) => {
+    const arr = choices.split('|');
+    return arr[Math.floor(Math.random() * arr.length)];
+  });
+
+  if (addStopOptOut) {
+    text += '\n\n---\nજો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો STOP લખી મોકલો.';
+  }
+  return text;
+}
+
+function scheduleNextBackendTick() {
+  clearTimeout(backendCronTimer);
+  backendCronTimer = null;
+
+  if (!cronDb.isRunning || cronDb.isPaused) return;
+
+  // 1. Quota check
+  if (cronDb.sentToday >= cronDb.todayQuota) {
+    log(`🎉 આજનો દૈનિક ટાર્ગેટ (${cronDb.todayQuota}) સફળતાપૂર્વક પૂર્ણ થયો!`, 'success');
+    cronDb.isRunning = false;
+    cronDb.nextTickTimestamp = null;
+    saveCronDb();
+    return;
+  }
+
+  // 2. Pending contact check
+  const nextContact = cronDb.contacts.find(c => c.status === 'pending');
+  if (!nextContact) {
+    log('🎉 કતારમાં રહેલા બધા જ કોન્ટેક્ટ્સ પ્રોસેસ થઈ ગયા છે!', 'success');
+    cronDb.isRunning = false;
+    cronDb.nextTickTimestamp = null;
+    saveCronDb();
+    return;
+  }
+
+  // 3. Work hours check
+  const hoursCheck = isWithinWorkHours();
+  if (!hoursCheck.ok) {
+    log(`⏳ ક્રોન પોઝ: ${hoursCheck.reason}. ૧ મિનિટ પછી ફરી પ્રયાસ કરીશું...`, 'warn');
+    cronDb.nextTickTimestamp = Date.now() + 60000;
+    saveCronDb();
+    backendCronTimer = setTimeout(scheduleNextBackendTick, 60000);
+    return;
+  }
+
+  // 4. Batch break check
+  if (cronDb.batchBreakEnabled && cronDb.currentBatchCount >= cronDb.batchMsgCount) {
+    const pauseMin = cronDb.batchPauseMin || 15;
+    const pauseMs = pauseMin * 60 * 1000;
+    log(`☕ બેચ પોઝ: ${cronDb.batchMsgCount} મેસેજ પૂરા થયા. ${pauseMin} મિનિટનો આરામ...`, 'info');
+    cronDb.currentBatchCount = 0;
+    cronDb.nextTickTimestamp = Date.now() + pauseMs;
+    saveCronDb();
+    backendCronTimer = setTimeout(scheduleNextBackendTick, pauseMs);
+    return;
+  }
+
+  // 5. Random Delay Jitter
+  const delaySec = calculateRandomDelay(cronDb.minDelay, cronDb.maxDelay);
+  cronDb.targetRandomDelay = delaySec;
+  cronDb.nextTickTimestamp = Date.now() + (delaySec * 1000);
+  saveCronDb();
+
+  log(`⏱️ આગામી મેસેજ ${nextContact.name} (${nextContact.phone}) ને ${delaySec} સેકન્ડમાં જશે (રેન્ડમ ડિલે)...`, 'info');
+
+  backendCronTimer = setTimeout(async () => {
+    if (!cronDb.isRunning || cronDb.isPaused) return;
+
+    try {
+      const jid = formatPhoneToJid(nextContact.phone);
+      const msgText = composeMessage(cronDb.messageTemplate, nextContact, cronDb.stopOptOut);
+
+      log(`⚡ [બેકગ્રાઉન્ડ ઓટો-મોકલ] ${nextContact.name} (${jid})...`, 'info');
+
+      if (connectionStatus === 'connected' && sock) {
+        const result = await sock.sendMessage(jid, { text: msgText });
+        const messageId = result?.key?.id || ('MN_' + Date.now());
+
+        nextContact.status = 'sent';
+        nextContact.sentAt = new Date().toLocaleTimeString();
+        nextContact.messageId = messageId;
+        cronDb.sentToday++;
+        cronDb.currentBatchCount++;
+
+        log(`✅ [ડિલિવર સફળ] ${nextContact.name} (${nextContact.phone}) - પ્રગતિ: ${cronDb.sentToday}/${cronDb.todayQuota} (ID: ${messageId})`, 'success');
+      } else {
+        log(`⚠️ WhatsApp કનેક્ટેડ નથી! મેસેજ સ્કીપ કરવામાં આવ્યો.`, 'error');
+        nextContact.status = 'failed';
+        nextContact.errorMsg = 'WhatsApp socket disconnected';
+      }
+    } catch (err) {
+      log(`❌ મોકલવામાં નિષ્ફળ (${nextContact.phone}): ${err.message}`, 'error');
+      nextContact.status = 'failed';
+      nextContact.errorMsg = err.message;
+    }
+
+    saveCronDb();
+    scheduleNextBackendTick();
+  }, delaySec * 1000);
+}
+
+function startBackendCron() {
+  if (cronDb.contacts.filter(c => c.status === 'pending').length === 0) {
+    return { success: false, error: 'કતારમાં કોઈ બાકી (pending) કોન્ટેક્ટ્સ નથી!' };
+  }
+  cronDb.isRunning = true;
+  cronDb.isPaused = false;
+  saveCronDb();
+  log(`▶️ બેકગ્રાઉન્ડ ક્રોન એન્જિન શરૂ થયું! મોકલનાર: ${cronDb.senderNumber} (Zero-Tab Mode)`, 'success');
+  scheduleNextBackendTick();
+  return { success: true, isRunning: true };
+}
+
+function stopBackendCron() {
+  cronDb.isRunning = false;
+  cronDb.isPaused = false;
+  cronDb.nextTickTimestamp = null;
+  clearTimeout(backendCronTimer);
+  backendCronTimer = null;
+  saveCronDb();
+  log('⏸️ બેકગ્રાઉન્ડ ક્રોન થોભાવવામાં આવ્યો.', 'warn');
+  return { success: true, isRunning: false };
+}
+
+// -------------------------------------------------------------
+// HTTP SERVER (CORS, REST API, & DASHBOARD)
+// -------------------------------------------------------------
 const server = http.createServer(async (req, res) => {
   // CORS Headers for mindnext.in
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -163,18 +424,156 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       status: 'online',
-      service: 'MindNext WhatsApp Background Gateway Engine',
+      service: 'MindNext WhatsApp Background Gateway & Cron Engine',
       port: PORT,
       connectionStatus,
       connectedPhone: connectedPhone ? `+${connectedPhone}` : null,
       hasQr: Boolean(currentQrDataUrl),
       qrDataUrl: currentQrDataUrl,
-      logs: activityLogs.slice(-20)
+      cronRunning: cronDb.isRunning,
+      sentToday: cronDb.sentToday,
+      todayQuota: cronDb.todayQuota,
+      totalContacts: cronDb.contacts.length,
+      pendingContacts: cronDb.contacts.filter(c => c.status === 'pending').length,
+      logs: activityLogs.slice(-25)
     }));
     return;
   }
 
-  // 2. Direct Background Send API
+  // 2. CRON DATABASE GET STATE API
+  if (req.method === 'GET' && pathname === '/api/cron/state') {
+    const remainingSec = cronDb.nextTickTimestamp 
+      ? Math.max(0, Math.round((cronDb.nextTickTimestamp - Date.now()) / 1000))
+      : 0;
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      state: cronDb,
+      connectionStatus,
+      connectedPhone: connectedPhone ? `+${connectedPhone}` : null,
+      remainingSec
+    }));
+    return;
+  }
+
+  // 3. CRON DATABASE SYNC / SAVE API
+  if (req.method === 'POST' && pathname === '/api/cron/sync') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+
+        // Merge incoming payload
+        if (Array.isArray(payload.contacts)) cronDb.contacts = payload.contacts;
+        if (payload.senderNumber) cronDb.senderNumber = payload.senderNumber;
+        if (payload.minDelay !== undefined) cronDb.minDelay = parseInt(payload.minDelay, 10);
+        if (payload.maxDelay !== undefined) cronDb.maxDelay = parseInt(payload.maxDelay, 10);
+        if (payload.workStartHour) cronDb.workStartHour = payload.workStartHour;
+        if (payload.workEndHour) cronDb.workEndHour = payload.workEndHour;
+        if (payload.lunchBreakEnabled !== undefined) cronDb.lunchBreakEnabled = Boolean(payload.lunchBreakEnabled);
+        if (payload.lunchStartHour) cronDb.lunchStartHour = payload.lunchStartHour;
+        if (payload.lunchEndHour) cronDb.lunchEndHour = payload.lunchEndHour;
+        if (payload.batchBreakEnabled !== undefined) cronDb.batchBreakEnabled = Boolean(payload.batchBreakEnabled);
+        if (payload.batchMsgCount !== undefined) cronDb.batchMsgCount = parseInt(payload.batchMsgCount, 10);
+        if (payload.batchPauseMin !== undefined) cronDb.batchPauseMin = parseInt(payload.batchPauseMin, 10);
+        if (payload.campaignStartDate) cronDb.campaignStartDate = payload.campaignStartDate;
+        if (payload.campaignEndDate) cronDb.campaignEndDate = payload.campaignEndDate;
+        if (payload.todayQuota !== undefined) cronDb.todayQuota = parseInt(payload.todayQuota, 10);
+        if (payload.messageTemplate !== undefined) cronDb.messageTemplate = payload.messageTemplate;
+        if (payload.stopOptOut !== undefined) cronDb.stopOptOut = Boolean(payload.stopOptOut);
+        if (Array.isArray(payload.dateSchedule)) cronDb.dateSchedule = payload.dateSchedule;
+
+        saveCronDb();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Database saved successfully', state: cronDb }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 4. CRON START API
+  if (req.method === 'POST' && pathname === '/api/cron/start') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        // If contacts or settings passed with start
+        if (Array.isArray(payload.contacts) && payload.contacts.length > 0) {
+          cronDb.contacts = payload.contacts;
+        }
+        if (payload.messageTemplate) cronDb.messageTemplate = payload.messageTemplate;
+        saveCronDb();
+
+        const result = startBackendCron();
+        res.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 5. CRON STOP API
+  if (req.method === 'POST' && pathname === '/api/cron/stop') {
+    const result = stopBackendCron();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(result));
+    return;
+  }
+
+  // 6. CLEAR SENT CONTACTS API
+  if (req.method === 'POST' && pathname === '/api/cron/clear-sent') {
+    cronDb.contacts = cronDb.contacts.filter(c => c.status !== 'sent');
+    saveCronDb();
+    log('મોકલાઈ ગયેલા કોન્ટેક્ટ્સ ડેટાબેઝમાંથી સાફ કર્યા.', 'info');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, contacts: cronDb.contacts }));
+    return;
+  }
+
+  // 7. CLEAR ALL CONTACTS API
+  if (req.method === 'POST' && pathname === '/api/cron/clear-all') {
+    cronDb.contacts = [];
+    stopBackendCron();
+    saveCronDb();
+    log('બધી કતાર ડેટાબેઝમાંથી સાફ કરી.', 'warn');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, contacts: [] }));
+    return;
+  }
+
+  // 8. REMOVE SINGLE CONTACT API
+  if (req.method === 'POST' && pathname === '/api/cron/remove-contact') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const { phone, index } = JSON.parse(body || '{}');
+        if (phone) {
+          cronDb.contacts = cronDb.contacts.filter(c => c.phone.replace(/[^0-9]/g, '') !== phone.toString().replace(/[^0-9]/g, ''));
+        } else if (index !== undefined) {
+          cronDb.contacts.splice(index, 1);
+        }
+        saveCronDb();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, contacts: cronDb.contacts }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 9. Direct Single Background Send API (for 🧪 Single Test button)
   if (req.method === 'POST' && pathname === '/api/send') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -191,7 +590,6 @@ const server = http.createServer(async (req, res) => {
 
         const cleanPhone = phone.toString().replace(/[^0-9]/g, '');
 
-        // If simulation requested or dry-run
         if (simulate) {
           log(`[સિમ્યુલેશન] ${cleanPhone} પર મેસેજ મોકલાયો`, 'info');
           res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -205,7 +603,6 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        // Check if WhatsApp socket is ready
         if (connectionStatus !== 'connected' || !sock) {
           log(`ડિસ્પેચ નિષ્ફળ: WhatsApp કનેક્ટેડ નથી (Status: ${connectionStatus})`, 'error');
           res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -219,9 +616,8 @@ const server = http.createServer(async (req, res) => {
         }
 
         const jid = formatPhoneToJid(phone);
-        log(`ઓટો-મેસેજ મોકલી રહ્યા છીએ: ${jid} (મોકલનાર: ${sender || connectedPhone || 'Default'})`, 'info');
+        log(`સિંગલ મેસેજ મોકલી રહ્યા છીએ: ${jid} (મોકલનાર: ${sender || connectedPhone || 'Default'})`, 'info');
 
-        // Real WhatsApp dispatch via Baileys MultiDevice socket
         const result = await sock.sendMessage(jid, { text: message });
         const messageId = result?.key?.id || ('MN_' + Date.now());
 
@@ -245,14 +641,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. Web UI Dashboard on http://localhost:3001/
+  // 10. Web UI Dashboard on http://localhost:3001/
   if (req.method === 'GET' && (pathname === '/' || pathname === '/index.html')) {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(renderWebDashboard());
     return;
   }
 
-  // 4. Logout / Reset API
+  // 11. Logout / Reset Session API
   if (req.method === 'POST' && pathname === '/api/logout') {
     try {
       if (sock) {
@@ -400,19 +796,48 @@ function renderWebDashboard() {
     .log-line.success { color: #25d366; }
     .log-line.error { color: #ff5252; }
     .log-line.warn { color: #ffb142; }
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 15px;
+      justify-content: center;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.04);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-val { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .stat-lbl { font-size: 0.72rem; color: var(--muted); }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>⚡ MindNext WhatsApp Background Gateway</h1>
-      <p>Zero Browser Tabs • Pure Background Auto-Delivery • Port 3001</p>
+      <h1>⚡ MindNext WhatsApp Background Gateway & Cron Engine</h1>
+      <p>Zero Browser Tabs • Persistent Database (cron_db.json) • Port 3001</p>
     </div>
 
     <div class="card" style="text-align: center;">
       <div id="statusContainer">
-        <!-- Replaced dynamically via JS -->
         <p>કનેક્શન સ્ટેટસ તપાસી રહ્યા છીએ...</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-val" id="cronStatusText">IDLE</div>
+          <div class="stat-lbl">ક્રોન સ્થિતિ</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="sentTodayCount">0 / 250</div>
+          <div class="stat-lbl">આજે મોકલેલ મેસેજ</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="pendingCount">0</div>
+          <div class="stat-lbl">કતારમાં બાકી</div>
+        </div>
       </div>
 
       <div id="qrContainer" style="display: none; margin-top: 15px;">
@@ -431,9 +856,9 @@ function renderWebDashboard() {
       </div>
 
       <div id="connectedContainer" style="display: none; margin-top: 15px;">
-        <h3 style="color: #25d366; font-size: 1.2rem; margin-bottom: 10px;">🎉 WhatsApp સફળતાપૂર્વક કનેક્ટેડ છે!</h3>
-        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 15px;">
-          હવે <strong>mindnext.in/marketing</strong> પરથી મોકલાતા તમામ મેસેજ કોઈ પણ બ્રાઉઝર ટેબ ખોલ્યા વગર બેકગ્રાઉન્ડમાંથી સીધા આ નંબર પરથી આપોઆપ ડિલિવર થશે.
+        <h3 style="color: #25d366; font-size: 1.2rem; margin-bottom: 8px;">🎉 WhatsApp સફળતાપૂર્વક કનેક્ટેડ છે!</h3>
+        <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 15px;">
+          હવે <strong>mindnext.in/marketing</strong> પરથી ક્રોન ચાલુ કરીને તમે <strong>બ્રાઉઝર ટેબ બંધ કરી દેશો તો પણ</strong> બેકગ્રાઉન્ડ સર્વરમાંથી આપમેળે મેસેજ જવાનું ચાલુ રહેશે.
         </p>
         <button class="btn btn-danger" onclick="logoutSession()">સત્ર લોગઆઉટ / રીસેટ કરો</button>
       </div>
@@ -470,6 +895,10 @@ function renderWebDashboard() {
         const qrContainer = document.getElementById('qrContainer');
         const connectedContainer = document.getElementById('connectedContainer');
 
+        document.getElementById('cronStatusText').textContent = data.cronRunning ? '🟢 RUNNING' : 'IDLE';
+        document.getElementById('sentTodayCount').textContent = data.sentToday + ' / ' + data.todayQuota;
+        document.getElementById('pendingCount').textContent = data.pendingContacts + ' બાકી';
+
         if (data.connectionStatus === 'connected') {
           statusContainer.innerHTML = '<span class="status-badge status-connected">🟢 ઓનલાઈન & કનેક્ટેડ: ' + (data.connectedPhone || 'WhatsApp') + '</span>';
           qrContainer.style.display = 'none';
@@ -478,7 +907,6 @@ function renderWebDashboard() {
           statusContainer.innerHTML = '<span class="status-badge status-qr">📲 QR કોડ સ્કેનની રાહ જોવાઈ રહી છે</span>';
           qrContainer.style.display = 'block';
           connectedContainer.style.display = 'none';
-          // Fetch current QR
           if (data.qrDataUrl) {
             document.getElementById('qrImage').src = data.qrDataUrl;
           }
@@ -488,7 +916,6 @@ function renderWebDashboard() {
           connectedContainer.style.display = 'none';
         }
 
-        // Render logs
         const logBox = document.getElementById('logBox');
         logBox.innerHTML = data.logs.map(l => '<div class="log-line ' + l.type + '">[' + l.time + '] ' + l.msg + '</div>').join('');
         logBox.scrollTop = logBox.scrollHeight;
@@ -497,7 +924,6 @@ function renderWebDashboard() {
       }
     }
 
-    // Refresh status every 3 seconds
     setInterval(fetchStatus, 3000);
     fetchStatus();
 
@@ -542,10 +968,10 @@ function renderWebDashboard() {
 // Start server
 server.listen(PORT, () => {
   console.log('================================================================');
-  console.log(` ⚡ MindNext WhatsApp Background Gateway Server is RUNNING!`);
+  console.log(` ⚡ MindNext WhatsApp Background Gateway & Cron Engine RUNNING!`);
   console.log(` 🌐 Gateway Dashboard: http://localhost:${PORT}`);
   console.log(` 📡 Status API: http://localhost:${PORT}/api/status`);
-  console.log(` 🚀 Send API: http://localhost:${PORT}/api/send`);
+  console.log(` 🗄️ Database: ${DB_FILE}`);
   console.log(` 🛡️ Zero Tabs Active for https://mindnext.in/marketing`);
   console.log('================================================================');
   log('Gateway Server શરૂ થયું. Baileys સોકેટ ઇનિશિયલાઇઝ થઈ રહ્યું છે...', 'info');

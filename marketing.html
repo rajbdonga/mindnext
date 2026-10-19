@@ -2316,6 +2316,8 @@ MindNext Team</textarea>
           appendLog('🗑️ કતારમાંથી ' + removed.name + ' (' + removed.phone + ') ને હટાવી દેવામાં આવ્યો.', 'warn');
           renderQueue();
           generateScripts();
+          saveLocalStateBackup();
+          syncStateToBackend();
         }
       };
 
@@ -2327,6 +2329,8 @@ MindNext Team</textarea>
           appendLog('🧹 મોકલાઈ ગયેલા ' + removedCount + ' નંબરો કતારમાંથી સાફ કરવામાં આવ્યા.', 'info');
           renderQueue();
           generateScripts();
+          saveLocalStateBackup();
+          syncStateToBackend();
         } else {
           alert('કતારમાં કોઈ મોકલાયેલા (Sent) મેસેજ નથી.');
         }
@@ -2361,6 +2365,8 @@ MindNext Team</textarea>
           appendLog(added + ' નવા કોન્ટેક્ટ્સ કતારમાં ઉમેરાયા.', 'success');
           renderQueue();
           generateScripts();
+          saveLocalStateBackup();
+          syncStateToBackend();
         } else {
           alert('કૃપા કરીને માન્ય મોબાઈલ નંબરો દાખલ કરો.');
         }
@@ -2654,29 +2660,226 @@ MindNext Team</textarea>
         scheduleNextTick();
       }
 
-      window.startCron = function () {
+      var STORAGE_KEY_STATE_BACKUP = 'mn_marketing_cron_db_v2';
+
+      function saveLocalStateBackup() {
+        try {
+          var snapshot = {
+            contacts: state.contacts,
+            senderNumber: state.senderNumber,
+            minDelay: state.minDelay,
+            maxDelay: state.maxDelay,
+            workStartHour: state.workStartHour,
+            workEndHour: state.workEndHour,
+            lunchBreakEnabled: state.lunchBreakEnabled,
+            lunchStartHour: state.lunchStartHour,
+            lunchEndHour: state.lunchEndHour,
+            batchBreakEnabled: state.batchBreakEnabled,
+            batchMsgCount: state.batchMsgCount,
+            batchPauseMin: state.batchPauseMin,
+            campaignStartDate: state.campaignStartDate,
+            campaignEndDate: state.campaignEndDate,
+            sentToday: state.sentToday,
+            todayQuota: state.todayQuota,
+            messageTemplate: document.getElementById('messageTemplate') ? document.getElementById('messageTemplate').value : '',
+            stopOptOut: document.getElementById('stopOptOutToggle') ? document.getElementById('stopOptOutToggle').checked : true
+          };
+          localStorage.setItem(STORAGE_KEY_STATE_BACKUP, JSON.stringify(snapshot));
+        } catch (e) {}
+      }
+
+      function loadLocalStateBackup() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY_STATE_BACKUP);
+          if (!raw) return false;
+          var saved = JSON.parse(raw);
+          if (Array.isArray(saved.contacts) && saved.contacts.length > 0) {
+            state.contacts = saved.contacts;
+          }
+          if (saved.sentToday !== undefined) state.sentToday = saved.sentToday;
+          if (saved.todayQuota) state.todayQuota = saved.todayQuota;
+          if (saved.minDelay) state.minDelay = saved.minDelay;
+          if (saved.maxDelay) state.maxDelay = saved.maxDelay;
+          if (saved.senderNumber) state.senderNumber = saved.senderNumber;
+          if (saved.messageTemplate && document.getElementById('messageTemplate')) {
+            document.getElementById('messageTemplate').value = saved.messageTemplate;
+          }
+          renderQueue();
+          document.getElementById('statSentToday').textContent = state.sentToday + ' / ' + state.todayQuota;
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      async function syncStateToBackend(baseUrl) {
+        var base = baseUrl;
+        if (!base) {
+          var urlIn = document.getElementById('gatewayEndpointUrl');
+          base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
+        }
+        try {
+          var payload = {
+            contacts: state.contacts,
+            senderNumber: state.senderNumber,
+            minDelay: state.minDelay,
+            maxDelay: state.maxDelay,
+            workStartHour: state.workStartHour,
+            workEndHour: state.workEndHour,
+            lunchBreakEnabled: state.lunchBreakEnabled,
+            lunchStartHour: state.lunchStartHour,
+            lunchEndHour: state.lunchEndHour,
+            batchBreakEnabled: state.batchBreakEnabled,
+            batchMsgCount: state.batchMsgCount,
+            batchPauseMin: state.batchPauseMin,
+            campaignStartDate: state.campaignStartDate,
+            campaignEndDate: state.campaignEndDate,
+            sentToday: state.sentToday,
+            todayQuota: state.todayQuota,
+            messageTemplate: document.getElementById('messageTemplate') ? document.getElementById('messageTemplate').value : '',
+            stopOptOut: document.getElementById('stopOptOutToggle') ? document.getElementById('stopOptOutToggle').checked : true
+          };
+          await fetch(base + '/api/cron/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (e) {}
+        saveLocalStateBackup();
+      }
+
+      async function syncStateFromBackend(silent) {
+        var urlIn = document.getElementById('gatewayEndpointUrl');
+        var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
+        try {
+          var res = await fetch(base + '/api/cron/state', { cache: 'no-cache' });
+          if (!res.ok) return false;
+          var data = await res.json();
+          if (!data.success || !data.state) return false;
+
+          var bState = data.state;
+
+          // If backend has contacts, restore them
+          if (Array.isArray(bState.contacts) && bState.contacts.length > 0) {
+            var changed = (state.contacts.length !== bState.contacts.length) || 
+                          (JSON.stringify(state.contacts.map(c=>c.status)) !== JSON.stringify(bState.contacts.map(c=>c.status)));
+            state.contacts = bState.contacts;
+            if (changed) renderQueue();
+          }
+
+          state.sentToday = bState.sentToday || 0;
+          state.todayQuota = bState.todayQuota || 250;
+          document.getElementById('statSentToday').textContent = state.sentToday + ' / ' + state.todayQuota;
+
+          if (!silent) {
+            if (bState.minDelay) state.minDelay = bState.minDelay;
+            if (bState.maxDelay) state.maxDelay = bState.maxDelay;
+            if (bState.senderNumber) state.senderNumber = bState.senderNumber;
+            if (bState.messageTemplate && document.getElementById('messageTemplate')) {
+              document.getElementById('messageTemplate').value = bState.messageTemplate;
+            }
+            if (document.getElementById('minDelayInput')) document.getElementById('minDelayInput').value = state.minDelay;
+            if (document.getElementById('maxDelayInput')) document.getElementById('maxDelayInput').value = state.maxDelay;
+          }
+
+          // If backend cron is running
+          if (bState.isRunning && !bState.isPaused) {
+            state.isRunning = true;
+            state.isPaused = false;
+            document.getElementById('startCronBtn').style.display = 'none';
+            document.getElementById('pauseCronBtn').style.display = 'inline-flex';
+            updateStatusDisplay('running', 'બેકગ્રાઉન્ડ સક્રિય (RUNNING)');
+
+            if (data.remainingSec !== undefined) {
+              updateTimerProgress(data.remainingSec, bState.targetRandomDelay || 150);
+            }
+          } else if (state.isRunning && !bState.isRunning) {
+            stopCron();
+          }
+
+          saveLocalStateBackup();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      window.requestStopCron = function () {
+        if (confirm('શું તમે ખરેખર ક્રોન થોભાવવા (Pause કરવા) માંગો છો? બાકી રહેલા મેસેજ અટકી જશે.')) {
+          stopCron();
+        }
+      };
+
+      window.startCron = async function () {
         if (state.contacts.length === 0) {
           alert('કૃપા કરીને પહેલા કોન્ટેક્ટ્સ કતારમાં ઉમેરો!');
           return;
         }
 
+        var mode = document.getElementById('dispatchModeSelect').value;
+        if (mode === 'backend_gateway') {
+          var urlIn = document.getElementById('gatewayEndpointUrl');
+          var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
+
+          // Sync first to save latest contacts to cron_db.json
+          await syncStateToBackend(base);
+
+          try {
+            var res = await fetch(base + '/api/cron/start', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contacts: state.contacts,
+                messageTemplate: document.getElementById('messageTemplate').value
+              })
+            });
+            var data = await res.json();
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || 'Backend failed to start');
+            }
+
+            state.isRunning = true;
+            state.isPaused = false;
+            document.getElementById('startCronBtn').style.display = 'none';
+            document.getElementById('pauseCronBtn').style.display = 'inline-flex';
+            updateStatusDisplay('running', 'બેકગ્રાઉન્ડ સક્રિય (RUNNING)');
+            appendLog('▶️ બેકગ્રાઉન્ડ ક્રોન એન્જિન શરૂ થયું! તમે આ બ્રાઉઝર ટેબ બંધ કરી દેશો તો પણ સર્વરમાંથી મેસેજ જવાનું ચાલુ રહેશે.', 'success');
+            saveLocalStateBackup();
+            return;
+          } catch (err) {
+            appendLog('⚠️ બેકગ્રાઉન્ડ ક્રોન એરર: ' + err.message + '. લોકલ બ્રાઉઝરમાં ચલાવી રહ્યા છીએ.', 'warn');
+          }
+        }
+
+        // Local Browser Fallback (e.g. for demo or simulation)
         state.isRunning = true;
         state.isPaused = false;
         document.getElementById('startCronBtn').style.display = 'none';
         document.getElementById('pauseCronBtn').style.display = 'inline-flex';
         appendLog('▶️ ક્રોન એન્જિન શરૂ થયું! મોકલનાર: ' + state.senderNumber, 'success');
         scheduleNextTick();
+        saveLocalStateBackup();
       };
 
       function stopCron() {
         state.isRunning = false;
         state.isPaused = false;
         clearInterval(state.currentTimer);
+
+        var mode = document.getElementById('dispatchModeSelect').value;
+        if (mode === 'backend_gateway') {
+          var urlIn = document.getElementById('gatewayEndpointUrl');
+          var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
+          fetch(base + '/api/cron/stop', { method: 'POST' }).catch(function(){});
+        }
+
         document.getElementById('startCronBtn').style.display = 'inline-flex';
         document.getElementById('startCronBtn').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> ક્રોન શરૂ કરો';
         document.getElementById('pauseCronBtn').style.display = 'none';
         document.getElementById('timerRemainingSeconds').textContent = '0';
         document.getElementById('timerCircleProgress').style.strokeDashoffset = 0;
+        updateStatusDisplay('', 'ક્રોન થોભાવેલ છે (PAUSED)');
+        saveLocalStateBackup();
       }
 
       // --- SCRIPT GENERATOR ---
@@ -2800,6 +3003,8 @@ print(f"[*] Random Delay Jitter: {MIN_DELAY_SEC}s - {MAX_DELAY_SEC}s")
           state.contacts = [];
           renderQueue();
           appendLog('કતાર સાફ કરવામાં આવી.', 'warn');
+          saveLocalStateBackup();
+          syncStateToBackend();
         }
       });
 
@@ -2861,14 +3066,25 @@ Chetan Parikh, 9909033445`;
       updateDelayMetrics();
       generateScripts();
 
-      // Load initial demo data
-      document.getElementById('loadDemoContactsBtn').click();
-      document.getElementById('importContactsBtn').click();
-
-      // Check local gateway status
-      setTimeout(function () {
+      // Load persistent state from backend database (or local storage backup)
+      syncStateFromBackend().then(function (loadedFromBackend) {
+        if (!loadedFromBackend) {
+          var loadedFromLocal = loadLocalStateBackup();
+          if (!loadedFromLocal && state.contacts.length === 0) {
+            // First time visit with zero saved contacts
+            document.getElementById('loadDemoContactsBtn').click();
+            document.getElementById('importContactsBtn').click();
+          }
+        }
         pingGatewayServer();
-      }, 500);
+      });
+
+      // Poll backend state every 3 seconds for live zero-tab sync
+      setInterval(function () {
+        if (document.getElementById('dispatchModeSelect').value === 'backend_gateway') {
+          syncStateFromBackend(true);
+        }
+      }, 3000);
 
     })();
   </script>
