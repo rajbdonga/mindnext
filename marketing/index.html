@@ -1683,9 +1683,10 @@
                   <button class="btn btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.72rem;" id="loadDemoContactsBtn">સેમ્પલ ડેટા ભરો</button>
                 </label>
                 <textarea class="form-control" id="contactsInput" placeholder="Rajesh Patel, 9825012345&#10;Amit Shah, 9879054321&#10;Pooja Dave, 919876543210"></textarea>
-                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
                   <button class="btn btn-secondary" style="width: auto;" id="importContactsBtn">કતારમાં ઉમેરો (+ Add)</button>
-                  <button class="btn btn-danger" style="width: auto;" id="clearQueueBtn">કતાર સાફ કરો</button>
+                  <button class="btn btn-secondary" style="width: auto;" id="clearSentBtn" onclick="clearSentContacts()">મોકલાઈ ગયેલા સાફ કરો</button>
+                  <button class="btn btn-danger" style="width: auto;" id="clearQueueBtn">બધી કતાર સાફ કરો</button>
                 </div>
               </div>
 
@@ -1698,6 +1699,7 @@
                       <th>નંબર</th>
                       <th>સ્થિતિ</th>
                       <th>મોકલેલ સમય</th>
+                      <th>એક્શન (Action)</th>
                     </tr>
                   </thead>
                   <tbody id="queueTableBody"></tbody>
@@ -2257,7 +2259,7 @@ MindNext Team</textarea>
         var pendingCount = 0;
 
         if (state.contacts.length === 0) {
-          body.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">કોઈ કોન્ટેક્ટ્સ ઉમેરેલા નથી.</td></tr>';
+          body.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">કોઈ કોન્ટેક્ટ્સ ઉમેરેલા નથી. ઉપર નંબર નાખી \'કતારમાં ઉમેરો\' દબાવો.</td></tr>';
           document.getElementById('statQueueCount').textContent = '0';
           document.getElementById('queueCountBadge').textContent = '0';
           return;
@@ -2271,7 +2273,8 @@ MindNext Team</textarea>
             '<td><strong>' + escapeHtml(c.name) + '</strong></td>' +
             '<td><code>' + escapeHtml(c.phone) + '</code></td>' +
             '<td><span class="queue-pill ' + c.status + '">' + c.status.toUpperCase() + '</span></td>' +
-            '<td>' + (c.sentAt || '-') + '</td>';
+            '<td>' + (c.sentAt || '-') + '</td>' +
+            '<td><button class="btn btn-danger" style="width: auto; padding: 4px 10px; font-size: 0.72rem; border-radius: 6px;" onclick="window.removeContactFromQueue(' + index + ')" title="આ નંબર કતારમાંથી કાઢી નાખો">🗑️ રિમૂવ</button></td>';
           body.appendChild(tr);
         });
 
@@ -2279,6 +2282,28 @@ MindNext Team</textarea>
         document.getElementById('queueCountBadge').textContent = pendingCount;
         recalculateEstimates();
       }
+
+      window.removeContactFromQueue = function (index) {
+        if (index >= 0 && index < state.contacts.length) {
+          var removed = state.contacts.splice(index, 1)[0];
+          appendLog('🗑️ કતારમાંથી ' + removed.name + ' (' + removed.phone + ') ને હટાવી દેવામાં આવ્યો.', 'warn');
+          renderQueue();
+          generateScripts();
+        }
+      };
+
+      window.clearSentContacts = function () {
+        var before = state.contacts.length;
+        state.contacts = state.contacts.filter(function (c) { return c.status !== 'sent'; });
+        var removedCount = before - state.contacts.length;
+        if (removedCount > 0) {
+          appendLog('🧹 મોકલાઈ ગયેલા ' + removedCount + ' નંબરો કતારમાંથી સાફ કરવામાં આવ્યા.', 'info');
+          renderQueue();
+          generateScripts();
+        } else {
+          alert('કતારમાં કોઈ મોકલાયેલા (Sent) મેસેજ નથી.');
+        }
+      };
 
       function parseAndAddContacts(rawText) {
         var lines = rawText.split(/\r?\n/);
