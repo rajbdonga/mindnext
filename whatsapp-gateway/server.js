@@ -36,8 +36,8 @@ function loadCronDb() {
       const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
       // sanitize defaults
       return {
-        isRunning: false, // Default idle on fresh restart until user or auto starts
-        isPaused: false,
+        isRunning: Boolean(data.isRunning),
+        isPaused: Boolean(data.isPaused),
         senderNumber: data.senderNumber || '+91 94290 66805',
         minDelay: data.minDelay || 120,
         maxDelay: data.maxDelay || 180,
@@ -57,6 +57,7 @@ function loadCronDb() {
         messageTemplate: data.messageTemplate || '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
         stopOptOut: data.stopOptOut !== undefined ? data.stopOptOut : true,
         contacts: Array.isArray(data.contacts) ? data.contacts : [],
+        offDates: Array.isArray(data.offDates) ? data.offDates : [],
         dateSchedule: Array.isArray(data.dateSchedule) ? data.dateSchedule : [],
         nextTickTimestamp: null,
         targetRandomDelay: 150
@@ -293,7 +294,26 @@ function scheduleNextBackendTick() {
 
   if (!cronDb.isRunning || cronDb.isPaused) return;
 
-  // 1. Quota check
+  // 1. Off-Dates check (Holidays / Skip days)
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (Array.isArray(cronDb.offDates) && cronDb.offDates.includes(todayStr)) {
+    log(`⏸️ આજે રજાનો દિવસ (Off Day: ${todayStr}) હોવાથી ક્રોન થોભાયેલ છે. આવતીકાલે સવારે ફરી તપાસ થશે.`, 'warn');
+    cronDb.nextTickTimestamp = Date.now() + 3600000;
+    saveCronDb();
+    backendCronTimer = setTimeout(scheduleNextBackendTick, 3600000);
+    return;
+  }
+
+  // 2. Campaign End Date check
+  if (cronDb.campaignEndDate && todayStr > cronDb.campaignEndDate) {
+    log(`🏁 ક્રોન નિર્ધારિત અંતિમ તારીખ (${cronDb.campaignEndDate}) સુધી પહોંચી ગયો છે! અભિયાન પૂર્ણ થયું.`, 'success');
+    cronDb.isRunning = false;
+    cronDb.nextTickTimestamp = null;
+    saveCronDb();
+    return;
+  }
+
+  // 3. Quota check
   if (cronDb.sentToday >= cronDb.todayQuota) {
     log(`🎉 આજનો દૈનિક ટાર્ગેટ (${cronDb.todayQuota}) સફળતાપૂર્વક પૂર્ણ થયો!`, 'success');
     cronDb.isRunning = false;
@@ -302,7 +322,7 @@ function scheduleNextBackendTick() {
     return;
   }
 
-  // 2. Pending contact check
+  // 4. Pending contact check
   const nextContact = cronDb.contacts.find(c => c.status === 'pending');
   if (!nextContact) {
     log('🎉 કતારમાં રહેલા બધા જ કોન્ટેક્ટ્સ પ્રોસેસ થઈ ગયા છે!', 'success');
@@ -312,7 +332,7 @@ function scheduleNextBackendTick() {
     return;
   }
 
-  // 3. Work hours check
+  // 5. Work hours check
   const hoursCheck = isWithinWorkHours();
   if (!hoursCheck.ok) {
     log(`⏳ ક્રોન પોઝ: ${hoursCheck.reason}. ૧ મિનિટ પછી ફરી પ્રયાસ કરીશું...`, 'warn');
@@ -322,7 +342,7 @@ function scheduleNextBackendTick() {
     return;
   }
 
-  // 4. Batch break check
+  // 6. Batch break check
   if (cronDb.batchBreakEnabled && cronDb.currentBatchCount >= cronDb.batchMsgCount) {
     const pauseMin = cronDb.batchPauseMin || 15;
     const pauseMs = pauseMin * 60 * 1000;
@@ -334,7 +354,7 @@ function scheduleNextBackendTick() {
     return;
   }
 
-  // 5. Random Delay Jitter
+  // 7. Random Delay Jitter
   const delaySec = calculateRandomDelay(cronDb.minDelay, cronDb.maxDelay);
   cronDb.targetRandomDelay = delaySec;
   cronDb.nextTickTimestamp = Date.now() + (delaySec * 1000);
@@ -379,6 +399,9 @@ function scheduleNextBackendTick() {
 }
 
 function startBackendCron() {
+  if (cronDb.isRunning && !cronDb.isPaused) {
+    return { success: false, error: 'ક્રોન પહેલેથી જ બેકગ્રાઉન્ડમાં સક્રિય (RUNNING) છે! એક સાથે બે ક્રોન ચલાવી શકાતા નથી.' };
+  }
   if (cronDb.contacts.filter(c => c.status === 'pending').length === 0) {
     return { success: false, error: 'કતારમાં કોઈ બાકી (pending) કોન્ટેક્ટ્સ નથી!' };
   }
@@ -483,6 +506,7 @@ const server = http.createServer(async (req, res) => {
         if (payload.todayQuota !== undefined) cronDb.todayQuota = parseInt(payload.todayQuota, 10);
         if (payload.messageTemplate !== undefined) cronDb.messageTemplate = payload.messageTemplate;
         if (payload.stopOptOut !== undefined) cronDb.stopOptOut = Boolean(payload.stopOptOut);
+        if (Array.isArray(payload.offDates)) cronDb.offDates = payload.offDates;
         if (Array.isArray(payload.dateSchedule)) cronDb.dateSchedule = payload.dateSchedule;
 
         saveCronDb();
@@ -502,12 +526,24 @@ const server = http.createServer(async (req, res) => {
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
       try {
+        if (cronDb.isRunning && !cronDb.isPaused && backendCronTimer) {
+          res.writeHead(409, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ 
+            success: false, 
+            error: 'ક્રોન પહેલેથી જ બેકગ્રાઉન્ડમાં સક્રિય (RUNNING) છે! એક સાથે બે ક્રોન શરૂ કરી શકાતા નથી.' 
+          }));
+          return;
+        }
+
         const payload = JSON.parse(body || '{}');
-        // If contacts or settings passed with start
         if (Array.isArray(payload.contacts) && payload.contacts.length > 0) {
           cronDb.contacts = payload.contacts;
         }
         if (payload.messageTemplate) cronDb.messageTemplate = payload.messageTemplate;
+        if (Array.isArray(payload.offDates)) cronDb.offDates = payload.offDates;
+        if (payload.todayQuota) cronDb.todayQuota = parseInt(payload.todayQuota, 10);
+        if (payload.campaignStartDate) cronDb.campaignStartDate = payload.campaignStartDate;
+        if (payload.campaignEndDate) cronDb.campaignEndDate = payload.campaignEndDate;
         saveCronDb();
 
         const result = startBackendCron();
