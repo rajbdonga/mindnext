@@ -1805,14 +1805,41 @@ MindNext Team</textarea>
             <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="testSingleBtn">🧪 ટેસ્ટ ૧ મેસેજ</button>
           </div>
 
-          <!-- Dispatch Mode Selection -->
-          <div style="width: 100%; text-align: left; background: var(--bg-card-subtle); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);">
-            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 6px;">ડિસ્પેચ મોડ (SENDING MODE):</label>
-            <select class="form-control" id="dispatchModeSelect" style="font-size: 0.82rem; padding: 7px 10px;">
-              <option value="wa_web">Direct WhatsApp Web / Desktop (1-Click Pop)</option>
-              <option value="webhook">Webhook / Local Backend Server (POST)</option>
-              <option value="simulation">ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
+          <!-- Dispatch Mode Selection & Zero-Tab Backend Engine -->
+          <div style="width: 100%; text-align: left; background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 6px;">
+              <span>ડિસ્પેચ એન્જિન (SENDING MODE):</span>
+              <span id="gatewayStatusDot" class="queue-pill sent" style="font-size: 0.65rem;">🟢 Zero-Tab Active</span>
+            </label>
+            <select class="form-control" id="dispatchModeSelect" style="font-size: 0.82rem; padding: 7px 10px; margin-bottom: 8px;" onchange="onDispatchModeChange()">
+              <option value="backend_gateway" selected>⚡ બેકગ્રાઉન્ડ સર્વર (Zero-Tab Mode - કોઈ ટેબ નહીં ખુલે)</option>
+              <option value="cloud_api">🌐 Meta WhatsApp Cloud API (સત્તાવાર)</option>
+              <option value="simulation">🧪 ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
+              <option value="wa_web">📲 WhatsApp Web પોપઅપ (મેન્યુઅલ)</option>
             </select>
+
+            <!-- Local Gateway Configuration Box -->
+            <div id="backendGatewayConfig" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Gateway URL:</span>
+                <div style="display: flex; gap: 4px;">
+                  <a href="http://localhost:3001" target="_blank" class="btn btn-secondary" style="width: auto; padding: 2px 7px; font-size: 0.68rem; text-decoration: none; color: #fff;">📲 QR સ્કેન / Open Gateway</a>
+                  <button type="button" class="btn btn-secondary" style="width: auto; padding: 2px 7px; font-size: 0.68rem;" onclick="pingGatewayServer()">📡 Ping Test</button>
+                </div>
+              </div>
+              <input type="text" class="form-control" id="gatewayEndpointUrl" value="http://localhost:3001/api/send" style="font-size: 0.75rem; padding: 5px 8px; font-family: var(--font-mono);">
+              <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+                💡 <em>કોઈ નવી બ્રાઉઝર ટેબ ખુલ્યા વગર બેકગ્રાઉન્ડમાંથી ઓટો-મેસેજ જશે.</em>
+              </p>
+            </div>
+
+            <!-- Meta Cloud API Config (Hidden by default) -->
+            <div id="metaCloudApiConfig" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+              <label class="form-label" style="font-size: 0.7rem;">Meta Phone Number ID:</label>
+              <input type="text" class="form-control" id="metaPhoneId" placeholder="105948372615..." style="font-size: 0.75rem; margin-bottom: 6px;">
+              <label class="form-label" style="font-size: 0.7rem;">Permanent Access Token:</label>
+              <input type="password" class="form-control" id="metaAccessToken" placeholder="EAABwz..." style="font-size: 0.75rem;">
+            </div>
           </div>
         </div>
 
@@ -2458,7 +2485,68 @@ MindNext Team</textarea>
         }, 1000);
       }
 
-      function dispatchMessage(contactIndex) {
+      window.onDispatchModeChange = function () {
+        var mode = document.getElementById('dispatchModeSelect').value;
+        var bgConfig = document.getElementById('backendGatewayConfig');
+        var metaConfig = document.getElementById('metaCloudApiConfig');
+        var statusDot = document.getElementById('gatewayStatusDot');
+
+        if (bgConfig) bgConfig.style.display = (mode === 'backend_gateway') ? 'block' : 'none';
+        if (metaConfig) metaConfig.style.display = (mode === 'cloud_api') ? 'block' : 'none';
+
+        if (mode === 'backend_gateway') {
+          statusDot.textContent = '🟢 Zero-Tab Active';
+          statusDot.className = 'queue-pill sent';
+          pingGatewayServer();
+        } else if (mode === 'cloud_api') {
+          statusDot.textContent = '🌐 Meta Cloud API';
+          statusDot.className = 'queue-pill sent';
+        } else if (mode === 'simulation') {
+          statusDot.textContent = '🧪 Demo Mode';
+          statusDot.className = 'queue-pill pending';
+        } else {
+          statusDot.textContent = '📲 Manual Tabs';
+          statusDot.className = 'queue-pill skipped';
+        }
+      };
+
+      window.pingGatewayServer = async function () {
+        var endpointInput = document.getElementById('gatewayEndpointUrl');
+        var url = endpointInput ? endpointInput.value.trim() : 'http://localhost:3001/api/send';
+        var statusUrl = url.replace(/\/api\/send\/?$/, '') + '/api/status';
+        var statusDot = document.getElementById('gatewayStatusDot');
+
+        try {
+          var res = await fetch(statusUrl, { method: 'GET', cache: 'no-cache' });
+          if (res.ok) {
+            var data = await res.json();
+            var phoneStr = data.connectedPhone ? ' (' + data.connectedPhone + ')' : '';
+            appendLog('📡 Gateway ઓનલાઈન છે! સ્થિતિ: ' + data.connectionStatus + phoneStr, 'success');
+            if (statusDot) {
+              if (data.connectionStatus === 'connected') {
+                statusDot.textContent = '🟢 Online ' + phoneStr;
+                statusDot.className = 'queue-pill sent';
+              } else if (data.hasQr) {
+                statusDot.textContent = '📲 Scan QR Needed';
+                statusDot.className = 'queue-pill pending';
+              } else {
+                statusDot.textContent = '🟡 Server Ready';
+                statusDot.className = 'queue-pill sent';
+              }
+            }
+            return true;
+          }
+        } catch (e) {
+          appendLog('⚠️ Local Gateway ઑફલાઇન છે. કૃપા કરીને "start_backend.bat" ફાઇલ રન કરો.', 'warn');
+          if (statusDot) {
+            statusDot.textContent = '🔴 Server Offline';
+            statusDot.className = 'queue-pill failed';
+          }
+        }
+        return false;
+      };
+
+      async function dispatchMessage(contactIndex) {
         var contact = state.contacts[contactIndex];
         contact.status = 'sending';
         renderQueue();
@@ -2468,26 +2556,85 @@ MindNext Team</textarea>
         var now = new Date();
         var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
 
-        if (mode === 'wa_web') {
-          var encodedMsg = encodeURIComponent(messageText);
-          var waUrl = 'https://web.whatsapp.com/send?phone=' + contact.phone + '&text=' + encodedMsg;
-          appendLog('🚀 WhatsApp Web પોપઅપ: ' + contact.name + ' (' + contact.phone + ') - મોકલનાર: ' + state.senderNumber, 'success');
-          window.open(waUrl, '_blank');
-          contact.status = 'sent';
-          contact.sentAt = timeStr;
-          onMessageSentSuccess(contact);
-        } else if (mode === 'simulation') {
-          setTimeout(function () {
-            appendLog('✅ [સિમ્યુલેશન સફળ] ' + contact.name + ' (' + contact.phone + ')', 'success');
+        try {
+          if (mode === 'backend_gateway') {
+            var gatewayUrl = document.getElementById('gatewayEndpointUrl').value.trim() || 'http://localhost:3001/api/send';
+            appendLog('⚡ બેકગ્રાઉન્ડ ઓટો-ડિસ્પેચ: ' + contact.name + ' (' + contact.phone + ') [Zero Tabs]', 'info');
+
+            var res = await fetch(gatewayUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                phone: contact.phone,
+                message: messageText,
+                sender: state.senderNumber
+              })
+            });
+
+            var resData = await res.json();
+            if (res.ok && resData.success) {
+              appendLog('✅ [બેકગ્રાઉન્ડ સફળ] ' + contact.name + ' (' + contact.phone + ') ને મેસેજ ડિલિવર થયો (ID: ' + (resData.messageId || 'OK') + ')', 'success');
+              contact.status = 'sent';
+              contact.sentAt = timeStr;
+              onMessageSentSuccess(contact);
+            } else {
+              throw new Error(resData.error || 'Server dispatch failed');
+            }
+          } else if (mode === 'cloud_api') {
+            var phoneId = (document.getElementById('metaPhoneId').value || '').trim();
+            var token = (document.getElementById('metaAccessToken').value || '').trim();
+            if (!phoneId || !token) {
+              throw new Error('Meta Phone ID અથવા Access Token ખાલી છે!');
+            }
+            var cleanPhone = contact.phone.replace(/[^0-9]/g, '');
+            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
+            appendLog('🌐 Meta Cloud API થી મોકલી રહ્યા છીએ: ' + cleanPhone, 'info');
+            var metaRes = await fetch('https://graph.facebook.com/v20.0/' + phoneId + '/messages', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                messaging_product: 'whatsapp',
+                to: cleanPhone,
+                type: 'text',
+                text: { body: messageText }
+              })
+            });
+            var metaData = await metaRes.json();
+            if (metaRes.ok && metaData.messages) {
+              appendLog('✅ [Meta Cloud સફળ] ' + contact.name + ' (' + cleanPhone + ') ID: ' + metaData.messages[0].id, 'success');
+              contact.status = 'sent';
+              contact.sentAt = timeStr;
+              onMessageSentSuccess(contact);
+            } else {
+              throw new Error(metaData.error ? metaData.error.message : 'Meta API error');
+            }
+          } else if (mode === 'simulation') {
+            setTimeout(function () {
+              appendLog('✅ [ડેમો સિમ્યુલેશન] ' + contact.name + ' (' + contact.phone + ') - મેસેજ મોકલાયો.', 'success');
+              contact.status = 'sent';
+              contact.sentAt = timeStr;
+              onMessageSentSuccess(contact);
+            }, 800);
+          } else if (mode === 'wa_web') {
+            var encodedMsg = encodeURIComponent(messageText);
+            var waUrl = 'https://web.whatsapp.com/send?phone=' + contact.phone + '&text=' + encodedMsg;
+            appendLog('🚀 WhatsApp Web પોપઅપ: ' + contact.name + ' (' + contact.phone + ')', 'info');
+            window.open(waUrl, '_blank');
             contact.status = 'sent';
             contact.sentAt = timeStr;
             onMessageSentSuccess(contact);
-          }, 1200);
-        } else {
-          appendLog('📡 Webhook POST મોકલાયો: ' + contact.phone, 'info');
-          contact.status = 'sent';
-          contact.sentAt = timeStr;
-          onMessageSentSuccess(contact);
+          }
+        } catch (err) {
+          appendLog('❌ [ડિસ્પેચ નિષ્ફળ] ' + err.message, 'error');
+          contact.status = 'failed';
+          renderQueue();
+          // Move to next contact even if one fails
+          state.currentBatchCount++;
+          scheduleNextTick();
         }
       }
 
@@ -2568,14 +2715,78 @@ print(f"[*] Random Delay Jitter: {MIN_DELAY_SEC}s - {MAX_DELAY_SEC}s")
         }
       });
 
-      document.getElementById('testSingleBtn').addEventListener('click', function () {
-        var testPhone = prompt('ટેસ્ટ ૧ મેસેજ મોકલવા માટે WhatsApp નંબર લખો:', '9825012345');
-        if (testPhone) {
-          var dummy = { name: 'Test User', phone: testPhone.replace(/[^0-9]/g, '') };
-          if (dummy.phone.length === 10) dummy.phone = '91' + dummy.phone;
-          var msg = composeMessage(dummy);
-          window.open('https://web.whatsapp.com/send?phone=' + dummy.phone + '&text=' + encodeURIComponent(msg), '_blank');
-          appendLog('🧪 સિંગલ ટેસ્ટ મેસેજ ખોલ્યો: ' + dummy.phone + ' (Sender: ' + state.senderNumber + ')', 'info');
+      document.getElementById('testSingleBtn').addEventListener('click', async function () {
+        var testPhone = prompt('ટેસ્ટ ૧ મેસેજ મોકલવા માટે WhatsApp નંબર લખો (e.g. 919825012345):', '919825012345');
+        if (!testPhone) return;
+
+        var clean = testPhone.replace(/[^0-9]/g, '');
+        if (clean.length === 10) clean = '91' + clean;
+        var dummy = { name: 'ટેસ્ટ ગ્રાહક', phone: clean };
+        var msg = composeMessage(dummy);
+        var mode = document.getElementById('dispatchModeSelect').value;
+
+        appendLog('🧪 સિંગલ ટેસ્ટ શરૂ કર્યો: ' + clean + ' [મોડ: ' + mode + ']', 'info');
+
+        if (mode === 'backend_gateway') {
+          var gatewayUrl = document.getElementById('gatewayEndpointUrl').value.trim() || 'http://localhost:3001/api/send';
+          try {
+            var res = await fetch(gatewayUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ phone: clean, message: msg, sender: state.senderNumber })
+            });
+            var data = await res.json();
+            if (res.ok && data.success) {
+              appendLog('✅ [સિંગલ ટેસ્ટ સફળ] ' + clean + ' ને કોઈ નવી ટેબ ખોલ્યા વગર બેકગ્રાઉન્ડમાંથી મેસેજ પહોંચ્યો! (ID: ' + (data.messageId || 'OK') + ')', 'success');
+              alert('સફળતા! કોઈ પણ બ્રાઉઝર ટેબ ખોલ્યા વગર બેકગ્રાઉન્ડ ગેટવે દ્વારા મેસેજ મોકલાઈ ગયો છે.\n\nનંબર: ' + clean + '\nMessage ID: ' + (data.messageId || 'OK'));
+            } else {
+              throw new Error(data.error || 'Gateway dispatch failed');
+            }
+          } catch (err) {
+            appendLog('❌ ટેસ્ટ એરર: ' + err.message + '. ખાતરી કરો કે start_backend.bat ચાલુ છે.', 'error');
+            alert('ગેટવે સર્વર એરર: ' + err.message + '\n\nકૃપા કરીને ખાતરી કરો કે start_backend.bat ચાલુ છે અને http://localhost:3001 ઓપન કરીને QR કોડ સ્કેન કરેલ છે.');
+          }
+        } else if (mode === 'cloud_api') {
+          var phoneId = (document.getElementById('metaPhoneId').value || '').trim();
+          var token = (document.getElementById('metaAccessToken').value || '').trim();
+          if (!phoneId || !token) {
+            alert('કૃપા કરીને Meta Phone Number ID અને Access Token ભરો!');
+            return;
+          }
+          try {
+            var metaRes = await fetch('https://graph.facebook.com/v20.0/' + phoneId + '/messages', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                messaging_product: 'whatsapp',
+                to: clean,
+                type: 'text',
+                text: { body: msg }
+              })
+            });
+            var metaData = await metaRes.json();
+            if (metaRes.ok && metaData.messages) {
+              appendLog('✅ [Meta Cloud ટેસ્ટ સફળ] Message ID: ' + metaData.messages[0].id, 'success');
+              alert('Meta Cloud API દ્વારા ટેસ્ટ મેસેજ સફળતાપૂર્વક મોકલાઈ ગયો!');
+            } else {
+              throw new Error(metaData.error ? metaData.error.message : 'API call failed');
+            }
+          } catch (err) {
+            appendLog('❌ Meta API ટેસ્ટ એરર: ' + err.message, 'error');
+            alert('Meta API એરર: ' + err.message);
+          }
+        } else if (mode === 'simulation') {
+          setTimeout(function () {
+            appendLog('✅ [ડેમો સિમ્યુલેશન ટેસ્ટ સફળ] ' + clean, 'success');
+            alert('ડેમો સિમ્યુલેશન ટેસ્ટ સફળ થયો!');
+          }, 500);
+        } else {
+          var waUrl = 'https://web.whatsapp.com/send?phone=' + clean + '&text=' + encodeURIComponent(msg);
+          window.open(waUrl, '_blank');
+          appendLog('🚀 WhatsApp Web પોપઅપ ખુલ્યું: ' + clean, 'info');
         }
       });
 
@@ -2653,6 +2864,11 @@ Chetan Parikh, 9909033445`;
       // Load initial demo data
       document.getElementById('loadDemoContactsBtn').click();
       document.getElementById('importContactsBtn').click();
+
+      // Check local gateway status
+      setTimeout(function () {
+        pingGatewayServer();
+      }, 500);
 
     })();
   </script>

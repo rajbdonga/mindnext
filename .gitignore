@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+whatsapp-gateway/node_modules/
+
+# WhatsApp Auth Session Credentials
+whatsapp-gateway/session_auth/
+session_auth/
+
+# Logs & temp
+*.log
+.DS_Store
