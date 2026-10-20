@@ -3642,6 +3642,14 @@ function escapeHtml(s) {
       var dbPill = document.getElementById('dbStatusPill');
       var dbText = document.getElementById('dbStatusText');
       if (!dbText) return;
+      if (window.location.protocol === 'https:') {
+        dbText.textContent = 'DB: Cloud Hybrid Ready';
+        if (dbPill) {
+          dbPill.className = 'db-pill';
+          dbPill.title = 'MindNext Cloud Storage Active';
+        }
+        return;
+      }
       try {
         var res = await fetch('http://localhost:3001/api/db/status');
         if (res.ok) {

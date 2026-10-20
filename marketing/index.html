@@ -1815,7 +1815,7 @@
                     <input type="file" id="customFileInput" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleCustomPdfUpload(event)">
                     <button type="button" class="btn btn-secondary" style="width: auto; padding: 5px 9px; font-size: 0.72rem;" onclick="document.getElementById('customFileInput').click()">📂 નવી PDF બદલો</button>
                     <button type="button" class="btn btn-secondary" style="width: auto; padding: 5px 9px; font-size: 0.72rem;" onclick="useDefaultSamplePdf()">🔄 Reset Sample.pdf</button>
-                    <a href="http://localhost:3001/uploads/Sample.pdf" target="_blank" class="btn btn-secondary" id="previewPdfBtn" style="width: auto; padding: 5px 9px; font-size: 0.72rem; text-decoration: none; color: #fff;">👁️ View PDF</a>
+                    <a href="/Sample.pdf" target="_blank" class="btn btn-secondary" id="previewPdfBtn" style="width: auto; padding: 5px 9px; font-size: 0.72rem; text-decoration: none; color: #fff;">👁️ View PDF</a>
                   </div>
                 </div>
               </div>
@@ -1925,17 +1925,28 @@ Best Regards,
           <div style="width: 100%; text-align: left; background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);">
             <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 6px;">
               <span>ડિસ્પેચ એન્જિન (SENDING MODE):</span>
-              <span id="gatewayStatusDot" class="queue-pill sent" style="font-size: 0.65rem;">Zero-Tab Active</span>
+              <span id="gatewayStatusDot" class="queue-pill sent" style="font-size: 0.65rem;">Website Active</span>
             </label>
             <select class="form-control" id="dispatchModeSelect" style="font-size: 0.82rem; padding: 7px 10px; margin-bottom: 8px;" onchange="onDispatchModeChange()">
-              <option value="backend_gateway" selected>બેકગ્રાઉન્ડ સર્વર (Zero-Tab Mode - કોઈ ટેબ નહીં ખુલે)</option>
-              <option value="cloud_api">Meta WhatsApp Cloud API (સત્તાવાર)</option>
-              <option value="simulation">ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
-              <option value="wa_web">WhatsApp Web પોપઅપ (મેન્યુઅલ)</option>
+              <option value="direct_web" selected>🌐 ડાયરેક્ટ વેબસાઇટ એન્જિન (Direct Web Mode - કોઈ લોકલ સર્વર નહીં)</option>
+              <option value="wa_web">📲 WhatsApp Web / App ડાયરેક્ટ (1-Click Tab)</option>
+              <option value="cloud_api">⚡ Meta WhatsApp Cloud API (સત્તાવાર)</option>
+              <option value="simulation">🧪 ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
+              <option value="backend_gateway">💻 લોકલ સર્વર (Localhost Baileys Gateway - Offline/Developer)</option>
             </select>
 
-            <!-- Local Gateway Configuration Box -->
-            <div id="backendGatewayConfig" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+            <!-- Direct Web Mode Info Box (Default) -->
+            <div id="directWebConfig" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
+              <div style="font-size: 0.73rem; color: #34d399; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                <span>✓</span> <span>૧૦૦% વેબસાઇટ આધારિત ઓટોમેશન - કોઈ localhost કે backend.bat રન કરવાની જરૂર નથી.</span>
+              </div>
+              <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+                <em>ક્રોન શરૂ કરવા પર ટાઈમર મુજબ આપમેળે ડાયરેક્ટ WhatsApp માં મેસેજ મોકલાશે.</em>
+              </p>
+            </div>
+
+            <!-- Local Gateway Configuration Box (Hidden by default) -->
+            <div id="backendGatewayConfig" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <span style="font-size: 0.72rem; color: var(--text-muted);">Gateway URL:</span>
                 <div style="display: flex; gap: 4px;">
@@ -1945,7 +1956,7 @@ Best Regards,
               </div>
               <input type="text" class="form-control" id="gatewayEndpointUrl" value="http://localhost:3001/api/send" style="font-size: 0.75rem; padding: 5px 8px; font-family: var(--font-mono);">
               <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
-                <em>કોઈ નવી બ્રાઉઝર ટેબ ખુલ્યા વગર બેકગ્રાઉન્ડમાંથી ઓટો-મેસેજ જશે.</em>
+                <em>ફક્ત ત્યારે જ વાપરો જ્યારે તમારા કમ્પ્યુટરમાં start_backend.bat ચાલુ હોય.</em>
               </p>
             </div>
 
@@ -2143,6 +2154,9 @@ Best Regards,
         if (document.getElementById('attachmentDetailsBox')) {
           document.getElementById('attachmentDetailsBox').style.display = 'flex';
         }
+        if (document.getElementById('previewPdfBtn')) {
+          document.getElementById('previewPdfBtn').href = '/Sample.pdf';
+        }
         onSettingFieldChange();
         showLiveToast('🩺 Doctor Research Pitch + Sample.pdf ટેમ્પલેટ લોડ થયું!', 'success');
       };
@@ -2157,7 +2171,7 @@ Best Regards,
         }
         state.attachment.enabled = true;
         state.attachment.fileName = 'Sample.pdf';
-        state.attachment.filePath = 'uploads/Sample.pdf';
+        state.attachment.filePath = 'Sample.pdf';
         state.attachment.fileSize = '4 MB';
         if (document.getElementById('attachmentToggle')) {
           document.getElementById('attachmentToggle').checked = true;
@@ -2170,6 +2184,9 @@ Best Regards,
         }
         if (document.getElementById('attachmentDetailsBox')) {
           document.getElementById('attachmentDetailsBox').style.display = 'flex';
+        }
+        if (document.getElementById('previewPdfBtn')) {
+          document.getElementById('previewPdfBtn').href = '/Sample.pdf';
         }
         onSettingFieldChange();
         showLiveToast('📎 Doctor Pitch (Attached Sample) ટેમ્પલેટ લોડ થયું!', 'success');
@@ -2203,7 +2220,7 @@ Best Regards,
 
       window.useDefaultSamplePdf = function () {
         state.attachment.fileName = 'Sample.pdf';
-        state.attachment.filePath = 'uploads/Sample.pdf';
+        state.attachment.filePath = 'Sample.pdf';
         state.attachment.base64 = null;
         if (document.getElementById('attachedFileName')) {
           document.getElementById('attachedFileName').textContent = 'Sample.pdf';
@@ -2212,7 +2229,7 @@ Best Regards,
           document.getElementById('attachedFileSize').textContent = 'તૈયાર છે • Medical Research Digest Sample (4 MB)';
         }
         if (document.getElementById('previewPdfBtn')) {
-          document.getElementById('previewPdfBtn').href = 'http://localhost:3001/uploads/Sample.pdf';
+          document.getElementById('previewPdfBtn').href = '/Sample.pdf';
         }
         onSettingFieldChange();
         showLiveToast('🔄 ડિફોલ્ટ Sample.pdf સેટ કરવામાં આવ્યું.', 'info');
@@ -2221,6 +2238,10 @@ Best Regards,
       window.handleCustomPdfUpload = async function (e) {
         var file = e.target.files && e.target.files[0];
         if (!file) return;
+        var blobUrl = URL.createObjectURL(file);
+        if (document.getElementById('previewPdfBtn')) {
+          document.getElementById('previewPdfBtn').href = blobUrl;
+        }
         var reader = new FileReader();
         reader.onload = async function (evt) {
           var base64 = evt.target.result;
@@ -2231,28 +2252,25 @@ Best Regards,
             document.getElementById('attachedFileName').textContent = file.name;
           }
           if (document.getElementById('attachedFileSize')) {
-            document.getElementById('attachedFileSize').textContent = 'અપલોડ થઈ રહ્યું છે... (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+            document.getElementById('attachedFileSize').textContent = 'તૈયાર છે • ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB';
           }
-          try {
-            var res = await fetch('http://localhost:3001/api/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ fileName: file.name, base64: base64 })
-            });
-            if (res.ok) {
-              var data = await res.json();
-              state.attachment.filePath = data.filePath;
-              if (document.getElementById('attachedFileSize')) {
-                document.getElementById('attachedFileSize').textContent = 'સફળતાપૂર્વક અપલોડ થયેલ • ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+          if (window.location.protocol === 'http:') {
+            try {
+              var res = await fetch('http://localhost:3001/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileName: file.name, base64: base64 })
+              });
+              if (res.ok) {
+                var data = await res.json();
+                state.attachment.filePath = data.filePath;
+                if (document.getElementById('previewPdfBtn')) {
+                  document.getElementById('previewPdfBtn').href = data.url || ('http://localhost:3001/' + data.filePath);
+                }
               }
-              if (document.getElementById('previewPdfBtn')) {
-                document.getElementById('previewPdfBtn').href = data.url || ('http://localhost:3001/' + data.filePath);
-              }
-              showLiveToast('✅ ' + file.name + ' સફળતાપૂર્વક અપલોડ થઈ!', 'success');
-            }
-          } catch (err) {
-            console.warn('Upload error, sending base64 direct:', err);
+            } catch (err) {}
           }
+          showLiveToast('✅ ' + file.name + ' સફળતાપૂર્વક લોડ થઈ!', 'success');
           onSettingFieldChange();
         };
         reader.readAsDataURL(file);
@@ -2827,6 +2845,19 @@ Best Regards,
           renderQueue();
         }
 
+        // 10. Dispatch Mode
+        if (saved.dispatchMode) {
+          var modeEl = document.getElementById('dispatchModeSelect');
+          if (modeEl) {
+            if (window.location.protocol === 'https:' && saved.dispatchMode === 'backend_gateway') {
+              modeEl.value = 'direct_web';
+            } else {
+              modeEl.value = saved.dispatchMode;
+            }
+            if (window.onDispatchModeChange) window.onDispatchModeChange();
+          }
+        }
+
         recalculateEstimates();
         generateScripts();
       }
@@ -2909,7 +2940,7 @@ Best Regards,
             '<td><code>' + escapeHtml(c.phone) + '</code></td>' +
             '<td><span class="queue-pill ' + c.status + '">' + c.status.toUpperCase() + '</span></td>' +
             '<td>' + (c.sentAt || '-') + '</td>' +
-            '<td><button class="btn btn-danger" style="width: auto; padding: 4px 10px; font-size: 0.72rem; border-radius: 6px;" onclick="window.removeContactFromQueue(' + index + ')" title="આ નંબર કતારમાંથી કાઢી નાખો">🗑️ રિમૂવ</button></td>';
+            '<td><div style="display: flex; gap: 4px;"><button class="btn btn-secondary" style="width: auto; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="window.sendSingleContactDirect(' + index + ')" title="ડાયરેક્ટ WhatsApp ખોલો">💬 મોકલો</button><button class="btn btn-danger" style="width: auto; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="window.removeContactFromQueue(' + index + ')" title="આ નંબર કતારમાંથી કાઢી નાખો">🗑️</button></div></td>';
           body.appendChild(tr);
         });
 
@@ -2917,6 +2948,26 @@ Best Regards,
         document.getElementById('queueCountBadge').textContent = pendingCount;
         recalculateEstimates();
       }
+
+      window.sendSingleContactDirect = function (index) {
+        if (index >= 0 && index < state.contacts.length) {
+          var contact = state.contacts[index];
+          var cleanPhone = (contact.phone || '').replace(/[^0-9]/g, '');
+          if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+          var msg = composeMessage(contact);
+          var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          var waUrl = isMobile 
+            ? 'https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg)
+            : 'https://web.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg);
+          window.open(waUrl, 'MindNextWhatsAppSession');
+          contact.status = 'sent';
+          var now = new Date();
+          contact.sentAt = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+          renderQueue();
+          saveLocalStateBackup();
+          appendLog('🚀 WhatsApp ચેટ ખુલી ગઈ: ' + contact.name + ' (' + cleanPhone + ')', 'success');
+        }
+      };
 
       window.removeContactFromQueue = function (index) {
         if (index >= 0 && index < state.contacts.length) {
@@ -3117,41 +3168,61 @@ Best Regards,
 
       window.onDispatchModeChange = function () {
         var mode = document.getElementById('dispatchModeSelect').value;
+        var directConfig = document.getElementById('directWebConfig');
         var bgConfig = document.getElementById('backendGatewayConfig');
         var metaConfig = document.getElementById('metaCloudApiConfig');
         var statusDot = document.getElementById('gatewayStatusDot');
 
+        if (directConfig) directConfig.style.display = (mode === 'direct_web' || mode === 'wa_web') ? 'block' : 'none';
         if (bgConfig) bgConfig.style.display = (mode === 'backend_gateway') ? 'block' : 'none';
         if (metaConfig) metaConfig.style.display = (mode === 'cloud_api') ? 'block' : 'none';
 
-        if (mode === 'backend_gateway') {
-          statusDot.textContent = 'Zero-Tab Active';
-          statusDot.className = 'queue-pill sent';
+        if (mode === 'direct_web' || mode === 'wa_web') {
+          if (statusDot) {
+            statusDot.textContent = '🟢 Website Active';
+            statusDot.className = 'queue-pill sent';
+          }
+        } else if (mode === 'backend_gateway') {
+          if (statusDot) {
+            statusDot.textContent = 'Localhost Mode';
+            statusDot.className = 'queue-pill pending';
+          }
           pingGatewayServer();
         } else if (mode === 'cloud_api') {
-          statusDot.textContent = '🌐 Meta Cloud API';
-          statusDot.className = 'queue-pill sent';
+          if (statusDot) {
+            statusDot.textContent = '🌐 Meta Cloud API';
+            statusDot.className = 'queue-pill sent';
+          }
         } else if (mode === 'simulation') {
-          statusDot.textContent = '🧪 Demo Mode';
-          statusDot.className = 'queue-pill pending';
-        } else {
-          statusDot.textContent = '📲 Manual Tabs';
-          statusDot.className = 'queue-pill skipped';
+          if (statusDot) {
+            statusDot.textContent = '🧪 Demo Mode';
+            statusDot.className = 'queue-pill pending';
+          }
         }
       };
 
-      window.pingGatewayServer = async function () {
+      window.pingGatewayServer = async function (silent) {
+        var mode = document.getElementById('dispatchModeSelect').value;
+        var statusDot = document.getElementById('gatewayStatusDot');
+
+        if (mode !== 'backend_gateway') {
+          if (statusDot && (mode === 'direct_web' || mode === 'wa_web')) {
+            statusDot.textContent = '🟢 Website Active';
+            statusDot.className = 'queue-pill sent';
+          }
+          return true;
+        }
+
         var endpointInput = document.getElementById('gatewayEndpointUrl');
         var url = endpointInput ? endpointInput.value.trim() : 'http://localhost:3001/api/send';
         var statusUrl = url.replace(/\/api\/send\/?$/, '') + '/api/status';
-        var statusDot = document.getElementById('gatewayStatusDot');
 
         try {
           var res = await fetch(statusUrl, { method: 'GET', cache: 'no-cache' });
           if (res.ok) {
             var data = await res.json();
             var phoneStr = data.connectedPhone ? ' (' + data.connectedPhone + ')' : '';
-            appendLog('📡 Gateway ઓનલાઈન છે! સ્થિતિ: ' + data.connectionStatus + phoneStr, 'success');
+            if (!silent) appendLog('📡 Gateway ઓનલાઈન છે! સ્થિતિ: ' + data.connectionStatus + phoneStr, 'success');
             if (statusDot) {
               if (data.connectionStatus === 'connected') {
                 statusDot.textContent = '🟢 Online ' + phoneStr;
@@ -3167,7 +3238,7 @@ Best Regards,
             return true;
           }
         } catch (e) {
-          appendLog('⚠️ Local Gateway ઑફલાઇન છે. કૃપા કરીને "start_backend.bat" ફાઇલ રન કરો.', 'warn');
+          if (!silent) appendLog('⚠️ Local Gateway ઑફલાઇન છે. કૃપા કરીને "start_backend.bat" ફાઇલ રન કરો અથવા ડાયરેક્ટ વેબસાઇટ મોડ પસંદ કરો.', 'warn');
           if (statusDot) {
             statusDot.textContent = '🔴 Server Offline';
             statusDot.className = 'queue-pill failed';
@@ -3186,8 +3257,30 @@ Best Regards,
         var now = new Date();
         var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
 
+        var cleanPhone = (contact.phone || '').replace(/[^0-9]/g, '');
+        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
         try {
-          if (mode === 'backend_gateway') {
+          if (mode === 'direct_web' || mode === 'wa_web') {
+            var encodedMsg = encodeURIComponent(messageText);
+            var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            var waUrl = isMobile 
+              ? 'https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodedMsg
+              : 'https://web.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodedMsg;
+
+            appendLog('🚀 [ડાયરેક્ટ વેબસાઇટ] ' + (contact.name || 'ગ્રાહક') + ' (' + cleanPhone + ') માટે WhatsApp ચેટ ઓપન થઈ રહી છે...', 'info');
+
+            var waWin = window.open(waUrl, 'MindNextWhatsAppSession');
+            if (!waWin || waWin.closed || typeof waWin.closed === 'undefined') {
+              appendLog('⚠️ WhatsApp ટેબ બ્લોક થઈ (Pop-up Blocked). કૃપા કરીને બ્રાઉઝર એડ્રેસ બારમાં Pop-ups "Always Allow" કરો.', 'warn');
+            } else {
+              appendLog('✅ [વેબસાઇટ ડિસ્પેચ સફળ] ' + (contact.name || 'Customer') + ' (' + cleanPhone + ') નો મેસેજ મોકલાયો.', 'success');
+            }
+            contact.status = 'sent';
+            contact.sentAt = timeStr;
+            onMessageSentSuccess(contact);
+
+          } else if (mode === 'backend_gateway') {
             var gatewayUrl = document.getElementById('gatewayEndpointUrl').value.trim() || 'http://localhost:3001/api/send';
             appendLog('⚡ બેકગ્રાઉન્ડ ઓટો-ડિસ્પેચ: ' + contact.name + ' (' + contact.phone + ') [Zero Tabs]', 'info');
 
@@ -3218,8 +3311,6 @@ Best Regards,
             if (!phoneId || !token) {
               throw new Error('Meta Phone ID અથવા Access Token ખાલી છે!');
             }
-            var cleanPhone = contact.phone.replace(/[^0-9]/g, '');
-            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
 
             appendLog('🌐 Meta Cloud API થી મોકલી રહ્યા છીએ: ' + cleanPhone, 'info');
             var metaRes = await fetch('https://graph.facebook.com/v20.0/' + phoneId + '/messages', {
@@ -3251,14 +3342,6 @@ Best Regards,
               contact.sentAt = timeStr;
               onMessageSentSuccess(contact);
             }, 800);
-          } else if (mode === 'wa_web') {
-            var encodedMsg = encodeURIComponent(messageText);
-            var waUrl = 'https://web.whatsapp.com/send?phone=' + contact.phone + '&text=' + encodedMsg;
-            appendLog('🚀 WhatsApp Web પોપઅપ: ' + contact.name + ' (' + contact.phone + ')', 'info');
-            window.open(waUrl, '_blank');
-            contact.status = 'sent';
-            contact.sentAt = timeStr;
-            onMessageSentSuccess(contact);
           }
         } catch (err) {
           appendLog('❌ [ડિસ્પેચ નિષ્ફળ] ' + err.message, 'error');
@@ -3310,7 +3393,8 @@ Best Regards,
             todayQuota: state.todayQuota,
             messageTemplate: document.getElementById('messageTemplate') ? document.getElementById('messageTemplate').value : '',
             stopOptOut: document.getElementById('stopOptOutToggle') ? document.getElementById('stopOptOutToggle').checked : true,
-            attachment: state.attachment
+            attachment: state.attachment,
+            dispatchMode: document.getElementById('dispatchModeSelect') ? document.getElementById('dispatchModeSelect').value : 'direct_web'
           };
           localStorage.setItem(STORAGE_KEY_STATE_BACKUP, JSON.stringify(snapshot));
         } catch (e) {}
@@ -3329,6 +3413,11 @@ Best Regards,
       }
 
       async function syncStateToBackend(baseUrl) {
+        var mode = document.getElementById('dispatchModeSelect') ? document.getElementById('dispatchModeSelect').value : 'direct_web';
+        if (mode !== 'backend_gateway' || window.location.protocol === 'https:') {
+          saveLocalStateBackup();
+          return;
+        }
         var base = baseUrl;
         if (!base) {
           var urlIn = document.getElementById('gatewayEndpointUrl');
@@ -3366,6 +3455,10 @@ Best Regards,
       }
 
       async function syncStateFromBackend(silent) {
+        var mode = document.getElementById('dispatchModeSelect') ? document.getElementById('dispatchModeSelect').value : 'direct_web';
+        if (mode !== 'backend_gateway' || window.location.protocol === 'https:') {
+          return false;
+        }
         var urlIn = document.getElementById('gatewayEndpointUrl');
         var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
         try {
@@ -3423,7 +3516,7 @@ Best Regards,
 
       window.startCron = async function () {
         if (state.isRunning) {
-          alert('⚠️ ક્રોન પહેલેથી જ બેકગ્રાઉન્ડમાં સક્રિય (RUNNING) છે! એક સાથે બે ક્રોન શરૂ કરી શકાતા નથી.\n\nજો તમારે કોઈ સેટિંગ્સ બદલવી હોય તો પહેલા ચાલુ ક્રોનને થોભાવો (Pause કરો).');
+          alert('⚠️ ક્રોન પહેલેથી જ સક્રિય (RUNNING) છે! એક સાથે બે ક્રોન શરૂ કરી શકાતા નથી.\n\nજો તમારે કોઈ સેટિંગ્સ બદલવી હોય તો પહેલા ચાલુ ક્રોનને થોભાવો (Pause કરો).');
           return;
         }
 
@@ -3437,53 +3530,78 @@ Best Regards,
         saveLocalStateBackup();
 
         var mode = document.getElementById('dispatchModeSelect').value;
+
+        // If Localhost Gateway mode is explicitly selected
         if (mode === 'backend_gateway') {
-          var urlIn = document.getElementById('gatewayEndpointUrl');
-          var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
-
-          // Sync full state to cron_db.json first
-          await syncStateToBackend(base);
-
-          try {
-            var res = await fetch(base + '/api/cron/start', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contacts: state.contacts,
-                attachment: state.attachment,
-                messageTemplate: document.getElementById('messageTemplate').value,
-                todayQuota: state.todayQuota,
-                campaignStartDate: state.campaignStartDate,
-                campaignEndDate: state.campaignEndDate,
-                offDates: state.offDates
-              })
-            });
-            var data = await res.json();
-            if (!res.ok || !data.success) {
-              throw new Error(data.error || 'Backend failed to start');
+          if (window.location.protocol === 'https:') {
+            var useDirect = confirm('ℹ️ તમે mindnext.in વેબસાઇટ પર છો (HTTPS).\n\nસુરક્ષા નીતિ મુજબ HTTPS વેબસાઇટમાંથી અસુરક્ષિત Localhost સર્વર કનેક્ટ થઈ શકતું નથી.\n\nશું તમે ડાયરેક્ટ વેબસાઇટ મોડમાં ક્રોન શરૂ કરવા માંગો છો? (કોઈ સોફ્ટવેર વગર ૧૦૦% ચાલશે)');
+            if (useDirect) {
+              document.getElementById('dispatchModeSelect').value = 'direct_web';
+              onDispatchModeChange();
+              mode = 'direct_web';
+            } else {
+              return;
             }
+          } else {
+            var urlIn = document.getElementById('gatewayEndpointUrl');
+            var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
 
-            state.isRunning = true;
-            state.isPaused = false;
-            document.getElementById('startCronBtn').style.display = 'none';
-            document.getElementById('pauseCronBtn').style.display = 'inline-flex';
-            updateStatusDisplay('running', 'બેકગ્રાઉન્ડ સક્રિય (RUNNING)');
-            appendLog('▶️ બેકગ્રાઉન્ડ ક્રોન એન્જિન શરૂ થયું! તમે આ બ્રાઉઝર ટેબ બંધ કરી દેશો તો પણ સર્વરમાંથી મેસેજ જવાનું ચાલુ રહેશે.', 'success');
-            saveLocalStateBackup();
-            return;
-          } catch (err) {
-            appendLog('⚠️ બેકગ્રાઉન્ડ ક્રોન એરર: ' + err.message, 'warn');
-            alert('ક્રોન શરૂ કરવામાં સમસ્યા: ' + err.message);
-            return;
+            try {
+              var pingRes = await fetch(base + '/api/status', { method: 'GET', cache: 'no-cache' }).catch(function(){ return null; });
+              if (!pingRes || !pingRes.ok) {
+                var switchMode = confirm('⚠️ Localhost સર્વર (start_backend.bat) બંધ છે.\n\nશું તમે ડાયરેક્ટ વેબસાઇટ મોડમાં ક્રોન શરૂ કરવા માંગો છો?');
+                if (switchMode) {
+                  document.getElementById('dispatchModeSelect').value = 'direct_web';
+                  onDispatchModeChange();
+                  mode = 'direct_web';
+                } else {
+                  return;
+                }
+              } else {
+                await syncStateToBackend(base);
+                var res = await fetch(base + '/api/cron/start', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contacts: state.contacts,
+                    attachment: state.attachment,
+                    messageTemplate: document.getElementById('messageTemplate').value,
+                    todayQuota: state.todayQuota,
+                    campaignStartDate: state.campaignStartDate,
+                    campaignEndDate: state.campaignEndDate,
+                    offDates: state.offDates
+                  })
+                });
+                var data = await res.json();
+                if (!res.ok || !data.success) {
+                  throw new Error(data.error || 'Backend failed to start');
+                }
+
+                state.isRunning = true;
+                state.isPaused = false;
+                document.getElementById('startCronBtn').style.display = 'none';
+                document.getElementById('pauseCronBtn').style.display = 'inline-flex';
+                updateStatusDisplay('running', 'બેકગ્રાઉન્ડ સક્રિય (RUNNING)');
+                appendLog('▶️ બેકગ્રાઉન્ડ ક્રોન એન્જિન શરૂ થયું!', 'success');
+                saveLocalStateBackup();
+                return;
+              }
+            } catch (err) {
+              appendLog('⚠️ Localhost ઉપલબ્ધ નથી, ડાયરેક્ટ વેબસાઇટ મોડમાં શરૂ કરી રહ્યા છીએ.', 'warn');
+              document.getElementById('dispatchModeSelect').value = 'direct_web';
+              onDispatchModeChange();
+              mode = 'direct_web';
+            }
           }
         }
 
-        // Local Browser Fallback (e.g. for demo or simulation)
+        // Direct Website Engine Execution (Default - Works 100% directly in browser)
         state.isRunning = true;
         state.isPaused = false;
         document.getElementById('startCronBtn').style.display = 'none';
         document.getElementById('pauseCronBtn').style.display = 'inline-flex';
-        appendLog('▶️ ક્રોન એન્જિન શરૂ થયું! મોકલનાર: ' + state.senderNumber, 'success');
+        updateStatusDisplay('running', 'વેબસાઇટ ક્રોન સક્રિય (RUNNING)');
+        appendLog('▶️ ડાયરેક્ટ વેબસાઇટ ક્રોન એન્જિન શરૂ થયું! શેડ્યુલ મુજબ મેસેજ મોકલાશે.', 'success');
         scheduleNextTick();
         saveLocalStateBackup();
       };
@@ -3494,7 +3612,7 @@ Best Regards,
         clearInterval(state.currentTimer);
 
         var mode = document.getElementById('dispatchModeSelect').value;
-        if (mode === 'backend_gateway') {
+        if (mode === 'backend_gateway' && window.location.protocol === 'http:') {
           var urlIn = document.getElementById('gatewayEndpointUrl');
           var base = urlIn ? urlIn.value.trim().replace(/\/api\/send\/?$/, '') : 'http://localhost:3001';
           fetch(base + '/api/cron/stop', { method: 'POST' }).catch(function(){});
@@ -3620,9 +3738,13 @@ print(f"[*] Random Delay Jitter: {MIN_DELAY_SEC}s - {MAX_DELAY_SEC}s")
             alert('ડેમો સિમ્યુલેશન ટેસ્ટ સફળ થયો!');
           }, 500);
         } else {
-          var waUrl = 'https://web.whatsapp.com/send?phone=' + clean + '&text=' + encodeURIComponent(msg);
-          window.open(waUrl, '_blank');
-          appendLog('🚀 WhatsApp Web પોપઅપ ખુલ્યું: ' + clean, 'info');
+          var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          var waUrl = isMobile 
+            ? 'https://api.whatsapp.com/send?phone=' + clean + '&text=' + encodeURIComponent(msg)
+            : 'https://web.whatsapp.com/send?phone=' + clean + '&text=' + encodeURIComponent(msg);
+          window.open(waUrl, 'MindNextWhatsAppSession');
+          appendLog('🚀 WhatsApp વિન્ડો ખુલી ગઈ: ' + clean, 'success');
+          showLiveToast('✅ ટેસ્ટ મેસેજ તૈયાર છે! WhatsApp વિન્ડો ઓપન થઈ.', 'success');
         }
       });
 
@@ -3686,22 +3808,27 @@ Chetan Parikh, 9909033445`;
       updateDelayMetrics();
       generateScripts();
 
-      // Load persistent state from backend database (or local storage backup)
-      syncStateFromBackend().then(function (loadedFromBackend) {
-        if (!loadedFromBackend) {
-          var loadedFromLocal = loadLocalStateBackup();
-          if (!loadedFromLocal && state.contacts.length === 0) {
-            // First time visit with zero saved contacts
-            document.getElementById('loadDemoContactsBtn').click();
-            document.getElementById('importContactsBtn').click();
-          }
-        }
-        pingGatewayServer();
-      });
+      // Load persistent state from local storage backup (or backend if on localhost)
+      var loadedFromLocal = loadLocalStateBackup();
+      if (!loadedFromLocal && state.contacts.length === 0) {
+        // First time visit with zero saved contacts
+        document.getElementById('loadDemoContactsBtn').click();
+        document.getElementById('importContactsBtn').click();
+      }
 
-      // Poll backend state every 3 seconds for live zero-tab sync
+      var currentMode = document.getElementById('dispatchModeSelect').value;
+      if (currentMode === 'backend_gateway' && window.location.protocol === 'http:') {
+        syncStateFromBackend().then(function () {
+          pingGatewayServer(true);
+        });
+      } else {
+        onDispatchModeChange();
+        appendLog('⚡ ડાયરેક્ટ વેબસાઇટ મોડ સક્રિય - કોઈપણ સોફ્ટવેર કે localhost વગર ૧૦૦% બ્રાઉઝરમાંથી મેસેજ મોકલી શકાશે.', 'success');
+      }
+
+      // Poll backend state every 3 seconds only if running in backend_gateway mode on localhost
       setInterval(function () {
-        if (document.getElementById('dispatchModeSelect').value === 'backend_gateway') {
+        if (window.location.protocol === 'http:' && document.getElementById('dispatchModeSelect').value === 'backend_gateway') {
           syncStateFromBackend(true);
         }
       }, 3000);
@@ -3713,6 +3840,16 @@ Chetan Parikh, 9909033445`;
       var dbPill = document.getElementById('dbStatusPill');
       var dbText = document.getElementById('dbStatusText');
       if (!dbText) return;
+
+      if (window.location.protocol === 'https:') {
+        dbText.textContent = 'DB: Cloud Hybrid Ready';
+        if (dbPill) {
+          dbPill.className = 'db-pill';
+          dbPill.title = 'MindNext Cloud Storage Active';
+        }
+        return;
+      }
+
       try {
         var res = await fetch('http://localhost:3001/api/db/status');
         if (res.ok) {

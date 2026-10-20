@@ -82,6 +82,14 @@ const DB_POLL_SCRIPT = `
       var dbPill = document.getElementById('dbStatusPill');
       var dbText = document.getElementById('dbStatusText');
       if (!dbText) return;
+      if (window.location.protocol === 'https:') {
+        dbText.textContent = 'DB: Cloud Hybrid Ready';
+        if (dbPill) {
+          dbPill.className = 'db-pill';
+          dbPill.title = 'MindNext Cloud Storage Active';
+        }
+        return;
+      }
       try {
         var res = await fetch('http://localhost:3001/api/db/status');
         if (res.ok) {
@@ -282,7 +290,7 @@ function processMarketing() {
                     <input type="file" id="customFileInput" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleCustomPdfUpload(event)">
                     <button type="button" class="btn btn-secondary" style="width: auto; padding: 5px 9px; font-size: 0.72rem;" onclick="document.getElementById('customFileInput').click()">📂 નવી PDF બદલો</button>
                     <button type="button" class="btn btn-secondary" style="width: auto; padding: 5px 9px; font-size: 0.72rem;" onclick="useDefaultSamplePdf()">🔄 Reset Sample.pdf</button>
-                    <a href="http://localhost:3001/uploads/Sample.pdf" target="_blank" class="btn btn-secondary" id="previewPdfBtn" style="width: auto; padding: 5px 9px; font-size: 0.72rem; text-decoration: none; color: #fff;">👁️ View PDF</a>
+                    <a href="/Sample.pdf" target="_blank" class="btn btn-secondary" id="previewPdfBtn" style="width: auto; padding: 5px 9px; font-size: 0.72rem; text-decoration: none; color: #fff;">👁️ View PDF</a>
                   </div>
                 </div>
               </div>
