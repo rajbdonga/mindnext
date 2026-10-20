@@ -13,3 +13,5 @@ cron_db.json
 # Logs & temp
 *.log
 .DS_Store
+.env
+whatsapp-gateway/.env

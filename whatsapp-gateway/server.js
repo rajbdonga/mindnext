@@ -5,6 +5,7 @@
  * Zero browser tabs needed - runs 100% in backend even when tab/browser is closed!
  */
 
+require('dotenv').config();
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
@@ -18,9 +19,15 @@ const {
   fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys');
 
+const { connectToMongo, getDbStatus, models } = require('./db');
+const { Campaign, Contact, Inquiry, ActivityLog, FastShareFile } = models;
+
 const PORT = 3001;
 const AUTH_DIR = path.join(__dirname, 'session_auth');
 const DB_FILE = path.join(__dirname, 'cron_db.json');
+
+// Connect to MongoDB asynchronously
+connectToMongo();
 
 // Ensure auth dir exists
 if (!fs.existsSync(AUTH_DIR)) {
@@ -102,6 +109,17 @@ function saveCronDb() {
   } catch (e) {
     console.error('Error saving cron_db.json:', e);
   }
+
+  // Dual sync to MongoDB
+  try {
+    if (getDbStatus().connected) {
+      Campaign.findOneAndUpdate(
+        { campaignName: 'Default MindNext WhatsApp Campaign' },
+        { ...cronDb, updatedAt: new Date() },
+        { upsert: true }
+      ).catch(() => {});
+    }
+  } catch (e) {}
 }
 
 // -------------------------------------------------------------
@@ -460,6 +478,195 @@ const server = http.createServer(async (req, res) => {
       pendingContacts: cronDb.contacts.filter(c => c.status === 'pending').length,
       logs: activityLogs.slice(-25)
     }));
+    return;
+  }
+
+  // MongoDB Database Status API
+  if (req.method === 'GET' && pathname === '/api/db/status') {
+    let counts = { contacts: cronDb.contacts.length, inquiries: 0, logs: activityLogs.length };
+    try {
+      if (getDbStatus().connected) {
+        counts.contacts = (await Contact.countDocuments()) || cronDb.contacts.length;
+        counts.inquiries = await Inquiry.countDocuments();
+        counts.logs = (await ActivityLog.countDocuments()) || activityLogs.length;
+      }
+    } catch (e) {}
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ...getDbStatus(), counts }));
+    return;
+  }
+
+  // MongoDB Connect / Switch URI API
+  if (req.method === 'POST' && pathname === '/api/db/connect') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { uri } = JSON.parse(body || '{}');
+        const result = await connectToMongo(uri);
+        res.writeHead(result.ok ? 200 : 400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Inquiries GET API (for Admin CRM Portal)
+  if (req.method === 'GET' && pathname === '/api/inquiries') {
+    try {
+      let list = [];
+      if (getDbStatus().connected) {
+        list = await Inquiry.find().sort({ timestamp: -1 }).lean();
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, inquiries: list, dbConnected: getDbStatus().connected }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: err.message }));
+    }
+    return;
+  }
+
+  // Inquiries POST / CREATE API
+  if (req.method === 'POST' && pathname === '/api/inquiries') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const id = payload.id || 'inq_' + Date.now();
+        const inquiryData = { ...payload, id, timestamp: payload.timestamp || new Date() };
+        if (getDbStatus().connected) {
+          await Inquiry.findOneAndUpdate({ id }, inquiryData, { upsert: true, new: true });
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, inquiry: inquiryData }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Inquiries UPDATE API
+  if (req.method === 'POST' && pathname === '/api/inquiries/update') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { id, status, priority, note, assignedTo } = JSON.parse(body || '{}');
+        if (!id) throw new Error('Inquiry id is required');
+        let updated = null;
+        if (getDbStatus().connected) {
+          const updateObj = {};
+          if (status) updateObj.status = status;
+          if (priority) updateObj.priority = priority;
+          if (assignedTo) updateObj.assignedTo = assignedTo;
+          if (note) updateObj.$push = { notes: note };
+          updated = await Inquiry.findOneAndUpdate({ id }, updateObj, { new: true });
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, inquiry: updated }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Inquiries DELETE API
+  if (req.method === 'POST' && pathname === '/api/inquiries/delete') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { id } = JSON.parse(body || '{}');
+        if (getDbStatus().connected && id) {
+          await Inquiry.deleteOne({ id });
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, id }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Contacts BULK IMPORT API (Saves to MongoDB and syncs cronDb)
+  if (req.method === 'POST' && pathname === '/api/contacts/bulk') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { contacts, type } = JSON.parse(body || '{}');
+        if (Array.isArray(contacts)) {
+          cronDb.contacts = contacts;
+          saveCronDb();
+          if (getDbStatus().connected) {
+            const ops = contacts.map(c => ({
+              updateOne: {
+                filter: { phone: c.phone },
+                update: { $set: { ...c, type: type || 'whatsapp' } },
+                upsert: true
+              }
+            }));
+            await Contact.bulkWrite(ops);
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, count: contacts.length }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // FastShare File Registration API
+  if (req.method === 'POST' && pathname === '/api/fastshare/record') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        if (getDbStatus().connected && data.transferCode) {
+          await FastShareFile.findOneAndUpdate(
+            { transferCode: data.transferCode },
+            data,
+            { upsert: true, new: true }
+          );
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, data }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // FastShare History GET API
+  if (req.method === 'GET' && pathname === '/api/fastshare/history') {
+    try {
+      let list = [];
+      if (getDbStatus().connected) {
+        list = await FastShareFile.find().sort({ createdAt: -1 }).limit(50).lean();
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, files: list }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: err.message }));
+    }
     return;
   }
 
