@@ -247,7 +247,10 @@ function processMarketing() {
               <!-- Quick Presets -->
               <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
                 <button type="button" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.76rem; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #34d399; font-weight: 600;" onclick="loadDoctorPreset()">
-                  🩺 Doctor Research Pitch + Sample.pdf (User Requested)
+                  🩺 Doctor Pitch + Sample.pdf (User Screenshot)
+                </button>
+                <button type="button" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.76rem; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #60a5fa; font-weight: 600;" onclick="loadDoctorAttachedPreset()">
+                  📎 Doctor Pitch (Attached Sample Wording)
                 </button>
                 <button type="button" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.76rem;" onclick="loadGeneralPreset()">
                   💼 MindNext Cloud &amp; IT Pitch
@@ -337,9 +340,13 @@ Best Regards,
         if (document.getElementById('messageTemplate')) {
           document.getElementById('messageTemplate').value = msg;
         }
+        if (document.getElementById('stopOptOutToggle')) {
+          document.getElementById('stopOptOutToggle').checked = false;
+        }
         state.attachment.enabled = true;
         state.attachment.fileName = 'Sample.pdf';
         state.attachment.filePath = 'uploads/Sample.pdf';
+        state.attachment.fileSize = '4 MB';
         if (document.getElementById('attachmentToggle')) {
           document.getElementById('attachmentToggle').checked = true;
         }
@@ -354,6 +361,34 @@ Best Regards,
         }
         onSettingFieldChange();
         showLiveToast('🩺 Doctor Research Pitch + Sample.pdf ટેમ્પલેટ લોડ થયું!', 'success');
+      };
+
+      window.loadDoctorAttachedPreset = function () {
+        var msg = "Good AfterNoon Doctor {name},\\n\\nI hope you are doing well.\\n\\nWe provide the *latest medical research articles* along with *concise, easy-to-read summaries* tailored to your specialization. This helps you stay updated with global studies while saving your valuable time.\\n\\n📄 Please find attached a *complimentary sample* for your review. Kindly let us know if you would like to receive regular research updates.\\n\\nThank you.\\n\\nBest Regards,\\n*MindNext Team*";
+        if (document.getElementById('messageTemplate')) {
+          document.getElementById('messageTemplate').value = msg;
+        }
+        if (document.getElementById('stopOptOutToggle')) {
+          document.getElementById('stopOptOutToggle').checked = false;
+        }
+        state.attachment.enabled = true;
+        state.attachment.fileName = 'Sample.pdf';
+        state.attachment.filePath = 'uploads/Sample.pdf';
+        state.attachment.fileSize = '4 MB';
+        if (document.getElementById('attachmentToggle')) {
+          document.getElementById('attachmentToggle').checked = true;
+        }
+        if (document.getElementById('attachedFileName')) {
+          document.getElementById('attachedFileName').textContent = 'Sample.pdf';
+        }
+        if (document.getElementById('attachedFileSize')) {
+          document.getElementById('attachedFileSize').textContent = 'તૈયાર છે • Medical Research Digest Sample (4 MB)';
+        }
+        if (document.getElementById('attachmentDetailsBox')) {
+          document.getElementById('attachmentDetailsBox').style.display = 'flex';
+        }
+        onSettingFieldChange();
+        showLiveToast('📎 Doctor Pitch (Attached Sample) ટેમ્પલેટ લોડ થયું!', 'success');
       };
 
       window.loadGeneralPreset = function () {
@@ -441,6 +476,30 @@ Best Regards,
   `;
 
   html = html.replace(/var CIRCLE_CIRCUMFERENCE = 440;/, attachmentJsFunctions + '\n      var CIRCLE_CIRCUMFERENCE = 440;');
+
+  // Update composeMessage to cleanly resolve Doctor {name} and empty name
+  html = html.replace(/function composeMessage\(contact\)\s*\{[\s\S]*?return resolved;\s*\}/, `function composeMessage(contact) {
+        var base = document.getElementById('messageTemplate').value;
+        var resolved = resolveSpintax(base);
+        var cName = ((contact && contact.name) || '').trim();
+        if (cName) {
+          var cleanName = cName.replace(/^(dr\\.?|doctor)\\s+/i, '');
+          resolved = resolved.replace(/Doctor\\s*\\{name\\}/gi, 'Doctor ' + cleanName);
+          resolved = resolved.replace(/\\{name\\}/gi, cleanName);
+        } else {
+          resolved = resolved.replace(/Doctor\\s*\\{name\\}/gi, 'Doctor');
+          resolved = resolved.replace(/\\{name\\}/gi, '');
+        }
+        resolved = resolved.replace(/\\{phone\\}/gi, (contact && contact.phone) || '');
+
+        if (document.getElementById('stopOptOutToggle') && document.getElementById('stopOptOutToggle').checked) {
+          resolved += "\\n\\n_જો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો 'STOP' લખી મોકલો._";
+        }
+        return resolved;
+      }`);
+
+  // Clean test dummy in testSingleBtn
+  html = html.replace(/var dummy = \{ name: 'ટેસ્ટ ગ્રાહક', phone: clean \};/, `var dummy = { name: '', phone: clean };`);
 
   // Update applySettingsToDOM to restore attachment
   html = html.replace(/if \(saved\.messageTemplate !== undefined/, `if (saved.attachment !== undefined && state.attachment) {

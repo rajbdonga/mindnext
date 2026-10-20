@@ -61,13 +61,14 @@ function loadCronDb() {
         sentToday: data.sentToday || 0,
         todayQuota: data.todayQuota || 250,
         currentBatchCount: data.currentBatchCount || 0,
-        messageTemplate: data.messageTemplate || '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
-        stopOptOut: data.stopOptOut !== undefined ? data.stopOptOut : true,
+        messageTemplate: data.messageTemplate || 'Good AfterNoon Doctor {name},\n\nI hope you are doing well.\n\nWe provide the *latest medical research articles* along with *concise, easy-to-read summaries* tailored to your specialization. This helps you stay updated with global studies while saving your valuable time.\n\n📄 I would be happy to share a *complimentary sample* for your review. Kindly let me know if you would like to receive it.\n\nThank you.\n\nBest Regards,\n*MindNext Team*',
+        stopOptOut: data.stopOptOut !== undefined ? data.stopOptOut : false,
         attachment: data.attachment || {
-          enabled: false,
+          enabled: true,
           fileName: 'Sample.pdf',
           mimetype: 'application/pdf',
-          filePath: 'uploads/Sample.pdf'
+          filePath: 'uploads/Sample.pdf',
+          fileSize: '4 MB'
         },
         contacts: Array.isArray(data.contacts) ? data.contacts : [],
         offDates: Array.isArray(data.offDates) ? data.offDates : [],
@@ -98,13 +99,14 @@ function loadCronDb() {
     sentToday: 0,
     todayQuota: 250,
     currentBatchCount: 0,
-    messageTemplate: '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
-    stopOptOut: true,
+    messageTemplate: 'Good AfterNoon Doctor {name},\n\nI hope you are doing well.\n\nWe provide the *latest medical research articles* along with *concise, easy-to-read summaries* tailored to your specialization. This helps you stay updated with global studies while saving your valuable time.\n\n📄 I would be happy to share a *complimentary sample* for your review. Kindly let me know if you would like to receive it.\n\nThank you.\n\nBest Regards,\n*MindNext Team*',
+    stopOptOut: false,
     attachment: {
-      enabled: false,
+      enabled: true,
       fileName: 'Sample.pdf',
       mimetype: 'application/pdf',
-      filePath: 'uploads/Sample.pdf'
+      filePath: 'uploads/Sample.pdf',
+      fileSize: '4 MB'
     },
     contacts: [],
     dateSchedule: [],
@@ -324,8 +326,16 @@ function isWithinWorkHours() {
 
 function composeMessage(template, contact, addStopOptOut) {
   let text = template || '';
-  text = text.replace(/\{name\}/gi, contact.name || 'ગ્રાહક');
-  text = text.replace(/\{phone\}/gi, contact.phone || '');
+  const cName = ((contact && contact.name) || '').trim();
+  if (cName) {
+    const cleanName = cName.replace(/^(dr\.?|doctor)\s+/i, '');
+    text = text.replace(/Doctor\s*\{name\}/gi, 'Doctor ' + cleanName);
+    text = text.replace(/\{name\}/gi, cleanName);
+  } else {
+    text = text.replace(/Doctor\s*\{name\}/gi, 'Doctor');
+    text = text.replace(/\{name\}/gi, '');
+  }
+  text = text.replace(/\{phone\}/gi, (contact && contact.phone) || '');
 
   // Spintax {A|B|C}
   text = text.replace(/\{([^{}]+)\}/g, (match, choices) => {

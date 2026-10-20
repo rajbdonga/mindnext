@@ -22,9 +22,15 @@ const CampaignSchema = new mongoose.Schema({
   currentBatchCount: { type: Number, default: 0 },
   messageTemplate: {
     type: String,
-    default: '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team'
+    default: 'Good AfterNoon Doctor {name},\n\nI hope you are doing well.\n\nWe provide the *latest medical research articles* along with *concise, easy-to-read summaries* tailored to your specialization. This helps you stay updated with global studies while saving your valuable time.\n\n📄 I would be happy to share a *complimentary sample* for your review. Kindly let me know if you would like to receive it.\n\nThank you.\n\nBest Regards,\n*MindNext Team*'
   },
-  stopOptOut: { type: Boolean, default: true },
+  stopOptOut: { type: Boolean, default: false },
+  attachment: {
+    enabled: { type: Boolean, default: true },
+    fileName: { type: String, default: 'Sample.pdf' },
+    mimetype: { type: String, default: 'application/pdf' },
+    filePath: { type: String, default: 'uploads/Sample.pdf' }
+  },
   offDates: [{ type: String }],
   dateSchedule: [{
     date: String,
