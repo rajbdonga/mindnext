@@ -27,10 +27,7 @@
     content="Intelligent WhatsApp automated marketing engine with randomized delays and anti-ban safeguards.">
   <meta property="og:image" content="https://mindnext.in/images/mindnext-icon.png">
 
-  <!-- Google Fonts: Outfit (Display) + Plus Jakarta Sans (UI) + JetBrains Mono (Code) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Google Fonts: Outfit (Display) + Plus Jakarta Sans (UI) + JetBrains Mono (Code) -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Google Fonts: Outfit (Display) + Plus Jakarta Sans (UI) + JetBrains Mono (Code) -->
@@ -51,13 +48,15 @@
     })();
   </script>
 
-      <style>
+  <style>
     :root {
-      --bg-app: #f4f6fb;
-      --bg-card: #ffffff;
-      --bg-card-subtle: #f8fafc;
-      --bg-input: #ffffff;
-      --border-color: #e2e8f0;
+      --bg-dark: #06080e;
+      --bg-app: #06080e;
+      --bg-card: #0e121c;
+      --bg-card-subtle: #141926;
+      --bg-input: #080c14;
+      --border-color: #1e2436;
+      --border-light: rgba(255, 255, 255, 0.08);
       --border-focus: #10b981;
 
       --wa-green: #10b981;
@@ -65,41 +64,85 @@
       --wa-green-light: #34d399;
       --wa-glow: rgba(16, 185, 129, 0.25);
 
-      --color-indigo: #4f46e5;
-      --color-indigo-light: #eef2ff;
-      --color-violet: #7c3aed;
-      --color-violet-light: #f5f3ff;
-      --color-cyan: #0284c7;
-      --color-cyan-light: #f0f9ff;
-      --color-emerald: #059669;
-      --color-emerald-light: #ecfdf5;
-      --color-amber: #d97706;
-      --color-amber-light: #fffbeb;
-      --color-rose: #e11d48;
-      --color-rose-light: #fff1f2;
+      --accent-violet: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
 
-      --text-primary: #0f172a;
-      --text-secondary: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
       --text-muted: #64748b;
 
       --font-display: 'Outfit', sans-serif;
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
-
-      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-      --shadow-lg: 0 12px 28px -5px rgba(15, 23, 42, 0.09), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-      --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
     }
 
-    *, *::before, *::after {
+    /* Prevent any oversized symbols in card headers */
+    .card-title svg {
+      display: none !important;
+    }
+
+    /* Clean Card Title Typography */
+    .card-title {
+      font-family: var(--font-display, 'Outfit', sans-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+    }
+
+    
+    /* MongoDB Live Connection Pill */
+    .db-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .db-pill.standby {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+    .db-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: dbPulse 2s infinite ease-in-out;
+    }
+    .db-pill.standby .db-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+      animation: none;
+    }
+    @keyframes dbPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    *,
+    *::before,
+    *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      background-color: var(--bg-app);
+      background-color: var(--bg-dark);
       color: var(--text-primary);
       font-family: var(--font-sans);
       line-height: 1.6;
@@ -110,7 +153,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Multi-color Ambient Mesh Glow */
+    /* Ambient Glow background */
     .bg-glow {
       position: fixed;
       top: 0;
@@ -120,31 +163,32 @@
       pointer-events: none;
       z-index: 0;
       background:
-        radial-gradient(circle at 10% 12%, rgba(16, 185, 129, 0.08) 0%, transparent 450px),
-        radial-gradient(circle at 90% 18%, rgba(99, 102, 241, 0.09) 0%, transparent 450px),
-        radial-gradient(circle at 50% 85%, rgba(2, 132, 199, 0.07) 0%, transparent 500px),
-        radial-gradient(circle at 80% 55%, rgba(244, 63, 94, 0.05) 0%, transparent 400px);
+        radial-gradient(circle at 10% 15%, rgba(37, 211, 102, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(155, 114, 203, 0.09) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(0, 210, 255, 0.05) 0%, transparent 50%);
     }
 
     .container {
-      max-width: 1360px;
+      max-width: 1340px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 20px;
       position: relative;
       z-index: 1;
       width: 100%;
     }
 
-    /* Lock Screen Overlay */
+    /* ========================================================= */
+    /* LOCK SCREEN OVERLAY                                       */
+    /* ========================================================= */
     .lock-screen-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(4, 6, 12, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 99999;
       display: flex;
       align-items: center;
@@ -162,11 +206,11 @@
     .lock-container {
       width: 100%;
       max-width: 440px;
-      background: #ffffff;
+      background: #0d111d;
       border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-xl);
-      border-radius: 20px;
-      padding: 40px 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(37, 211, 102, 0.1);
+      border-radius: 18px;
+      padding: 36px 30px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -178,31 +222,32 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #10b981, #6366f1, #0284c7, #f59e0b);
+      height: 3px;
+      background: linear-gradient(90deg, var(--wa-green), var(--accent-cyan), var(--accent-violet));
     }
 
     .lock-brand-img {
-      height: 44px;
-      max-width: 190px;
+      height: 42px;
+      max-width: 180px;
       width: auto;
-      margin: 0 auto 18px;
+      margin: 0 auto 16px;
       display: block;
       object-fit: contain;
     }
 
     .lock-title {
-      font-family: var(--font-display);
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 6px;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
     }
 
     .lock-subtitle {
-      font-size: 0.85rem;
-      color: #059669;
+      font-size: 0.82rem;
+      color: var(--wa-green);
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
@@ -218,20 +263,20 @@
     .passcode-input {
       width: 100%;
       padding: 13px 44px 13px 16px;
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 12px;
-      color: #0f172a;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      color: #ffffff;
       font-size: 1rem;
       outline: none;
+      font-family: inherit;
       transition: all 0.2s ease;
       letter-spacing: 2px;
     }
 
     .passcode-input:focus {
-      border-color: #10b981;
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+      border-color: var(--wa-green);
+      box-shadow: 0 0 15px var(--wa-glow);
     }
 
     .toggle-pass-eye {
@@ -245,56 +290,62 @@
       cursor: pointer;
       padding: 6px;
       display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-pass-eye:hover {
+      color: #ffffff;
     }
 
     .btn-unlock-portal {
       width: 100%;
       padding: 13px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--wa-green), var(--wa-green-dark));
       border: none;
-      color: #ffffff;
+      color: #031407;
       font-size: 0.95rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      font-family: inherit;
       transition: all 0.2s;
+      box-shadow: 0 4px 15px var(--wa-glow);
     }
 
     .btn-unlock-portal:hover {
-      filter: brightness(1.05);
+      filter: brightness(1.1);
       transform: translateY(-1px);
     }
 
     .lock-error-msg {
       display: none;
-      color: var(--color-rose);
-      font-size: 0.82rem;
+      color: var(--accent-rose);
+      font-size: 0.8rem;
       font-weight: 600;
       margin-bottom: 14px;
+      text-align: center;
+      animation: shake 0.3s ease;
     }
 
-    /* Top Header with Gradient Accent Line */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* ========================================================= */
+    /* SITE HEADER                                               */
+    /* ========================================================= */
     .site-header {
       padding: 14px 0;
-      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(7, 9, 14, 0.9);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
       z-index: 50;
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.04);
-    }
-
-    .site-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #10b981 0%, #4f46e5 35%, #0284c7 70%, #f59e0b 100%);
     }
 
     .header-inner {
@@ -313,7 +364,7 @@
 
     .brand-logo-img {
       height: 38px;
-      max-width: 170px;
+      max-width: 160px;
       width: auto;
       object-fit: contain;
       display: block;
@@ -323,24 +374,23 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 999px;
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-      box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
+      background: rgba(37, 211, 102, 0.12);
+      color: var(--wa-green);
+      border: 1px solid rgba(37, 211, 102, 0.3);
     }
 
     .brand-badge .dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      background: var(--wa-green);
+      box-shadow: 0 0 8px var(--wa-green);
       animation: pulseDot 2s infinite ease-in-out;
     }
 
@@ -352,109 +402,47 @@
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
-    /* Distinctly Colored Navigation Pills */
     .nav-link-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 13px;
-      border-radius: 10px;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: 8px;
       font-size: 0.82rem;
       font-weight: 600;
+      color: var(--text-secondary);
       text-decoration: none;
-      background: #ffffff;
+      background: var(--bg-card-subtle);
       border: 1px solid var(--border-color);
       transition: all 0.2s ease;
       cursor: pointer;
-      box-shadow: var(--shadow-sm);
     }
 
-    .nav-link-btn.btn-home { color: #334155; }
-    .nav-link-btn.btn-home:hover { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
-
-    .nav-link-btn.btn-emails {
-      background: #f5f3ff;
-      border-color: #ddd6fe;
-      color: #6d28d9;
-    }
-    .nav-link-btn.btn-emails:hover {
-      background: #ede9fe;
-      border-color: #c4b5fd;
+    .nav-link-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--wa-green);
     }
 
-    .nav-link-btn.btn-fastshare {
-      background: #f0f9ff;
-      border-color: #bae6fd;
-      color: #0369a1;
-    }
-    .nav-link-btn.btn-fastshare:hover {
-      background: #e0f2fe;
-      border-color: #7dd3fc;
-    }
-
-    .nav-link-btn.btn-admin {
-      background: #fff1f2;
-      border-color: #fecdd3;
-      color: #be123c;
-    }
-    .nav-link-btn.btn-admin:hover {
-      background: #ffe4e6;
-      border-color: #fda4af;
-    }
-
-    .nav-link-btn.btn-lock {
-      background: #ffffff;
-      border-color: #fecdd3;
-      color: #e11d48;
-    }
-    .nav-link-btn.btn-lock:hover {
-      background: #fff1f2;
-    }
-
-    /* MongoDB Live Pill */
-    .db-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 13px;
-      border-radius: 999px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-      color: #065f46;
-      border: 1px solid #6ee7b7;
-      box-shadow: 0 1px 3px rgba(16, 185, 129, 0.15);
-    }
-
-    .db-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
-      animation: pulseDot 2s infinite;
-    }
-
-    /* Top Banner with Vibrant Gradient Border & Soft Tint */
+    /* Top Banner */
     .top-banner {
-      padding: 24px 0 18px;
+      padding: 22px 0 16px;
     }
 
     .banner-card {
-      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-      border: 1.5px solid #e2e8f0;
-      border-radius: 20px;
-      padding: 26px 30px;
+      background: linear-gradient(135deg, rgba(20, 25, 38, 0.95), rgba(14, 18, 28, 0.95));
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 22px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 22px;
-      box-shadow: var(--shadow-md);
+      gap: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       position: relative;
       overflow: hidden;
     }
@@ -465,30 +453,27 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #10b981, #0284c7, #6366f1, #f59e0b);
+      height: 2px;
+      background: linear-gradient(90deg, var(--wa-green), var(--accent-violet), var(--accent-cyan));
     }
 
     .banner-info h1 {
-      font-family: var(--font-display);
-      font-size: 1.65rem;
+      font-size: 1.55rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 6px;
-      color: #0f172a;
+      color: #ffffff;
     }
 
     .banner-info p {
       color: var(--text-secondary);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       max-width: 680px;
-      line-height: 1.55;
     }
 
-    /* 4 Distinct Vibrant Metric Cards */
     .banner-metrics {
       display: flex;
       gap: 14px;
@@ -496,39 +481,17 @@
     }
 
     .metric-pill {
-      border-radius: 16px;
-      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
-      min-width: 125px;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .metric-pill:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .metric-pill.card-cyan {
-      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
-      border: 1.5px solid #bae6fd;
-    }
-    .metric-pill.card-green {
-      background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
-      border: 1.5px solid #a7f3d0;
-    }
-    .metric-pill.card-violet {
-      background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
-      border: 1.5px solid #ddd6fe;
-    }
-    .metric-pill.card-amber {
-      background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
-      border: 1.5px solid #fde68a;
+      min-width: 110px;
     }
 
     .metric-pill .label {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       font-weight: 700;
       color: var(--text-muted);
@@ -536,66 +499,136 @@
     }
 
     .metric-pill .val {
-      font-family: var(--font-display);
-      font-size: 1.45rem;
+      font-size: 1.25rem;
       font-weight: 800;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 2px;
     }
 
-    .val.green { color: #059669; }
-    .val.amber { color: #d97706; }
-    .val.cyan { color: #0284c7; }
-    .val.violet { color: #4f46e5; }
+    .val.green { color: var(--wa-green); }
+    .val.amber { color: var(--accent-amber); }
+    .val.cyan { color: var(--accent-cyan); }
+    .val.violet { color: var(--accent-violet); }
 
-    /* Sender Box with Vibrant Emerald Gradient */
+    /* ========================================================= */
+    /* DASHBOARD GRID - STRICT FIX FOR OVERLAPPING               */
+    /* ========================================================= */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 24px;
+      margin-bottom: 40px;
+      align-items: start; /* Prevents stretching and overlapping */
+    }
+
+    /* RIGHT COLUMN FIX: Normal column flow with gap, NO independent sticky collapsing */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 86px; /* Sticky the whole column together cleanly */
+    }
+
+    @media (max-width: 1080px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .right-col {
+        position: static; /* Disable sticky on tablet/mobile for smooth flow */
+      }
+    }
+
+    /* Cards */
+    .dash-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.015);
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title svg {
+      width: 19px;
+      height: 19px;
+      color: var(--wa-green);
+      flex-shrink: 0;
+    }
+
+    .card-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* Sender Account Card */
     .sender-box {
-      background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 100%);
-      border: 1.5px solid #6ee7b7;
-      border-radius: 18px;
-      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.07), rgba(0, 210, 255, 0.04));
+      border: 1.5px solid rgba(37, 211, 102, 0.25);
+      border-radius: 14px;
+      padding: 18px 20px;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 16px;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
     }
 
     .sender-info {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .sender-icon-wrap {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid var(--wa-green);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+      color: var(--wa-green);
       flex-shrink: 0;
     }
 
     .sender-details strong {
-      font-size: 1rem;
-      color: #065f46;
+      font-size: 0.98rem;
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     .sender-details p {
-      font-size: 0.86rem;
-      color: #047857;
-      margin-top: 2px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
     }
 
     .sender-input-group {
@@ -603,95 +636,6 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-    }
-
-    /* Dashboard Grid */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr 390px;
-      gap: 24px;
-      margin-bottom: 40px;
-      align-items: start;
-    }
-
-    .right-col {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      position: sticky;
-      top: 86px;
-    }
-
-    @media (max-width: 1080px) {
-      .dashboard-grid { grid-template-columns: 1fr; }
-      .right-col { position: static; }
-    }
-
-    /* Cards with Color-Coded Personality */
-    .dash-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-      position: relative;
-    }
-
-    .dash-card:hover {
-      box-shadow: var(--shadow-md);
-      border-color: #cbd5e1;
-    }
-
-    .dash-card.card-accent-violet { border-top: 3.5px solid #6366f1; }
-    .dash-card.card-accent-cyan { border-top: 3.5px solid #0284c7; }
-    .dash-card.card-accent-amber { border-top: 3.5px solid #f59e0b; }
-    .dash-card.card-accent-rose { border-top: 3.5px solid #f43f5e; }
-    .dash-card.card-accent-emerald { border-top: 3.5px solid #10b981; }
-
-    .card-header {
-      padding: 18px 24px;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      background: linear-gradient(180deg, #fafbfd 0%, #ffffff 100%);
-      flex-wrap: wrap;
-    }
-
-    .card-title {
-      font-family: var(--font-display);
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .card-icon-pill {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .pill-violet { background: #f5f3ff; color: #6d28d9; }
-    .pill-cyan { background: #f0f9ff; color: #0284c7; }
-    .pill-amber { background: #fffbeb; color: #d97706; }
-    .pill-rose { background: #fff1f2; color: #e11d48; }
-    .pill-emerald { background: #ecfdf5; color: #059669; }
-
-    .card-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .card-body {
-      padding: 24px;
     }
 
     /* Form Controls */
@@ -708,49 +652,51 @@
     }
 
     .form-label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      color: #334155;
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
     .form-hint {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
     }
 
     .form-control {
-      background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      color: #0f172a;
-      padding: 10px 14px;
-      border-radius: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 9px 13px;
+      border-radius: 10px;
       font-family: var(--font-sans);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       transition: all 0.2s ease;
       width: 100%;
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+      border-color: var(--wa-green);
+      box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
     }
 
     textarea.form-control {
-      min-height: 120px;
+      min-height: 110px;
       resize: vertical;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
-    /* Clocks & Time Pickers */
+    /* ========================================================= */
+    /* WATCH / CLOCK TIME PICKER COMPONENT                       */
+    /* ========================================================= */
     .watch-picker-box {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      background: var(--bg-card-subtle);
       border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -767,30 +713,34 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      background: #ffffff;
-      border: 1.5px solid #cbd5e1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 6px 10px;
-      box-shadow: var(--shadow-sm);
     }
 
     .clock-select {
       background: transparent;
       border: none;
-      color: #0f172a;
+      color: var(--text-primary);
       font-family: var(--font-mono);
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
       outline: none;
       cursor: pointer;
       text-align: center;
     }
 
+    .clock-select option {
+      background: #0f1523;
+      color: #fff;
+    }
+
     .clock-colon {
       font-family: var(--font-mono);
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
-      color: #10b981;
+      color: var(--wa-green);
       animation: blinkColon 1.5s infinite;
     }
 
@@ -800,76 +750,81 @@
     }
 
     .ampm-toggle-btn {
-      padding: 7px 14px;
-      border-radius: 10px;
+      padding: 6px 12px;
+      border-radius: 8px;
       font-family: var(--font-mono);
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       font-weight: 800;
-      background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      color: #334155;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .ampm-toggle-btn.is-am {
-      color: #0284c7;
-      border-color: #7dd3fc;
-      background: #f0f9ff;
+      color: var(--accent-cyan);
+      border-color: rgba(0, 210, 255, 0.4);
+      background: rgba(0, 210, 255, 0.1);
     }
 
     .ampm-toggle-btn.is-pm {
-      color: #d97706;
-      border-color: #fde68a;
-      background: #fffbeb;
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.1);
     }
 
-    /* Live Controller Card with Indigo Accent */
+    /* Live Controller Card - NON-STICKY INDIVIDUAL OVERLAP FIXED */
     .live-controller-card {
-      background: #ffffff;
+      background: radial-gradient(circle at top right, rgba(37, 211, 102, 0.08), transparent 70%), var(--bg-card);
       border: 1px solid var(--border-color);
-      border-top: 4px solid #10b981;
-      border-radius: 20px;
-      padding: 26px;
+      border-radius: 16px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       gap: 16px;
-      position: relative;
-      box-shadow: var(--shadow-md);
+      position: relative; /* Normal positioning inside .right-col */
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 7px 18px;
+      padding: 6px 14px;
       border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.03em;
       text-transform: uppercase;
-      background: #f1f5f9;
-      color: #334155;
-      border: 1px solid #cbd5e1;
+      background: rgba(100, 116, 139, 0.15);
+      color: var(--text-secondary);
+      border: 1px solid rgba(100, 116, 139, 0.3);
       transition: all 0.3s ease;
     }
 
     .status-badge.running {
-      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-      color: #065f46;
-      border-color: #10b981;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+      background: rgba(37, 211, 102, 0.15);
+      color: var(--wa-green-light);
+      border-color: var(--wa-green);
+      box-shadow: 0 0 15px rgba(37, 211, 102, 0.2);
     }
 
     .status-badge.break {
-      background: #fffbeb;
-      color: #92400e;
-      border-color: #facc15;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      border-color: var(--accent-amber);
     }
 
-    /* Timer Circle */
+    .status-badge.sleeping {
+      background: rgba(155, 114, 203, 0.15);
+      color: var(--accent-violet);
+      border-color: var(--accent-violet);
+    }
+
+    /* Circular SVG Timer */
     .timer-circle-wrap {
       position: relative;
       width: 160px;
@@ -887,13 +842,13 @@
 
     .timer-circle-bg {
       fill: none;
-      stroke: #f1f5f9;
+      stroke: var(--bg-card-subtle);
       stroke-width: 8;
     }
 
     .timer-circle-progress {
       fill: none;
-      stroke: #10b981;
+      stroke: var(--wa-green);
       stroke-width: 8;
       stroke-linecap: round;
       stroke-dasharray: 440;
@@ -911,14 +866,14 @@
 
     .timer-seconds {
       font-family: var(--font-mono);
-      font-size: 2.2rem;
+      font-size: 2.1rem;
       font-weight: 800;
-      color: #0f172a;
+      color: var(--text-primary);
       line-height: 1;
     }
 
     .timer-unit {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       text-transform: uppercase;
       font-weight: 700;
@@ -926,21 +881,21 @@
     }
 
     .timer-jitter-info {
-      font-size: 0.84rem;
-      color: #334155;
-      background: #f8fafc;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-card-subtle);
       border: 1px solid var(--border-color);
-      padding: 8px 14px;
-      border-radius: 12px;
+      padding: 6px 14px;
+      border-radius: 8px;
       font-family: var(--font-mono);
       width: 100%;
     }
 
     .timer-jitter-info strong {
-      color: #059669;
+      color: var(--wa-green);
     }
 
-    /* Action Buttons with Gradients */
+    /* Action Buttons */
     .action-btn-group {
       display: flex;
       gap: 10px;
@@ -953,55 +908,57 @@
       justify-content: center;
       gap: 8px;
       padding: 12px 18px;
-      border-radius: 12px;
-      font-size: 0.92rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       border: 1px solid transparent;
       text-decoration: none;
       width: 100%;
       user-select: none;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      background: linear-gradient(135deg, var(--wa-green), var(--wa-green-dark));
+      color: #041208;
+      box-shadow: 0 4px 14px var(--wa-glow);
     }
+
     .btn-primary:hover {
-      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      background: linear-gradient(135deg, var(--wa-green-light), var(--wa-green));
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
     }
 
     .btn-danger {
-      background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-      color: #e11d48;
-      border-color: #fecdd3;
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--accent-rose);
+      border-color: rgba(244, 63, 94, 0.3);
     }
+
     .btn-danger:hover {
-      background: #ffe4e6;
-      border-color: #fda4af;
+      background: rgba(244, 63, 94, 0.25);
+      border-color: var(--accent-rose);
     }
 
     .btn-secondary {
-      background: #ffffff;
-      color: #0f172a;
-      border-color: #cbd5e1;
-      box-shadow: var(--shadow-sm);
+      background: var(--bg-card-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-color);
     }
+
     .btn-secondary:hover {
-      background: #f8fafc;
-      border-color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-muted);
     }
 
     /* Range Box */
     .range-box {
-      background: #f8fafc;
+      background: var(--bg-card-subtle);
       border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 14px;
     }
 
     .range-header {
@@ -1013,42 +970,41 @@
 
     .range-val {
       font-family: var(--font-mono);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       font-weight: 700;
-      color: #059669;
+      color: var(--wa-green);
     }
 
     .range-slider {
       width: 100%;
       height: 6px;
       border-radius: 3px;
-      background: #cbd5e1;
+      background: var(--border-color);
       outline: none;
       -webkit-appearance: none;
     }
 
     .range-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: #10b981;
+      background: var(--wa-green);
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
-      border: 2px solid #ffffff;
+      box-shadow: 0 0 10px var(--wa-glow);
     }
 
     /* Schedule & Warm-up Table */
     .schedule-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       min-width: 520px;
     }
 
     .schedule-table th,
     .schedule-table td {
-      padding: 12px 16px;
+      padding: 10px 14px;
       text-align: left;
       border-bottom: 1px solid var(--border-color);
     }
@@ -1056,34 +1012,34 @@
     .schedule-table th {
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      background: #f8fafc;
+      background: rgba(255, 255, 255, 0.01);
     }
 
     .schedule-table tr.active-today {
-      background: linear-gradient(90deg, #ecfdf5 0%, #ffffff 100%);
+      background: rgba(37, 211, 102, 0.07);
     }
 
     .schedule-table tr.active-today td:first-child {
-      border-left: 3px solid #10b981;
+      border-left: 3px solid var(--wa-green);
       font-weight: 700;
-      color: #065f46;
+      color: var(--wa-green);
     }
 
     /* Queue Table */
     .queue-table-wrap {
-      max-height: 300px;
+      max-height: 280px;
       overflow-y: auto;
       border: 1px solid var(--border-color);
-      border-radius: 14px;
-      background: #ffffff;
+      border-radius: 10px;
+      background: var(--bg-input);
       -webkit-overflow-scrolling: touch;
     }
 
     .queue-pill {
-      font-size: 0.72rem;
-      padding: 4px 10px;
+      font-size: 0.7rem;
+      padding: 3px 8px;
       border-radius: 999px;
       font-weight: 700;
       display: inline-flex;
@@ -1092,44 +1048,35 @@
     }
 
     .queue-pill.pending {
-      background: #f1f5f9;
-      color: #475569;
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-secondary);
     }
 
     .queue-pill.sent {
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
+      background: rgba(37, 211, 102, 0.15);
+      color: var(--wa-green);
     }
 
     .queue-pill.sending {
-      background: #f0f9ff;
-      color: #0369a1;
-      border: 1px solid #bae6fd;
+      background: rgba(0, 210, 255, 0.15);
+      color: var(--accent-cyan);
       animation: pulseDot 1.5s infinite;
-    }
-
-    .queue-pill.failed {
-      background: #fff1f2;
-      color: #be123c;
-      border: 1px solid #fecdd3;
     }
 
     /* Live Terminal Console Log */
     .console-log {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 16px;
+      background: #040508;
+      border: 1px solid #141926;
+      border-radius: 10px;
+      padding: 12px;
       font-family: var(--font-mono);
-      font-size: 0.78rem;
-      height: 220px;
+      font-size: 0.75rem;
+      height: 200px;
       overflow-y: auto;
-      color: #cbd5e1;
+      color: #94a3b8;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
     }
 
     .log-line {
@@ -1139,14 +1086,14 @@
     }
 
     .log-time {
-      color: #64748b;
+      color: #475569;
       flex-shrink: 0;
     }
 
-    .log-msg.success { color: #34d399; }
-    .log-msg.info { color: #38bdf8; }
-    .log-msg.warn { color: #fbbf24; }
-    .log-msg.alert { color: #f87171; }
+    .log-msg.success { color: var(--wa-green); }
+    .log-msg.info { color: var(--accent-cyan); }
+    .log-msg.warn { color: var(--accent-amber); }
+    .log-msg.alert { color: var(--accent-rose); }
 
     /* Custom Switch Toggle */
     .toggle-switch {
@@ -1160,7 +1107,7 @@
     .toggle-track {
       width: 44px;
       height: 24px;
-      background: #cbd5e1;
+      background: var(--border-color);
       border-radius: 999px;
       position: relative;
       transition: background 0.2s ease;
@@ -1170,18 +1117,25 @@
     .toggle-thumb {
       width: 18px;
       height: 18px;
-      background: #ffffff;
+      background: white;
       border-radius: 50%;
       position: absolute;
       top: 3px;
       left: 3px;
       transition: transform 0.2s ease;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
 
-    .toggle-input { display: none; }
-    .toggle-input:checked + .toggle-track { background: #10b981; }
-    .toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
+    .toggle-input {
+      display: none;
+    }
+
+    .toggle-input:checked + .toggle-track {
+      background: var(--wa-green);
+    }
+
+    .toggle-input:checked + .toggle-track .toggle-thumb {
+      transform: translateX(20px);
+    }
 
     /* Tabs */
     .tab-nav {
@@ -1189,18 +1143,18 @@
       border-bottom: 1px solid var(--border-color);
       gap: 8px;
       padding: 0 16px;
-      background: #f8fafc;
+      background: rgba(255, 255, 255, 0.015);
       overflow-x: auto;
     }
 
     .tab-btn {
-      padding: 12px 18px;
+      padding: 12px 16px;
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 0.86rem;
+      font-size: 0.82rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -1210,21 +1164,28 @@
     }
 
     .tab-btn.active {
-      color: #059669;
-      border-bottom-color: #10b981;
+      color: var(--wa-green);
+      border-bottom-color: var(--wa-green);
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+    .tab-content {
+      display: none;
+    }
 
-    /* Modal Backdrop */
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ========================================================= */
+    /* CONFIRMATION MODAL                                        */
+    /* ========================================================= */
     .modal-backdrop {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(15, 23, 42, 0.65);
+      background: rgba(4, 6, 12, 0.85);
       backdrop-filter: blur(8px);
       z-index: 9999;
       display: flex;
@@ -1236,72 +1197,123 @@
       transition: all 0.25s ease;
     }
 
-    .modal-backdrop.is-open { opacity: 1; visibility: visible; }
+    .modal-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
 
     .modal-box {
       width: 100%;
-      max-width: 460px;
-      background: #ffffff;
+      max-width: 420px;
+      background: #0f1523;
       border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: var(--shadow-xl);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      border-radius: 16px;
+      padding: 26px;
+      text-align: center;
       position: relative;
     }
 
+    .modal-icon-warn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--accent-amber);
+      color: var(--accent-amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+
     .modal-title {
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #0f172a;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
       margin-bottom: 8px;
     }
 
     .modal-desc {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
-      margin-bottom: 20px;
       line-height: 1.5;
+      margin-bottom: 20px;
     }
 
-    .modal-actions {
+    .modal-btn-row {
       display: flex;
-      gap: 12px;
-      justify-content: flex-end;
+      gap: 10px;
     }
 
     /* Footer */
     .site-footer {
       margin-top: auto;
       border-top: 1px solid var(--border-color);
-      padding: 24px 0;
-      background: #ffffff;
-      font-size: 0.82rem;
+      padding: 22px 0;
       text-align: center;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
     .site-footer a {
-      color: #4f46e5;
+      color: var(--accent-violet);
       text-decoration: none;
+    }
+
+    /* Code Block */
+    .code-preview-wrap {
+      position: relative;
+      background: #05070c;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .copy-code-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
       font-weight: 600;
     }
 
-    /* Responsive */
+    /* Responsive Adjustments */
     @media (max-width: 768px) {
       .header-inner {
         flex-direction: column;
         align-items: flex-start;
-        gap: 14px;
+        gap: 12px;
       }
       .nav-actions {
         width: 100%;
         justify-content: space-between;
       }
-      .banner-info h1 { font-size: 1.3rem; }
-      .metric-pill { flex: 1 1 45%; }
-      .sender-box { flex-direction: column; align-items: flex-start; }
-      .watch-display-row { flex-direction: column; align-items: flex-start; }
+      .banner-info h1 {
+        font-size: 1.25rem;
+      }
+      .metric-pill {
+        flex: 1 1 45%;
+      }
+      .sender-box {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .watch-display-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -1315,8 +1327,8 @@
   <!-- ========================================================= -->
   <div class="lock-screen-overlay" id="lockOverlay">
     <div class="lock-container">
-      <img src="images/mindnext-logo.png" alt="MindNext" class="lock-brand-img"
-        onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo.png';}else{this.src='images/mindnext-icon.png';}">
+      <img src="images/mindnext-logo-white.png" alt="MindNext" class="lock-brand-img"
+        onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo-white.png';}else{this.src='images/mindnext-icon.png';}">
       <h1 class="lock-title">WhatsApp Marketing Portal</h1>
       <p class="lock-subtitle">🔒 પાસકોડ વડે લૉગિન કરો (Enter Passcode)</p>
 
@@ -1347,8 +1359,8 @@
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand-wrap">
-        <img src="images/mindnext-logo.png" alt="MindNext Technologies" class="brand-logo-img"
-          onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo.png';}else{this.src='images/mindnext-icon.png';}">
+        <img src="images/mindnext-logo-white.png" alt="MindNext Technologies" class="brand-logo-img"
+          onerror="if(!this.t1){this.t1=1; this.src='../images/mindnext-logo-white.png';}else if(!this.t2){this.t2=1; this.src='/images/mindnext-logo-white.png';}else{this.src='images/mindnext-icon.png';}">
         <span class="brand-badge">
           <span class="dot"></span>
           WhatsApp Cron Engine
@@ -1356,39 +1368,40 @@
       </a>
 
       <div class="nav-actions">
-        <a href="/" class="nav-link-btn btn-home" title="Main Website">
+        <a href="/" class="nav-link-btn" title="MindNext Home">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           Home
         </a>
-        <a href="/emails" class="nav-link-btn btn-emails" title="Email Management Suite">
+        <a href="/emails" class="nav-link-btn" title="Email Management Suite">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
             <polyline points="22,6 12,13 2,6"></polyline>
           </svg>
           Emails
         </a>
-        <a href="/fastshare" class="nav-link-btn btn-fastshare" title="FastShare File Transfer">
+        <a href="/fastshare" class="nav-link-btn" title="Secure FastShare Portal">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="16 18 22 12 16 6"></polyline>
             <polyline points="8 6 2 12 8 18"></polyline>
           </svg>
           FastShare
         </a>
-        <a href="/admin" class="nav-link-btn btn-admin" title="Executive Admin CRM">
+        <a href="/admin" class="nav-link-btn" title="Executive Admin Portal">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
           Admin
         </a>
+        
         <div class="db-pill" id="dbStatusPill" title="MongoDB Connection Status">
           <span class="db-dot"></span>
-          <span id="dbStatusText">MongoDB: Connected (mindnext)</span>
+          <span id="dbStatusText">MongoDB: Connected</span>
         </div>
-        <button class="nav-link-btn btn-lock" onclick="lockMarketingPortal()" title="Lock Portal">
+        <button class="nav-link-btn" onclick="lockMarketingPortal()" title="Lock Portal" style="color: var(--accent-rose); border-color: rgba(244, 63, 94, 0.3);">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -1417,19 +1430,19 @@
         </div>
 
         <div class="banner-metrics">
-          <div class="metric-pill card-cyan">
+          <div class="metric-pill">
             <span class="label">કુલ કતાર (Queue)</span>
             <span class="val cyan" id="statQueueCount">0</span>
           </div>
-          <div class="metric-pill card-green">
+          <div class="metric-pill">
             <span class="label">આજે મોકલાયેલ</span>
             <span class="val green" id="statSentToday">0 / 250</span>
           </div>
-          <div class="metric-pill card-violet">
+          <div class="metric-pill">
             <span class="label">સરેરાશ ડિલે</span>
             <span class="val violet" id="statAvgDelay">150s (2.5m)</span>
           </div>
-          <div class="metric-pill card-amber">
+          <div class="metric-pill">
             <span class="label">અનુમાનિત સમાપ્તિ</span>
             <span class="val amber" id="statEstFinish">07:25 PM</span>
           </div>
@@ -1451,7 +1464,7 @@
         <div class="sender-details">
           <strong>
             મોકલનાર WhatsApp એકાઉન્ટ (Sender Phone Profile)
-            <span class="queue-pill sent" style="font-size: 0.65rem;">🟢 Active SIM</span>
+            <span class="queue-pill sent" style="font-size: 0.65rem;">Active SIM</span>
           </strong>
           <p id="senderDisplayLabel">હાલ આ નંબરથી મેસેજ ડિસ્પેચ થશે: <strong>+91 98250 12345 (SIM 1 - Primary)</strong></p>
         </div>
@@ -1477,17 +1490,9 @@
       <div class="left-col" style="display: flex; flex-direction: column; gap: 24px;">
 
         <!-- 1. Randomized Delay Controls -->
-        <div class="dash-card card-accent-violet">
+        <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">
-              <div class="card-icon-pill pill-violet">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-              </div>
-              રેન્ડમ ડિલે કંટ્રોલ (Anti-Ban Jitter)
-            </div>
+            <div class="card-title">(A) રેન્ડમ ડિલે કંટ્રોલ (Anti-Ban Jitter)</div>
             <span class="card-subtitle">એવરેજ ૧૫૦ સેકન્ડ (૨.૫ મિનિટ)</span>
           </div>
           <div class="card-body">
@@ -1516,13 +1521,7 @@
         <!-- 2. Interactive Watch Clock Time Pickers (Requirement: proper watch AM/PM Hour Minute Second) -->
         <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 14 10"></polyline>
-              </svg>
-              (B) દૈનિક ઓફિસ ટાઈમિંગ (ઘડિયાળ સેટિંગ - AM/PM, કલાક, મિનિટ, સેકન્ડ)
-            </div>
+            <div class="card-title">(B) દૈનિક ઓફિસ ટાઈમિંગ (ઘડિયાળ સેટિંગ - AM/PM, કલાક, મિનિટ, સેકન્ડ)</div>
             <span class="card-subtitle">વર્કિંગ અવર્સ લિમિટર</span>
           </div>
           <div class="card-body">
@@ -1531,7 +1530,7 @@
               <!-- Start Time Watch Picker -->
               <div class="watch-picker-box">
                 <label class="form-label">
-                  <span>🌅 શરૂઆત સમય (Start Time)</span>
+                  <span>શરૂઆત સમય (Start Time)</span>
                   <span class="form-hint" id="startTimePreview">09:00:00 AM</span>
                 </label>
                 <div class="watch-display-row">
@@ -1555,7 +1554,7 @@
               <!-- End Time Watch Picker -->
               <div class="watch-picker-box">
                 <label class="form-label">
-                  <span>🌙 સમાપ્તિ સમય (End Time)</span>
+                  <span>સમાપ્તિ સમય (End Time)</span>
                   <span class="form-hint" id="endTimePreview">09:00:00 PM</span>
                 </label>
                 <div class="watch-display-row">
@@ -1583,16 +1582,7 @@
         <!-- 3. Intermediate Breaks (Lunch & Batch Pauses) -->
         <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                <line x1="6" y1="1" x2="6" y2="4"></line>
-                <line x1="10" y1="1" x2="10" y2="4"></line>
-                <line x1="14" y1="1" x2="14" y2="4"></line>
-              </svg>
-              (C) વચ્ચે બ્રેક અને લંચ ગેપ સેટિંગ્સ
-            </div>
+            <div class="card-title">(C) વચ્ચે બ્રેક અને લંચ ગેપ સેટિંગ્સ</div>
             <span class="card-subtitle">આપોઆપ આરામ</span>
           </div>
           <div class="card-body">
@@ -1666,15 +1656,7 @@
         <!-- 4. Date-wise Calendar, Daily Quota & Off-Days Schedule (Clean, Proper, and Intuitive) -->
         <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="18" y2="10"></line>
-              </svg>
-              (D) કેલેન્ડર સમયગાળો અને દૈનિક ટાર્ગેટ (Date & Target Settings)
-            </div>
+            <div class="card-title">(D) કેલેન્ડર સમયગાળો અને દૈનિક ટાર્ગેટ (Date & Target Settings)</div>
             <span class="card-subtitle">અભિયાન અવધિ</span>
           </div>
           <div class="card-body">
@@ -1682,16 +1664,16 @@
             <div style="background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--border-color);">
               <div class="form-grid">
                 <div class="form-group">
-                  <label class="form-label">📅 અભિયાન શરૂ તારીખ (Campaign Start Date):</label>
+                  <label class="form-label">અભિયાન શરૂ તારીખ (Campaign Start Date):</label>
                   <input type="date" class="form-control" id="campaignStartDate" onchange="onSettingFieldChange()">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">🏁 કઈ તારીખ સુધી ક્રોન ચલાવવો છે (Run Until Date):</label>
+                  <label class="form-label">કઈ તારીખ સુધી ક્રોન ચલાવવો છે (Run Until Date):</label>
                   <input type="date" class="form-control" id="campaignEndDate" onchange="onSettingFieldChange()">
                 </div>
               </div>
               <div id="campaignDateStatusBadge" style="margin-top: 8px; font-size: 0.78rem; color: var(--wa-green-light);">
-                🏁 ક્રોન નિર્ધારિત તારીખ સુધી દરરોજ નિયત સમયે આપમેળે ચાલશે.
+                ક્રોન નિર્ધારિત તારીખ સુધી દરરોજ નિયત સમયે આપમેળે ચાલશે.
               </div>
             </div>
 
@@ -1699,7 +1681,7 @@
             <div style="background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--border-color);">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
-                  <strong style="font-size: 0.9rem; color: #fff;">🎯 દૈનિક મેસેજ ટાર્ગેટ ક્વોટા (Daily Message Quota):</strong>
+                  <strong style="font-size: 0.9rem; color: #fff;">દૈનિક મેસેજ ટાર્ગેટ ક્વોટા (Daily Message Quota):</strong>
                   <p style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
                     રોજના આટલા મેસેજ પૂરા થતાં ક્રોન આપોઆપ અટકી જશે અને બીજા દિવસે ફરી શરૂ થશે.
                   </p>
@@ -1866,7 +1848,7 @@ MindNext Team</textarea>
 
           <!-- Active Sender indicator in Live Card -->
           <div style="font-size: 0.75rem; color: var(--wa-green-light); background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.2); padding: 5px 10px; border-radius: 6px; width: 100%;">
-            📱 મોકલનાર: <strong id="liveSenderNumberText">+91 98250 12345</strong>
+            મોકલનાર: <strong id="liveSenderNumberText">+91 98250 12345</strong>
           </div>
 
           <!-- Action Buttons with Confirmation on Stop -->
@@ -1887,21 +1869,21 @@ MindNext Team</textarea>
           </div>
 
           <div style="display: flex; gap: 8px; width: 100%;">
-            <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="skipNextBtn">⏭️ સ્કીપ</button>
-            <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="testSingleBtn">🧪 ટેસ્ટ ૧ મેસેજ</button>
+            <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="skipNextBtn">સ્કીપ</button>
+            <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 0.78rem;" id="testSingleBtn">ટેસ્ટ ૧ મેસેજ</button>
           </div>
 
           <!-- Dispatch Mode Selection & Zero-Tab Backend Engine -->
           <div style="width: 100%; text-align: left; background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);">
             <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; margin-bottom: 6px;">
               <span>ડિસ્પેચ એન્જિન (SENDING MODE):</span>
-              <span id="gatewayStatusDot" class="queue-pill sent" style="font-size: 0.65rem;">🟢 Zero-Tab Active</span>
+              <span id="gatewayStatusDot" class="queue-pill sent" style="font-size: 0.65rem;">Zero-Tab Active</span>
             </label>
             <select class="form-control" id="dispatchModeSelect" style="font-size: 0.82rem; padding: 7px 10px; margin-bottom: 8px;" onchange="onDispatchModeChange()">
-              <option value="backend_gateway" selected>⚡ બેકગ્રાઉન્ડ સર્વર (Zero-Tab Mode - કોઈ ટેબ નહીં ખુલે)</option>
-              <option value="cloud_api">🌐 Meta WhatsApp Cloud API (સત્તાવાર)</option>
-              <option value="simulation">🧪 ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
-              <option value="wa_web">📲 WhatsApp Web પોપઅપ (મેન્યુઅલ)</option>
+              <option value="backend_gateway" selected>બેકગ્રાઉન્ડ સર્વર (Zero-Tab Mode - કોઈ ટેબ નહીં ખુલે)</option>
+              <option value="cloud_api">Meta WhatsApp Cloud API (સત્તાવાર)</option>
+              <option value="simulation">ડેમો સિમ્યુલેશન (ટેસ્ટિંગ માટે)</option>
+              <option value="wa_web">WhatsApp Web પોપઅપ (મેન્યુઅલ)</option>
             </select>
 
             <!-- Local Gateway Configuration Box -->
@@ -1909,13 +1891,13 @@ MindNext Team</textarea>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <span style="font-size: 0.72rem; color: var(--text-muted);">Gateway URL:</span>
                 <div style="display: flex; gap: 4px;">
-                  <a href="http://localhost:3001" target="_blank" class="btn btn-secondary" style="width: auto; padding: 2px 7px; font-size: 0.68rem; text-decoration: none; color: #fff;">📲 QR સ્કેન / Open Gateway</a>
-                  <button type="button" class="btn btn-secondary" style="width: auto; padding: 2px 7px; font-size: 0.68rem;" onclick="pingGatewayServer()">📡 Ping Test</button>
+                  <a href="http://localhost:3001" target="_blank" class="btn btn-secondary" style="width: auto; padding: 2px 7px; font-size: 0.68rem; text-decoration: none; color: #fff;">QR સ્કેન / Open Gateway</a>
+                  <button type="button" class="btn btn-secondary" style="width: auto; padding: 2px 7px; font-size: 0.68rem;" onclick="pingGatewayServer()">Ping Test</button>
                 </div>
               </div>
               <input type="text" class="form-control" id="gatewayEndpointUrl" value="http://localhost:3001/api/send" style="font-size: 0.75rem; padding: 5px 8px; font-family: var(--font-mono);">
               <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
-                💡 <em>કોઈ નવી બ્રાઉઝર ટેબ ખુલ્યા વગર બેકગ્રાઉન્ડમાંથી ઓટો-મેસેજ જશે.</em>
+                <em>કોઈ નવી બ્રાઉઝર ટેબ ખુલ્યા વગર બેકગ્રાઉન્ડમાંથી ઓટો-મેસેજ જશે.</em>
               </p>
             </div>
 
@@ -1932,13 +1914,7 @@ MindNext Team</textarea>
         <!-- Live Terminal Log - Flows cleanly without overlapping -->
         <div class="dash-card">
           <div class="card-header">
-            <div class="card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="4 17 10 11 4 5"></polyline>
-                <line x1="12" y1="19" x2="20" y2="19"></line>
-              </svg>
-              લાઈવ કન્સોલ લોગ્સ (Live Logs)
-            </div>
+            <div class="card-title">લાઈવ કન્સોલ લોગ્સ (Live Logs)</div>
             <button class="btn btn-secondary" style="width: auto; padding: 4px 8px; font-size: 0.7rem;" id="clearLogsBtn">સાફ કરો</button>
           </div>
           <div class="card-body" style="padding: 12px;">
@@ -1997,37 +1973,6 @@ MindNext Team</textarea>
       'use strict';
 
       var STORAGE_KEY_AUTH = 'mn_marketing_auth_v1';
-
-      // --- MONGODB CONNECTION TRACKER ---
-      async function checkMongoConnection() {
-        var dbPill = document.getElementById('dbStatusPill');
-        var dbText = document.getElementById('dbStatusText');
-        if (!dbText) return;
-        try {
-          var res = await fetch('http://localhost:3001/api/db/status');
-          if (res.ok) {
-            var data = await res.json();
-            if (data.connected) {
-              dbText.textContent = 'MongoDB: Connected (' + data.dbName + ')';
-              if (dbPill) {
-                dbPill.className = 'db-pill';
-                dbPill.title = 'MongoDB Server: ' + data.host + ':' + data.port + ' | Database: ' + data.dbName;
-              }
-            } else {
-              dbText.textContent = 'DB: Hybrid Local Mode';
-              if (dbPill) {
-                dbPill.className = 'db-pill standby';
-                dbPill.title = 'Local JSON database active (MongoDB standby)';
-              }
-            }
-          }
-        } catch (e) {
-          dbText.textContent = 'DB: Hybrid Ready';
-        }
-      }
-      setInterval(checkMongoConnection, 8000);
-      setTimeout(checkMongoConnection, 1000);
-
       var STORAGE_KEY_SENDER = 'mn_marketing_sender_phone';
 
       // --- PASSCODE / AUTHENTICATION ---
@@ -2157,7 +2102,7 @@ MindNext Team</textarea>
         if (disp) disp.innerHTML = 'હાલ આ નંબરથી મેસેજ ડિસ્પેચ થશે: <strong>' + state.senderNumber + '</strong>';
         var liveText = document.getElementById('liveSenderNumberText');
         if (liveText) liveText.textContent = state.senderNumber;
-        appendLog('📱 મોકલનાર WhatsApp નંબર સેટ થયો: ' + state.senderNumber, 'success');
+        appendLog('મોકલનાર WhatsApp નંબર સેટ થયો: ' + state.senderNumber, 'success');
         onSettingFieldChange();
       };
 
@@ -2340,7 +2285,7 @@ MindNext Team</textarea>
         var sVal = startInput ? startInput.value : state.campaignStartDate;
         var eVal = endInput ? endInput.value : state.campaignEndDate;
         if (!sVal || !eVal) {
-          badge.textContent = '🏁 ક્રોન નિર્ધારિત તારીખ સુધી દરરોજ નિયત સમયે આપમેળે ચાલશે.';
+          badge.textContent = 'ક્રોન નિર્ધારિત તારીખ સુધી દરરોજ નિયત સમયે આપમેળે ચાલશે.';
           return;
         }
 
@@ -2867,7 +2812,7 @@ MindNext Team</textarea>
         // Check Campaign End Date
         if (isCampaignExpired()) {
           updateStatusDisplay('', 'અભિયાન પૂર્ણ (Campaign Ended)');
-          appendLog('🏁 ક્રોન નિર્ધારિત તારીખ સુધી પહોંચી ગયો છે! અભિયાન પૂર્ણ થયું.', 'success');
+          appendLog('ક્રોન નિર્ધારિત તારીખ સુધી પહોંચી ગયો છે! અભિયાન પૂર્ણ થયું.', 'success');
           stopCron();
           return;
         }
@@ -2966,7 +2911,7 @@ MindNext Team</textarea>
         if (metaConfig) metaConfig.style.display = (mode === 'cloud_api') ? 'block' : 'none';
 
         if (mode === 'backend_gateway') {
-          statusDot.textContent = '🟢 Zero-Tab Active';
+          statusDot.textContent = 'Zero-Tab Active';
           statusDot.className = 'queue-pill sent';
           pingGatewayServer();
         } else if (mode === 'cloud_api') {
@@ -3538,7 +3483,37 @@ Chetan Parikh, 9909033445`;
       }, 3000);
 
     })();
-  </script>
+  
+    // --- MONGODB CONNECTION TRACKER ---
+    async function checkMongoConnection() {
+      var dbPill = document.getElementById('dbStatusPill');
+      var dbText = document.getElementById('dbStatusText');
+      if (!dbText) return;
+      try {
+        var res = await fetch('http://localhost:3001/api/db/status');
+        if (res.ok) {
+          var data = await res.json();
+          if (data.connected) {
+            dbText.textContent = 'MongoDB: Connected (' + (data.dbName || 'mindnext') + ')';
+            if (dbPill) {
+              dbPill.className = 'db-pill';
+              dbPill.title = 'MongoDB Server: ' + data.host + ':' + data.port + ' | Database: ' + data.dbName;
+            }
+          } else {
+            dbText.textContent = 'DB: Hybrid Local Mode';
+            if (dbPill) {
+              dbPill.className = 'db-pill standby';
+              dbPill.title = 'Local JSON database active (MongoDB standby)';
+            }
+          }
+        }
+      } catch (e) {
+        dbText.textContent = 'DB: Hybrid Ready';
+      }
+    }
+    setInterval(checkMongoConnection, 8000);
+    setTimeout(checkMongoConnection, 1000);
 
+  </script>
 </body>
 </html>
