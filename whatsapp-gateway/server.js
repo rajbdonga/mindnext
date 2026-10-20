@@ -63,6 +63,12 @@ function loadCronDb() {
         currentBatchCount: data.currentBatchCount || 0,
         messageTemplate: data.messageTemplate || '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
         stopOptOut: data.stopOptOut !== undefined ? data.stopOptOut : true,
+        attachment: data.attachment || {
+          enabled: false,
+          fileName: 'Sample.pdf',
+          mimetype: 'application/pdf',
+          filePath: 'uploads/Sample.pdf'
+        },
         contacts: Array.isArray(data.contacts) ? data.contacts : [],
         offDates: Array.isArray(data.offDates) ? data.offDates : [],
         dateSchedule: Array.isArray(data.dateSchedule) ? data.dateSchedule : [],
@@ -94,6 +100,12 @@ function loadCronDb() {
     currentBatchCount: 0,
     messageTemplate: '{નમસ્તે|હેલો} {name} જી,\n\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\n\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\n\nઆભાર,\nMindNext Team',
     stopOptOut: true,
+    attachment: {
+      enabled: false,
+      fileName: 'Sample.pdf',
+      mimetype: 'application/pdf',
+      filePath: 'uploads/Sample.pdf'
+    },
     contacts: [],
     dateSchedule: [],
     nextTickTimestamp: null,
@@ -246,6 +258,27 @@ function formatPhoneToJid(phone) {
   return clean + '@s.whatsapp.net';
 }
 
+/**
+ * Resolve attachment file path safely
+ */
+function resolveAttachmentPath(attachment) {
+  if (!attachment) return null;
+  const candidatePaths = [
+    attachment.filePath,
+    path.join(__dirname, attachment.filePath || ''),
+    path.join(__dirname, 'uploads', attachment.fileName || ''),
+    path.join(__dirname, 'uploads', path.basename(attachment.filePath || '')),
+    path.join(__dirname, 'Sample.pdf'),
+    path.join(__dirname, 'uploads', 'Sample.pdf'),
+    path.join(__dirname, '..', 'Sample.pdf')
+  ].filter(Boolean);
+
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
 // -------------------------------------------------------------
 // BACKEND CRON ENGINE (RUNS HEADLESSLY EVEN IF TABS ARE CLOSED)
 // -------------------------------------------------------------
@@ -390,7 +423,25 @@ function scheduleNextBackendTick() {
       log(`⚡ [બેકગ્રાઉન્ડ ઓટો-મોકલ] ${nextContact.name} (${jid})...`, 'info');
 
       if (connectionStatus === 'connected' && sock) {
-        const result = await sock.sendMessage(jid, { text: msgText });
+        let result;
+        const attachment = cronDb.attachment;
+        if (attachment && attachment.enabled) {
+          const docPath = resolveAttachmentPath(attachment);
+          if (docPath && fs.existsSync(docPath)) {
+            const buffer = fs.readFileSync(docPath);
+            result = await sock.sendMessage(jid, {
+              document: buffer,
+              mimetype: attachment.mimetype || 'application/pdf',
+              fileName: attachment.fileName || 'Sample.pdf',
+              caption: msgText
+            });
+            log(`📎 [PDF Document સાથે મોકલાયું] ${attachment.fileName || 'Sample.pdf'} to ${nextContact.name} (${nextContact.phone})`, 'info');
+          } else {
+            result = await sock.sendMessage(jid, { text: msgText });
+          }
+        } else {
+          result = await sock.sendMessage(jid, { text: msgText });
+        }
         const messageId = result?.key?.id || ('MN_' + Date.now());
 
         nextContact.status = 'sent';
@@ -713,6 +764,7 @@ const server = http.createServer(async (req, res) => {
         if (payload.todayQuota !== undefined) cronDb.todayQuota = parseInt(payload.todayQuota, 10);
         if (payload.messageTemplate !== undefined) cronDb.messageTemplate = payload.messageTemplate;
         if (payload.stopOptOut !== undefined) cronDb.stopOptOut = Boolean(payload.stopOptOut);
+        if (payload.attachment !== undefined) cronDb.attachment = payload.attachment;
         if (Array.isArray(payload.offDates)) cronDb.offDates = payload.offDates;
         if (Array.isArray(payload.dateSchedule)) cronDb.dateSchedule = payload.dateSchedule;
 
@@ -861,10 +913,33 @@ const server = http.createServer(async (req, res) => {
         const jid = formatPhoneToJid(phone);
         log(`સિંગલ મેસેજ મોકલી રહ્યા છીએ: ${jid} (મોકલનાર: ${sender || connectedPhone || 'Default'})`, 'info');
 
-        const result = await sock.sendMessage(jid, { text: message });
-        const messageId = result?.key?.id || ('MN_' + Date.now());
+        let result;
+        const attachment = payload.attachment || cronDb.attachment;
+        let docBuffer = null;
+        if (attachment && attachment.enabled) {
+          if (payload.attachmentBase64) {
+            docBuffer = Buffer.from(payload.attachmentBase64.replace(/^data:.*?;base64,/, ''), 'base64');
+          } else {
+            const docPath = resolveAttachmentPath(attachment);
+            if (docPath && fs.existsSync(docPath)) {
+              docBuffer = fs.readFileSync(docPath);
+            }
+          }
+        }
 
-        log(`✅ મેસેજ સફળતાપૂર્વક ડિલિવર થયો! Recipient: ${jid} (ID: ${messageId})`, 'success');
+        if (docBuffer) {
+          result = await sock.sendMessage(jid, {
+            document: docBuffer,
+            mimetype: attachment.mimetype || 'application/pdf',
+            fileName: attachment.fileName || 'Sample.pdf',
+            caption: message
+          });
+          log(`📎 [PDF Document સાથે સફળતાપૂર્વક મોકલાયું] ${attachment.fileName || 'Sample.pdf'} to ${jid}`, 'success');
+        } else {
+          result = await sock.sendMessage(jid, { text: message });
+          log(`✅ મેસેજ સફળતાપૂર્વક ડિલિવર થયો! Recipient: ${jid}`, 'success');
+        }
+        const messageId = result?.key?.id || ('MN_' + Date.now());
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -882,6 +957,56 @@ const server = http.createServer(async (req, res) => {
       }
     });
     return;
+  }
+
+  // Upload Attachment API (for custom PDF / documents)
+  if (req.method === 'POST' && pathname === '/api/upload') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const fileName = (payload.fileName || 'Sample.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
+        const base64Data = (payload.base64 || '').replace(/^data:.*?;base64,/, '');
+        if (!base64Data) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'No base64 file data provided' }));
+          return;
+        }
+        const uploadsDir = path.join(__dirname, 'uploads');
+        if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+        const targetPath = path.join(uploadsDir, fileName);
+        fs.writeFileSync(targetPath, Buffer.from(base64Data, 'base64'));
+        const size = fs.statSync(targetPath).size;
+        log(`📎 નવી ફાઇલ અપલોડ થઈ: ${fileName} (${(size / 1024).toFixed(1)} KB)`, 'success');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          fileName,
+          filePath: 'uploads/' + fileName,
+          size,
+          url: 'http://localhost:3001/uploads/' + fileName
+        }));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // Static uploads serving (e.g. /uploads/Sample.pdf)
+  if (req.method === 'GET' && pathname.startsWith('/uploads/')) {
+    const filename = path.basename(pathname);
+    const filepath = path.join(__dirname, 'uploads', filename);
+    if (fs.existsSync(filepath)) {
+      res.writeHead(200, {
+        'Content-Type': filename.endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream',
+        'Content-Disposition': 'inline; filename="' + filename + '"'
+      });
+      fs.createReadStream(filepath).pipe(res);
+      return;
+    }
   }
 
   // 10. Web UI Dashboard on http://localhost:3001/

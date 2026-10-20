@@ -241,6 +241,243 @@ function processMarketing() {
 
   html = html.replace(/<div class="nav-actions">[\s\S]*?<\/div>/, navActions);
 
+  // Upgrade TAB 2 with PDF Attachment Card & Doctor Research Presets
+  const newTab2Html = `<!-- TAB 2: Message Template & PDF Attachment -->
+            <div class="tab-content" id="tab-message">
+              <!-- Quick Presets -->
+              <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.76rem; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #34d399; font-weight: 600;" onclick="loadDoctorPreset()">
+                  🩺 Doctor Research Pitch + Sample.pdf (User Requested)
+                </button>
+                <button type="button" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.76rem;" onclick="loadGeneralPreset()">
+                  💼 MindNext Cloud &amp; IT Pitch
+                </button>
+              </div>
+
+              <!-- PDF Document Attachment Box -->
+              <div style="background: var(--bg-card-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                  <div>
+                    <strong style="font-size: 0.9rem; color: #fff;">દસ્તાવેજ જોડાણ (Attach PDF Document)</strong>
+                    <p style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">મેસેજ સાથે WhatsApp પર Sample.pdf અથવા કોઈપણ કસ્ટમ PDF સીધી મોકલવા માટે.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="attachmentToggle" class="toggle-input" checked onchange="onAttachmentToggleChange()">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+
+                <div id="attachmentDetailsBox" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #080c14; border-radius: 8px; border: 1px solid #1e2436; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="background: #e11d48; color: #fff; font-weight: 800; font-size: 0.65rem; padding: 4px 6px; border-radius: 4px; letter-spacing: 0.5px;">PDF</div>
+                    <div>
+                      <div style="font-weight: 600; font-size: 0.85rem; color: #f8fafc;" id="attachedFileName">Sample.pdf</div>
+                      <div style="font-size: 0.72rem; color: #34d399;" id="attachedFileSize">તૈયાર છે &bull; Medical Research Digest Sample (4 MB)</div>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="file" id="customFileInput" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleCustomPdfUpload(event)">
+                    <button type="button" class="btn btn-secondary" style="width: auto; padding: 5px 9px; font-size: 0.72rem;" onclick="document.getElementById('customFileInput').click()">📂 નવી PDF બદલો</button>
+                    <button type="button" class="btn btn-secondary" style="width: auto; padding: 5px 9px; font-size: 0.72rem;" onclick="useDefaultSamplePdf()">🔄 Reset Sample.pdf</button>
+                    <a href="http://localhost:3001/uploads/Sample.pdf" target="_blank" class="btn btn-secondary" id="previewPdfBtn" style="width: auto; padding: 5px 9px; font-size: 0.72rem; text-decoration: none; color: #fff;">👁️ View PDF</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message / Caption Textarea -->
+              <div class="form-group">
+                <label class="form-label">
+                  મેસેજ / કેપ્શન લખાણ (Message Caption: {name}, {phone} સપોર્ટેડ)
+                  <span class="form-hint">WhatsApp માં PDF ની નીચે કેપ્શન તરીકે દેખાશે</span>
+                </label>
+                <textarea class="form-control" id="messageTemplate" style="min-height: 160px;" oninput="onSettingFieldChange()">Good AfterNoon Doctor {name},
+
+I hope you are doing well.
+
+We provide the *latest medical research articles* along with *concise, easy-to-read summaries* tailored to your specialization. This helps you stay updated with global studies while saving your valuable time.
+
+📄 I would be happy to share a *complimentary sample* for your review. Kindly let me know if you would like to receive it.
+
+Thank you.
+
+Best Regards,
+*MindNext Team*</textarea>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 12px; background: var(--bg-card-subtle); border-radius: 10px; border: 1px solid var(--border-color);">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="stopOptOutToggle" class="toggle-input" onchange="onSettingFieldChange()">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+                <div>
+                  <strong style="font-size: 0.85rem; color: #fff;">Anti-Ban 'STOP' ફૂટર જોડો</strong>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">મેસેજના અંતે <em>"જો આપ આ મેસેજ ફરી ન મેળવવા માંગતા હોવ તો STOP લખી મોકલો."</em> ઉમેરશે.</p>
+                </div>
+              </div>
+            </div>`;
+
+  html = html.replace(/<!-- TAB 2: Message Template -->[\s\S]*?<!-- TAB 3: Script -->/, newTab2Html + '\n\n            <!-- TAB 3: Script -->');
+
+  // Inject state.attachment in JavaScript
+  html = html.replace(/var state = \{/, `var state = {
+        attachment: {
+          enabled: true,
+          fileName: 'Sample.pdf',
+          mimetype: 'application/pdf',
+          filePath: 'uploads/Sample.pdf',
+          fileSize: '4 MB',
+          base64: null
+        },`);
+
+  // Inject attachment helper functions
+  const attachmentJsFunctions = `
+      // --- PDF ATTACHMENT & DOCTOR RESEARCH PRESETS ---
+      window.loadDoctorPreset = function () {
+        var msg = "Good AfterNoon Doctor {name},\\n\\nI hope you are doing well.\\n\\nWe provide the *latest medical research articles* along with *concise, easy-to-read summaries* tailored to your specialization. This helps you stay updated with global studies while saving your valuable time.\\n\\n📄 I would be happy to share a *complimentary sample* for your review. Kindly let me know if you would like to receive it.\\n\\nThank you.\\n\\nBest Regards,\\n*MindNext Team*";
+        if (document.getElementById('messageTemplate')) {
+          document.getElementById('messageTemplate').value = msg;
+        }
+        state.attachment.enabled = true;
+        state.attachment.fileName = 'Sample.pdf';
+        state.attachment.filePath = 'uploads/Sample.pdf';
+        if (document.getElementById('attachmentToggle')) {
+          document.getElementById('attachmentToggle').checked = true;
+        }
+        if (document.getElementById('attachedFileName')) {
+          document.getElementById('attachedFileName').textContent = 'Sample.pdf';
+        }
+        if (document.getElementById('attachedFileSize')) {
+          document.getElementById('attachedFileSize').textContent = 'તૈયાર છે • Medical Research Digest Sample (4 MB)';
+        }
+        if (document.getElementById('attachmentDetailsBox')) {
+          document.getElementById('attachmentDetailsBox').style.display = 'flex';
+        }
+        onSettingFieldChange();
+        showLiveToast('🩺 Doctor Research Pitch + Sample.pdf ટેમ્પલેટ લોડ થયું!', 'success');
+      };
+
+      window.loadGeneralPreset = function () {
+        var msg = "{નમસ્તે|હેલો} {name} જી,\\n\\nMindNext Technologies તરફથી આપનું હાર્દિક સ્વાગત છે. અમારી નવી ક્લાઉડ અને આઈટી સર્વિસ અંગે આપને માહિતગાર કરવા આ સંદેશ પાઠવ્યો છે.\\n\\nઆપ વધુ વિગત માટે અમારી સાઇટ mindnext.in જોઈ શકો છો.\\n\\nઆભાર,\\nMindNext Team";
+        if (document.getElementById('messageTemplate')) {
+          document.getElementById('messageTemplate').value = msg;
+        }
+        state.attachment.enabled = false;
+        if (document.getElementById('attachmentToggle')) {
+          document.getElementById('attachmentToggle').checked = false;
+        }
+        if (document.getElementById('attachmentDetailsBox')) {
+          document.getElementById('attachmentDetailsBox').style.display = 'none';
+        }
+        onSettingFieldChange();
+        showLiveToast('💼 સામાન્ય IT માર્કેટિંગ ટેમ્પલેટ લોડ થયું.', 'info');
+      };
+
+      window.onAttachmentToggleChange = function () {
+        var toggle = document.getElementById('attachmentToggle');
+        var box = document.getElementById('attachmentDetailsBox');
+        state.attachment.enabled = toggle ? toggle.checked : false;
+        if (box) {
+          box.style.display = state.attachment.enabled ? 'flex' : 'none';
+        }
+        onSettingFieldChange();
+      };
+
+      window.useDefaultSamplePdf = function () {
+        state.attachment.fileName = 'Sample.pdf';
+        state.attachment.filePath = 'uploads/Sample.pdf';
+        state.attachment.base64 = null;
+        if (document.getElementById('attachedFileName')) {
+          document.getElementById('attachedFileName').textContent = 'Sample.pdf';
+        }
+        if (document.getElementById('attachedFileSize')) {
+          document.getElementById('attachedFileSize').textContent = 'તૈયાર છે • Medical Research Digest Sample (4 MB)';
+        }
+        if (document.getElementById('previewPdfBtn')) {
+          document.getElementById('previewPdfBtn').href = 'http://localhost:3001/uploads/Sample.pdf';
+        }
+        onSettingFieldChange();
+        showLiveToast('🔄 ડિફોલ્ટ Sample.pdf સેટ કરવામાં આવ્યું.', 'info');
+      };
+
+      window.handleCustomPdfUpload = async function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = async function (evt) {
+          var base64 = evt.target.result;
+          state.attachment.fileName = file.name;
+          state.attachment.mimetype = file.type || 'application/pdf';
+          state.attachment.base64 = base64;
+          if (document.getElementById('attachedFileName')) {
+            document.getElementById('attachedFileName').textContent = file.name;
+          }
+          if (document.getElementById('attachedFileSize')) {
+            document.getElementById('attachedFileSize').textContent = 'અપલોડ થઈ રહ્યું છે... (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+          }
+          try {
+            var res = await fetch('http://localhost:3001/api/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fileName: file.name, base64: base64 })
+            });
+            if (res.ok) {
+              var data = await res.json();
+              state.attachment.filePath = data.filePath;
+              if (document.getElementById('attachedFileSize')) {
+                document.getElementById('attachedFileSize').textContent = 'સફળતાપૂર્વક અપલોડ થયેલ • ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+              }
+              if (document.getElementById('previewPdfBtn')) {
+                document.getElementById('previewPdfBtn').href = data.url || ('http://localhost:3001/' + data.filePath);
+              }
+              showLiveToast('✅ ' + file.name + ' સફળતાપૂર્વક અપલોડ થઈ!', 'success');
+            }
+          } catch (err) {
+            console.warn('Upload error, sending base64 direct:', err);
+          }
+          onSettingFieldChange();
+        };
+        reader.readAsDataURL(file);
+      };
+  `;
+
+  html = html.replace(/var CIRCLE_CIRCUMFERENCE = 440;/, attachmentJsFunctions + '\n      var CIRCLE_CIRCUMFERENCE = 440;');
+
+  // Update applySettingsToDOM to restore attachment
+  html = html.replace(/if \(saved\.messageTemplate !== undefined/, `if (saved.attachment !== undefined && state.attachment) {
+          state.attachment = saved.attachment;
+          var attToggle = document.getElementById('attachmentToggle');
+          if (attToggle) attToggle.checked = Boolean(state.attachment.enabled);
+          var box = document.getElementById('attachmentDetailsBox');
+          if (box) box.style.display = state.attachment.enabled ? 'flex' : 'none';
+          var nameEl = document.getElementById('attachedFileName');
+          if (nameEl) nameEl.textContent = state.attachment.fileName || 'Sample.pdf';
+        }
+        if (saved.messageTemplate !== undefined`);
+
+  // Update syncStateToBackend to include attachment
+  html = html.replace(/stopOptOut:\s*document\.getElementById\('stopOptOutToggle'\)\s*\?\s*document\.getElementById\('stopOptOutToggle'\)\.checked\s*:\s*true/, `stopOptOut: document.getElementById('stopOptOutToggle') ? document.getElementById('stopOptOutToggle').checked : true,
+            attachment: state.attachment`);
+
+  // Update auto-dispatch loop payload
+  html = html.replace(/sender:\s*state\.senderNumber\s*\}/, `sender: state.senderNumber,
+                attachment: state.attachment,
+                attachmentBase64: state.attachment?.base64
+              }`);
+
+  // Update testSingleBtn click payload
+  html = html.replace(/body:\s*JSON\.stringify\(\{\s*phone:\s*clean,\s*message:\s*msg,\s*sender:\s*state\.senderNumber\s*\}\)/, `body: JSON.stringify({
+                phone: clean,
+                message: msg,
+                sender: state.senderNumber,
+                attachment: state.attachment,
+                attachmentBase64: state.attachment?.base64
+              })`);
+
+  // Update startCron payload
+  html = html.replace(/body:\s*JSON\.stringify\(\{\s*contacts:\s*state\.contacts,/, `body: JSON.stringify({
+                contacts: state.contacts,
+                attachment: state.attachment,`);
+
   // Add DB Polling script before </script>
   if (!html.includes('checkMongoConnection')) {
     html = html.replace(/<\/script>\s*<\/body>/i, DB_POLL_SCRIPT + '\n  </script>\n</body>');
