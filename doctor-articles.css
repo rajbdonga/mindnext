@@ -7,8 +7,42 @@
 /* ============ 1. PORTAL LAYOUT & WIZARD WRAPPER ============ */
 .portal-main-wrap {
   background: linear-gradient(180deg, #F8FAFD 0%, #FFFFFF 100%);
-  min-height: calc(100vh - var(--header-h));
-  padding: calc(var(--header-h) + 28px) 0 80px;
+  min-height: 100vh;
+  padding: 36px 0 80px;
+}
+
+.portal-brand-row {
+  max-width: 960px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.portal-brand-logo {
+  height: 34px;
+  width: auto;
+  display: block;
+}
+
+.portal-help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F2D59;
+  text-decoration: none;
+  background: #FFFFFF;
+  border: 1px solid #DCE6F1;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.portal-help-link:hover {
+  background: #F1F5F9;
+  border-color: #0F2D59;
 }
 
 .portal-container {
