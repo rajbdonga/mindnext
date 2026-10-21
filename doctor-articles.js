@@ -37,18 +37,7 @@
     4: document.getElementById('stepPanel4')
   };
 
-  var stepIndicators = {
-    1: document.getElementById('stepIndicator1'),
-    2: document.getElementById('stepIndicator2'),
-    3: document.getElementById('stepIndicator3'),
-    4: document.getElementById('stepIndicator4')
-  };
 
-  var connectors = {
-    1: document.getElementById('connector1'),
-    2: document.getElementById('connector2'),
-    3: document.getElementById('connector3')
-  };
 
   // Step 1 Elements
   var agreementCheckbox = document.getElementById('agreementCheckbox');
@@ -113,31 +102,7 @@
 
     portalState.currentStep = stepNumber;
 
-    // Update Progress Indicator
-    for (var j = 1; j <= 4; j++) {
-      var ind = stepIndicators[j];
-      if (!ind) continue;
 
-      ind.classList.remove('is-active', 'is-completed', 'is-clickable');
-
-      if (j < stepNumber) {
-        ind.classList.add('is-completed', 'is-clickable');
-      } else if (j === stepNumber) {
-        ind.classList.add('is-active');
-      }
-    }
-
-    // Update Wizard Progress Bar: Remove completely on Step 1 (Consent Agreement), show on Steps 2-4
-    var wizardBar = document.querySelector('.wizard-progress-bar');
-    if (wizardBar) {
-      if (stepNumber === 1) {
-        wizardBar.style.display = 'none';
-        document.body.classList.add('step-1-active');
-      } else {
-        wizardBar.style.display = 'block';
-        document.body.classList.remove('step-1-active');
-      }
-    }
 
     // Scroll smoothly to top of portal container
     var portalTop = document.querySelector('.portal-main-wrap');
@@ -149,19 +114,7 @@
     }
   }
 
-  // Clickable past step indicators
-  for (var s = 1; s <= 4; s++) {
-    (function (stepIdx) {
-      var item = stepIndicators[stepIdx];
-      if (item) {
-        item.addEventListener('click', function () {
-          if (stepIdx < portalState.currentStep && portalState.currentStep !== 4) {
-            goToStep(stepIdx);
-          }
-        });
-      }
-    })(s);
-  }
+
 
   /* ============ 2. STEP 1: AGREEMENT & COPYRIGHT ============ */
   if (agreementCheckbox && btnStep1Next) {
