@@ -127,14 +127,15 @@
       }
     }
 
-    // Update Connectors
-    for (var k = 1; k <= 3; k++) {
-      var conn = connectors[k];
-      if (!conn) continue;
-      if (k < stepNumber) {
-        conn.classList.add('is-active');
+    // Update Wizard Progress Bar: Remove completely on Step 1 (Consent Agreement), show on Steps 2-4
+    var wizardBar = document.querySelector('.wizard-progress-bar');
+    if (wizardBar) {
+      if (stepNumber === 1) {
+        wizardBar.style.display = 'none';
+        document.body.classList.add('step-1-active');
       } else {
-        conn.classList.remove('is-active');
+        wizardBar.style.display = 'block';
+        document.body.classList.remove('step-1-active');
       }
     }
 
